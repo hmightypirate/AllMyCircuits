@@ -1,6 +1,6 @@
 [Default]
-bears = SpaceConsistencyBear, LineLengthBear, ClangBear 
-files = *.c, 
+bears = SpaceConsistencyBear, LineLengthBear 
+files = *.c, */*/*.c
 use_spaces = yeah
 ignore = 
 
