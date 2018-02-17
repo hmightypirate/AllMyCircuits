@@ -1,6 +1,15 @@
-# Bluepill test
+# All My Circuits
 
 This repository is intended to serve as a base to build project for cheap chinese _Bluepill_ boards based on STM32F103C8T6 Cortex M3 processor. We use [libopencm3](https://github.com/libopencm3/libopencm3) as our main library and flash the boards with a simple USB to serial converter using [stm32loader.py](https://github.com/jsnyder/stm32loader).
+
+# Initial setup
+
+Initialise submodules
+
+```
+
+```
+
 
 # Toolchain Installation
 
