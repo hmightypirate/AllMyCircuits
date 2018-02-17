@@ -1,9 +1,9 @@
 [Default]
 bears = SpaceConsistencyBear, LineLengthBear, ClangBear 
-files = *.c
+files = *.c, 
 use_spaces = yeah
 ignore = 
 
 [Makefiles]
 bears = LineLengthBear
-files = Makefile
+files = rules.mk, */*/Makefile
