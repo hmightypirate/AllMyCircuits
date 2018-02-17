@@ -7,9 +7,10 @@ This repository is intended to serve as a base to build project for cheap chines
 Initialise submodules
 
 ```
+git submodule init
+git submodule update
 
 ```
-
 
 # Toolchain Installation
 
