@@ -1,6 +1,6 @@
 # All My Circuits
 
-This repository is intended to serve as a base to build project for cheap chinese _Bluepill_ boards based on STM32F103C8T6 Cortex M3 processor. We use [libopencm3](https://github.com/libopencm3/libopencm3) as our main library and flash the boards with a simple USB to serial converter using [stm32loader.py](https://github.com/jsnyder/stm32loader).
+This repository is intended to serve as a base project to build firmwares for cheap chinese _Bluepill_ boards based on STM32F103C8T6 Cortex M3 processor. We use [libopencm3](https://github.com/libopencm3/libopencm3) as our main library and flash the boards with a simple USB to serial converter using [stm32loader.py](https://github.com/jsnyder/stm32loader).
 
 # Initial setup
 
@@ -36,7 +36,7 @@ A10 | TXD
 
 Note that in order to flash a binary firmware it is necessary to configure the BOOT0 jumper in position 1 as shown in the following picture:
 
-![Alt text](img/ftdi_wiring.jpg?raw=true "FTDI wiring to flash firmware" | width=100)
+<img src="img/ftdi_wiring.jpg" width="50%">
 
 To talk to the board you can use a python script called _stm32loader.py_:
 
