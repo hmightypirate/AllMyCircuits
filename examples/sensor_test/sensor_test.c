@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <unistd.h>
 
+#define WAIT_NUMBER 80 // for a relevant wait time amount write 800000 or more
 
 int _write(int file, char *ptr, int len)
 {
@@ -63,7 +64,7 @@ static void usart_setup(void)
 		      GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
 
 	/* Setup UART parameters. */
-	usart_set_baudrate(USART1, 38400);
+	usart_set_baudrate(USART1, 115200);
 	usart_set_databits(USART1, 8);
 	usart_set_stopbits(USART1, USART_STOPBITS_1);
 	usart_set_mode(USART1, USART_MODE_TX);
@@ -81,10 +82,20 @@ static void adc_setup(void)
 
         gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
 		      GPIO_CNF_INPUT_ANALOG, GPIO0);
-
         gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
 		      GPIO_CNF_INPUT_ANALOG, GPIO1);
-	
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
+		      GPIO_CNF_INPUT_ANALOG, GPIO2);
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
+		      GPIO_CNF_INPUT_ANALOG, GPIO3);
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
+		      GPIO_CNF_INPUT_ANALOG, GPIO4);
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
+		      GPIO_CNF_INPUT_ANALOG, GPIO5);
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
+		      GPIO_CNF_INPUT_ANALOG, GPIO6);
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
+		      GPIO_CNF_INPUT_ANALOG, GPIO7);
 
 	/* Make sure the ADC doesn't run during config. */
 	adc_power_off(ADC1);
@@ -144,10 +155,18 @@ int main(void)
 	 
                 uint16_t input_adc0 = read_adc_naiive(0);
                 uint16_t input_adc1 = read_adc_naiive(1);
+                uint16_t input_adc2 = read_adc_naiive(2);
+                uint16_t input_adc3 = read_adc_naiive(3);
+                uint16_t input_adc4 = read_adc_naiive(4);
+                uint16_t input_adc5 = read_adc_naiive(5);
+                uint16_t input_adc6 = read_adc_naiive(6);
+                uint16_t input_adc7 = read_adc_naiive(7);
 
-                printf("adc0 %d adc1 %d\n", input_adc0, input_adc1);
-                
-		for (i = 0; i < 800000; i++)	/* Wait a bit. */
+                printf("CH0 %d CH1 %d CH2 %d CH3 %d CH4 %d CH5 %d CH6 %d CH7 %d\n"
+                    , input_adc0, input_adc1, input_adc2, input_adc3
+		    , input_adc4, input_adc5, input_adc6, input_adc7);
+
+		for (i = 0; i < WAIT_NUMBER; i++)	/* Wait a bit. */
 			__asm__("nop");
 	}
 
