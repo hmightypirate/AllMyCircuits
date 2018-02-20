@@ -3,3 +3,7 @@
 *.o
 *.d
 #
+stm32loader.py
+.cproject
+.project
+
