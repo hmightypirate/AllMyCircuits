@@ -6,4 +6,5 @@
 stm32loader.py
 .cproject
 .project
+.settings
 
