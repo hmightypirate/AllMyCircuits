@@ -2,7 +2,7 @@
 bears = SpaceConsistencyBear, LineLengthBear 
 files = *.c, */*/*.c
 use_spaces = yeah
-ignore = 
+ignore = *.c.orig
 
 [Makefiles]
 bears = LineLengthBear
