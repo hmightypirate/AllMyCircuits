@@ -7,7 +7,7 @@ void gpio_setup(void) {
     rcc_periph_clock_enable(RCC_GPIOB);
 
     /* Control GPIOs configuration for left motor */
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
             GPIO12 | GPIO13);
 
     /* Enable GPIOC clock (For internal LED */
@@ -82,17 +82,18 @@ int main(void) {
     pwm_setup();
 
     /* Configure motor for forward */
-    gpio_set(GPIOB, GPIO12 | GPIO13);
+    gpio_set(GPIOB, GPIO12);
+    gpio_clear(GPIOB, GPIO13);
 
-    timer_set_oc_value(TIM4, TIM_OC3, 51); // 5% duty
-    timer_set_oc_value(TIM4, TIM_OC4, 51);
+    timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
+    timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
 
     while (1) {
         gpio_set(GPIOC, GPIO13);
         for (int i = 0; i < 1000000; ++i)
             __asm__("nop");
         gpio_clear(GPIOC, GPIO13);
-        for (int i = 0; i < 1000000; ++i)
+        for (int i = 0; i < 10000000; ++i)
             __asm__("nop");
     }
 
