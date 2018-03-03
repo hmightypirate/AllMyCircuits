@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
@@ -19,7 +20,8 @@ void gpio_setup(void) {
     /* Set internal LED */
     gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
             GPIO13);
-    
+
+    rcc_periph_clock_enable(RCC_GPIOA);
 }
 
 
@@ -39,6 +41,20 @@ static void usart_setup(void) {
     /* Finally enable the USART. */
     usart_enable(USART1);
 
+
+    
+}
+
+static void setup_timer1(void)
+{
+  rcc_periph_reset_pulse(RST_TIM1);
+  timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE,
+                 TIM_CR1_DIR_UP);
+  timer_set_clock_division(TIM1, 0x00);
+  timer_set_prescaler(TIM1, (rcc_apb2_frequency / 160000 - 1));
+  timer_set_period(TIM1, 10 - 1);
+  timer_enable_counter(TIM1);
+  timer_enable_irq(TIM1, TIM_DIER_UIE);
 }
 
 
@@ -47,20 +63,22 @@ void encoder_setup()
 
   /* Enable GPIO for encoder */
     rcc_periph_clock_enable(RCC_TIM2);
-
-  
+    
     /* No reset clock */
     timer_set_period(TIM2, 0xFFFF);
 
     /* encoders in quadrature  */
     timer_slave_set_mode(TIM2, TIM_SMCR_SMS_EM3);
 
+    /* Disable preload. */
+    
     /* set input channels  */
     timer_ic_set_input(TIM2, TIM_IC1, TIM_IC_IN_TI1);
     timer_ic_set_input(TIM2, TIM_IC2, TIM_IC_IN_TI2);
 
     /* enable counter */
     timer_enable_counter(TIM2);
+
 }
 
 
@@ -129,6 +147,7 @@ int main(void) {
     pwm_setup();
     usart_setup();
     encoder_setup();
+    setup_timer1();
 
     /* Configure motor for forward */
     gpio_set(GPIOB, GPIO12);
