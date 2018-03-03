@@ -166,7 +166,7 @@ int main(void) {
 
         /* read timer 2 */
 
-        uint16_t read_count = (uint16_t)timer_get_counter(TIM1);
+        uint16_t read_count = (uint16_t)timer_get_counter(TIM2);
         char welcome[20];
         sprintf(welcome, "%x\n", read_count);
 
