@@ -7,8 +7,6 @@
 #include <libopencm3/stm32/usart.h>
 
 
-#define WAIT_1  5
-#define WAIT_2  10
 
 void gpio_setup(void) {
     /* Enable GPIOB clock (for PWM and control pins) */
@@ -47,20 +45,6 @@ static void usart_setup(void) {
 
 
     
-}
-
-static void setup_timer1(void)
-{
-
-  rcc_periph_clock_enable(RCC_TIM1);
-  rcc_periph_reset_pulse(RST_TIM1);
-  timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE,
-                 TIM_CR1_DIR_UP);
-  timer_set_clock_division(TIM1, 0x00);
-  timer_set_prescaler(TIM1, (rcc_apb2_frequency / 160000 - 1));
-  timer_set_period(TIM1, 10 - 1);
-  timer_enable_counter(TIM1);
-  timer_enable_irq(TIM1, TIM_DIER_UIE);
 }
 
 
@@ -161,64 +145,39 @@ int main(void) {
     pwm_setup();
     usart_setup();
     encoder_setup();
-    //setup_timer1();
 
     /* Configure motor for forward */
     gpio_set(GPIOB, GPIO12);
     gpio_clear(GPIOB, GPIO13);
 
-    timer_set_oc_value(TIM4, TIM_OC3, 0); // 10% duty for left motor
+    timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
     timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
 
     uint16_t read_count = 0;
-    uint16_t flux = 0;
-    uint16_t max_flux = WAIT_1;
     uint16_t old_read_count = 0;
     
     while (1) {
         gpio_set(GPIOC, GPIO13);
-        for (int i = 0; i < 1000000; ++i)
+        for (int i = 0; i < 100000; ++i)
             __asm__("nop");
         gpio_clear(GPIOC, GPIO13);
-        for (int i = 0; i < 1000000; ++i)
+        for (int i = 0; i < 100000; ++i)
             __asm__("nop");
 
         /* read timer 2 */
-        if (flux == max_flux) {
-          read_count = (uint16_t)timer_get_counter(TIM2);
+        read_count = (uint16_t)timer_get_counter(TIM2);
 
-          char welcome[20];
-          sprintf(welcome, "%u\n", read_count);
+        char diff_encoder_count[20];
+        sprintf(diff_encoder_count, "%u\n", old_read_count - read_count);
 
-          char mode[20];
-          sprintf(mode, "%u\n", max_flux);
+        for (int i = 0; i < strlen(diff_encoder_count); i++)
+          {
+            usart_send_blocking(USART1, diff_encoder_count[i]);
 
-          for (int i = 0; i < strlen(welcome); i++)
-            {
-              usart_send_blocking(USART1, welcome[i]);
+          }
 
-            }
-
-          for (int i = 0; i < strlen(mode); i++)
-            {
-              usart_send_blocking(USART1, mode[i]);
-
-            }
-
-          old_read_count = read_count;
+        old_read_count = read_count;
           
-          if (max_flux == WAIT_1) {
-              max_flux = WAIT_2;
-            }
-          else {
-              max_flux = WAIT_1;
-            }
-                      
-          
-          flux = 0;
-        }
-        
-        flux += 1;
     }
 
     return 0;
