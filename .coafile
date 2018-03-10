@@ -1,8 +1,10 @@
 [Default]
-bears = SpaceConsistencyBear, LineLengthBear 
+bears = SpaceConsistencyBear, LineLengthBear, ClangBear
 files = *.c, */*/*.c
-use_spaces = yeah
+use_spaces = True
+indent_size = 4
 ignore = *.c.orig
+allow_trailing_whitespace = False
 
 [Makefiles]
 bears = LineLengthBear

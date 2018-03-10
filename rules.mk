@@ -2,7 +2,6 @@ CROSS_COMPILE = arm-none-eabi-
 CC = $(CROSS_COMPILE)gcc
 OBJCOPY = $(CROSS_COMPILE)objcopy
 CPUFLAGS = -mcpu=cortex-m3 -mthumb
-
 LIBPATHS := ./libopencm3 ../../libopencm3 
 
 OPENCM3_DIR := $(wildcard $(LIBPATHS:=/locm3.sublime-project))

@@ -52,8 +52,8 @@ static void clock_setup(void)
     /* Enable clocks for GPIO port B (for GPIO_USART3_TX) and USART3. */
     rcc_periph_clock_enable(RCC_USART1);
 
-        /* Enable ADC Clock */
-        rcc_periph_clock_enable(RCC_ADC1);
+    /* Enable ADC Clock */
+    rcc_periph_clock_enable(RCC_ADC1);
 
 }
 
@@ -147,7 +147,7 @@ int main(void)
     clock_setup();
     gpio_setup();
     usart_setup();
-        adc_setup();
+    adc_setup();
 
     /* Blink the LED (PC12) on the board with every transmitted byte. */
     while (1) {

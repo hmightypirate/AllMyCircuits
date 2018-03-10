@@ -85,7 +85,7 @@ int main(void) {
     gpio_set(GPIOB, GPIO12);
     gpio_clear(GPIOB, GPIO13);
 
-    timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
+    timer_set_oc_value(TIM4, TIM_OC3, 50); // 10% duty for left motor
     timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
 
     while (1) {

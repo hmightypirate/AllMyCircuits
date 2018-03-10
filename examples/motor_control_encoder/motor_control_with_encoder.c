@@ -6,6 +6,10 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 
+
+#define WAIT_1  5
+#define WAIT_2  10
+
 void gpio_setup(void) {
     /* Enable GPIOB clock (for PWM and control pins) */
     rcc_periph_clock_enable(RCC_GPIOB);
@@ -47,6 +51,8 @@ static void usart_setup(void) {
 
 static void setup_timer1(void)
 {
+
+  rcc_periph_clock_enable(RCC_TIM1);
   rcc_periph_reset_pulse(RST_TIM1);
   timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE,
                  TIM_CR1_DIR_UP);
@@ -63,6 +69,13 @@ void encoder_setup()
 
   /* Enable GPIO for encoder */
     rcc_periph_clock_enable(RCC_TIM2);
+    rcc_periph_clock_enable(RCC_AFIO);
+
+    timer_reset(RCC_TIM2);
+    
+    /* TIM2 remap for the quadrature encoder */
+    gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
+                       AFIO_MAPR_TIM2_REMAP_FULL_REMAP);
     
     /* No reset clock */
     timer_set_period(TIM2, 0xFFFF);
@@ -71,14 +84,14 @@ void encoder_setup()
     timer_slave_set_mode(TIM2, TIM_SMCR_SMS_EM3);
 
     /* Disable preload. */
+
     
     /* set input channels  */
     timer_ic_set_input(TIM2, TIM_IC1, TIM_IC_IN_TI1);
     timer_ic_set_input(TIM2, TIM_IC2, TIM_IC_IN_TI2);
-
+    
     /* enable counter */
     timer_enable_counter(TIM2);
-
 }
 
 
@@ -143,41 +156,69 @@ void pwm_setup() {
 
 int main(void) {
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
+    
     gpio_setup();
     pwm_setup();
     usart_setup();
     encoder_setup();
-    setup_timer1();
+    //setup_timer1();
 
     /* Configure motor for forward */
     gpio_set(GPIOB, GPIO12);
     gpio_clear(GPIOB, GPIO13);
 
-    timer_set_oc_value(TIM4, TIM_OC3, 50); // 10% duty for left motor
+    timer_set_oc_value(TIM4, TIM_OC3, 0); // 10% duty for left motor
     timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
 
+    uint16_t read_count = 0;
+    uint16_t flux = 0;
+    uint16_t max_flux = WAIT_1;
+    uint16_t old_read_count = 0;
+    
     while (1) {
         gpio_set(GPIOC, GPIO13);
         for (int i = 0; i < 1000000; ++i)
             __asm__("nop");
         gpio_clear(GPIOC, GPIO13);
-        for (int i = 0; i < 10000000; ++i)
+        for (int i = 0; i < 1000000; ++i)
             __asm__("nop");
 
         /* read timer 2 */
+        if (flux == max_flux) {
+          read_count = (uint16_t)timer_get_counter(TIM2);
 
-        uint16_t read_count = (uint16_t)timer_get_counter(TIM2);
-        char welcome[20];
-        sprintf(welcome, "%x\n", read_count);
+          char welcome[20];
+          sprintf(welcome, "%u\n", read_count);
 
-        for (int i = 0; i < strlen(welcome); i++)
-          {
-            usart_send_blocking(USART1, welcome[i]);
+          char mode[20];
+          sprintf(mode, "%u\n", max_flux);
 
-          }
+          for (int i = 0; i < strlen(welcome); i++)
+            {
+              usart_send_blocking(USART1, welcome[i]);
 
+            }
+
+          for (int i = 0; i < strlen(mode); i++)
+            {
+              usart_send_blocking(USART1, mode[i]);
+
+            }
+
+          old_read_count = read_count;
           
+          if (max_flux == WAIT_1) {
+              max_flux = WAIT_2;
+            }
+          else {
+              max_flux = WAIT_1;
+            }
+                      
+          
+          flux = 0;
+        }
         
+        flux += 1;
     }
 
     return 0;
