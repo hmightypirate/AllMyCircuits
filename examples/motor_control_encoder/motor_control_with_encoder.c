@@ -13,18 +13,18 @@
 void gpio_setup(void) {
   /* Enable GPIOB clock (for PWM and control pins) */
   rcc_periph_clock_enable(RCC_GPIOB);
-  
+
   /* Control GPIOs configuration for left motor */
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 GPIO12 | GPIO13);
-  
+
   /* Enable GPIOC clock (For internal LED */
   rcc_periph_clock_enable(RCC_GPIOC);
 
   /* Set internal LED */
   gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 GPIO13);
-  
+
   /* Enable GPIO A: Usart */
   rcc_periph_clock_enable(RCC_GPIOA);
 }
@@ -51,7 +51,7 @@ static void usart_setup(void) {
 
 }
 
-/* 
+/*
  * @brief setup encoder using Timer 2
  */
 void encoder_setup()
@@ -62,11 +62,11 @@ void encoder_setup()
   rcc_periph_clock_enable(RCC_AFIO);
 
   timer_reset(RCC_TIM2);
-  
+
   /* TIM2 remap for the quadrature encoder */
   gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
                        AFIO_MAPR_TIM2_REMAP_FULL_REMAP);
-  
+
   /* No reset clock: full period */
   timer_set_period(TIM2, 0xFFFF);
 
@@ -76,7 +76,7 @@ void encoder_setup()
   /* set input channels  */
   timer_ic_set_input(TIM2, TIM_IC1, TIM_IC_IN_TI1);
   timer_ic_set_input(TIM2, TIM_IC2, TIM_IC_IN_TI2);
-    
+
   /* enable counter */
   timer_enable_counter(TIM2);
 }
@@ -147,7 +147,7 @@ void pwm_setup() {
 
 /*
  * @brief main function
- * 
+ *
  */
 int main(void) {
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
@@ -168,7 +168,7 @@ int main(void) {
 
     uint16_t read_count = 0;
     uint16_t old_read_count = 0;
-    
+
     while (1) {
       /* set the LED */
       gpio_set(GPIOC, GPIO13);
@@ -195,7 +195,7 @@ int main(void) {
         }
 
       old_read_count = read_count;
-          
+
     }
 
     return 0;
