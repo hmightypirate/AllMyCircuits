@@ -7,26 +7,32 @@
 #include <libopencm3/stm32/usart.h>
 
 
-
+/*
+ * @brief set gpio modes, enable gpio clocks
+ */
 void gpio_setup(void) {
-    /* Enable GPIOB clock (for PWM and control pins) */
-    rcc_periph_clock_enable(RCC_GPIOB);
+  /* Enable GPIOB clock (for PWM and control pins) */
+  rcc_periph_clock_enable(RCC_GPIOB);
+  
+  /* Control GPIOs configuration for left motor */
+  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO12 | GPIO13);
+  
+  /* Enable GPIOC clock (For internal LED */
+  rcc_periph_clock_enable(RCC_GPIOC);
 
-    /* Control GPIOs configuration for left motor */
-    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-            GPIO12 | GPIO13);
-
-    /* Enable GPIOC clock (For internal LED */
-    rcc_periph_clock_enable(RCC_GPIOC);
-
-    /* Set internal LED */
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-            GPIO13);
-
-    rcc_periph_clock_enable(RCC_GPIOA);
+  /* Set internal LED */
+  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO13);
+  
+  /* Enable GPIO A: Usart */
+  rcc_periph_clock_enable(RCC_GPIOA);
 }
 
 
+/*
+ * @brief setup usart
+ */
 static void usart_setup(void) {
 
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_INPUT_PULL_UPDOWN,
@@ -43,43 +49,44 @@ static void usart_setup(void) {
     /* Finally enable the USART. */
     usart_enable(USART1);
 
-
-    
 }
 
-
+/* 
+ * @brief setup encoder using Timer 2
+ */
 void encoder_setup()
 {
 
   /* Enable GPIO for encoder */
-    rcc_periph_clock_enable(RCC_TIM2);
-    rcc_periph_clock_enable(RCC_AFIO);
+  rcc_periph_clock_enable(RCC_TIM2);
+  rcc_periph_clock_enable(RCC_AFIO);
 
-    timer_reset(RCC_TIM2);
-    
-    /* TIM2 remap for the quadrature encoder */
-    gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
+  timer_reset(RCC_TIM2);
+  
+  /* TIM2 remap for the quadrature encoder */
+  gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
                        AFIO_MAPR_TIM2_REMAP_FULL_REMAP);
-    
-    /* No reset clock */
-    timer_set_period(TIM2, 0xFFFF);
+  
+  /* No reset clock: full period */
+  timer_set_period(TIM2, 0xFFFF);
 
-    /* encoders in quadrature  */
-    timer_slave_set_mode(TIM2, TIM_SMCR_SMS_EM3);
+  /* encoders in quadrature  */
+  timer_slave_set_mode(TIM2, TIM_SMCR_SMS_EM3);
 
-    /* Disable preload. */
-
+  /* set input channels  */
+  timer_ic_set_input(TIM2, TIM_IC1, TIM_IC_IN_TI1);
+  timer_ic_set_input(TIM2, TIM_IC2, TIM_IC_IN_TI2);
     
-    /* set input channels  */
-    timer_ic_set_input(TIM2, TIM_IC1, TIM_IC_IN_TI1);
-    timer_ic_set_input(TIM2, TIM_IC2, TIM_IC_IN_TI2);
-    
-    /* enable counter */
-    timer_enable_counter(TIM2);
+  /* enable counter */
+  timer_enable_counter(TIM2);
 }
 
-
-
+/*
+ * @brief set pwm for motor control
+ *
+ * It uses timer 4 for controlling two engines with the same PWM
+ *
+ */
 void pwm_setup() {
     /* The speed control pin accepts a PWM input with a frequency of up to
      * 100 kHz */
@@ -138,9 +145,14 @@ void pwm_setup() {
     timer_enable_counter(TIM4);
 }
 
+/*
+ * @brief main function
+ * 
+ */
 int main(void) {
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
-    
+
+    /* Initial setup */
     gpio_setup();
     pwm_setup();
     usart_setup();
@@ -150,6 +162,7 @@ int main(void) {
     gpio_set(GPIOB, GPIO12);
     gpio_clear(GPIOB, GPIO13);
 
+    /* this value is the time each engine is active : max value is 1024 */
     timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
     timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
 
@@ -157,26 +170,31 @@ int main(void) {
     uint16_t old_read_count = 0;
     
     while (1) {
-        gpio_set(GPIOC, GPIO13);
-        for (int i = 0; i < 100000; ++i)
-            __asm__("nop");
-        gpio_clear(GPIOC, GPIO13);
-        for (int i = 0; i < 100000; ++i)
-            __asm__("nop");
+      /* set the LED */
+      gpio_set(GPIOC, GPIO13);
+      for (int i = 0; i < 100000; ++i)
+        __asm__("nop");
 
-        /* read timer 2 */
-        read_count = (uint16_t)timer_get_counter(TIM2);
+      /* clear the LED */
+      gpio_clear(GPIOC, GPIO13);
+      for (int i = 0; i < 100000; ++i)
+        __asm__("nop");
 
-        char diff_encoder_count[20];
-        sprintf(diff_encoder_count, "%u\n", old_read_count - read_count);
+      /* read timer 2: left motor encoder information */
+      read_count = (uint16_t)timer_get_counter(TIM2);
 
-        for (int i = 0; i < strlen(diff_encoder_count); i++)
-          {
-            usart_send_blocking(USART1, diff_encoder_count[i]);
+      /* Obtain the difference between the former and new measure */
+      char diff_encoder_count[20];
+      sprintf(diff_encoder_count, "%u\n", old_read_count - read_count);
 
-          }
+      /* Send difference through the USART */
+      for (int i = 0; i < strlen(diff_encoder_count); i++)
+        {
+          usart_send_blocking(USART1, diff_encoder_count[i]);
 
-        old_read_count = read_count;
+        }
+
+      old_read_count = read_count;
           
     }
 
