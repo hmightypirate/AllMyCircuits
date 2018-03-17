@@ -5,7 +5,50 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/cm3/systick.h>
 
+/* Read encoders every x systicks */
+#define ENCODER_MEASURE_TICKS 1000   
+
+uint32_t temp32 = 0;
+uint16_t former_left_encoder = 0;
+uint16_t new_left_encoder = 0;
+bool new_measure = false;
+
+
+void sys_tick_handler(void) {
+  // Increase systick calls
+  temp32++;
+
+  /* We call this handler every 1ms so 1000ms = 1s on/off. */
+  if (temp32 == ENCODER_MEASURE_TICKS) {
+    gpio_toggle(GPIOC, GPIO13);
+    temp32 = 0;
+    /* Read encoders */
+    former_left_encoder = new_left_encoder;
+    /* Read timer 2: left encoder information */
+    new_left_encoder = (uint16_t)timer_get_counter(TIM2);
+    new_measure = true;
+  }
+}
+
+void systick_setup(void) {
+  
+  /* Init counter to 0 */
+  temp32 = 0;
+
+  /* 72MHz / 8 => 9000000 counts per second */
+  systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
+
+  /* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
+  /* SysTick interrupt every N clock pulses: set reload to N-1 */
+  systick_set_reload(8999);
+  
+  systick_interrupt_enable();
+  
+  /* Start counting. */
+  systick_counter_enable();
+}
 
 /*
  * @brief set gpio modes, enable gpio clocks
@@ -157,6 +200,7 @@ int main(void) {
     pwm_setup();
     usart_setup();
     encoder_setup();
+    systick_setup();
 
     /* Configure motor for forward */
     gpio_set(GPIOB, GPIO12);
@@ -166,36 +210,23 @@ int main(void) {
     timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
     timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
 
-    uint16_t read_count = 0;
-    uint16_t old_read_count = 0;
-
     while (1) {
-      /* set the LED */
-      gpio_set(GPIOC, GPIO13);
-      for (int i = 0; i < 100000; ++i)
-        __asm__("nop");
 
-      /* clear the LED */
-      gpio_clear(GPIOC, GPIO13);
-      for (int i = 0; i < 100000; ++i)
-        __asm__("nop");
-
-      /* read timer 2: left motor encoder information */
-      read_count = (uint16_t)timer_get_counter(TIM2);
-
-      /* Obtain the difference between the former and new measure */
-      char diff_encoder_count[20];
-      sprintf(diff_encoder_count, "%u\n", old_read_count - read_count);
-
-      /* Send difference through the USART */
-      for (int i = 0; i < strlen(diff_encoder_count); i++)
+      if (new_measure)
         {
-          usart_send_blocking(USART1, diff_encoder_count[i]);
+          /* Obtain the difference between the former and new measure */
+          char diff_encoder_count[20];
+          sprintf(diff_encoder_count, "%u\n", new_left_encoder - former_left_encoder);
 
+          /* Send difference through the USART */
+          for (int i = 0; i < strlen(diff_encoder_count); i++)
+            {
+              usart_send_blocking(USART1, diff_encoder_count[i]);
+              
+            }
+          // Finished transmission
+          new_measure = false;
         }
-
-      old_read_count = read_count;
-
     }
 
     return 0;

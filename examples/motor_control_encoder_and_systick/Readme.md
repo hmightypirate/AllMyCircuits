@@ -8,6 +8,8 @@ The encoder ticks are read periodically using the Systick timer.
 * Timer 3 is used to count the number of ticks of the right encoder (TODO)
 * Timer 4 is used for the PWM of the two motors: CH3 for the left motor and CH4 for the right motor
 
+Encoder measurements are sent periodically through the serial port
+
 ## Pinout (FIXME: check and complete)
 PC13 -> Internal LED.
 PB08 and PB09 -> Timer 4 PWM CH3 (left motor) and CH4 (right motor). 
