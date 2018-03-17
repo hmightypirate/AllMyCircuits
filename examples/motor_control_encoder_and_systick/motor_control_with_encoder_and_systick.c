@@ -32,6 +32,10 @@ void sys_tick_handler(void) {
   }
 }
 
+/*
+ * @brief systick setup (with by 8 division)
+ *
+ */
 void systick_setup(void) {
   
   /* Init counter to 0 */
@@ -102,6 +106,7 @@ void encoder_setup()
 
   /* Enable GPIO for encoder */
   rcc_periph_clock_enable(RCC_TIM2);
+  /* Enable Auxiliary functions I/O */
   rcc_periph_clock_enable(RCC_AFIO);
 
   timer_reset(RCC_TIM2);
