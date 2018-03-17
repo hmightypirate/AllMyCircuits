@@ -41,6 +41,8 @@ void systick_setup(void) {
   /* Init counter to 0 */
   temp32 = 0;
 
+  nvic_set_priority(NVIC_SYSTICK_IRQ, 16);
+  
   /* 72MHz / 8 => 9000000 counts per second */
   systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
 
@@ -95,7 +97,6 @@ static void usart_setup(void) {
 
     /* Finally enable the USART. */
     usart_enable(USART1);
-
 }
 
 /*
@@ -199,14 +200,12 @@ void pwm_setup() {
  */
 int main(void) {
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
-
+    
     /* Initial setup */
     gpio_setup();
     pwm_setup();
     usart_setup();
     encoder_setup();
-    systick_setup();
-
     /* Configure motor for forward */
     gpio_set(GPIOB, GPIO12);
     gpio_clear(GPIOB, GPIO13);
@@ -215,8 +214,10 @@ int main(void) {
     timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
     timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
 
-    while (1) {
+    systick_setup();
 
+    while (1) {
+      
       if (new_measure)
         {
           /* Obtain the difference between the former and new measure */
