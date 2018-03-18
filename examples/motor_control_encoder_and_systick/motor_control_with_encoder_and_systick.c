@@ -8,29 +8,30 @@
 #include <libopencm3/cm3/systick.h>
 
 /* Read encoders every x systicks */
-#define ENCODER_MEASURE_TICKS 1000   
+#define ENCODER_MEASURE_TICKS 10000
 
 uint32_t temp32 = 0;
 uint16_t former_left_encoder = 0;
 uint16_t new_left_encoder = 0;
-bool new_measure = false;
+uint16_t new_measure = 0;
 
 
 void sys_tick_handler(void) {
   // Increase systick calls
   temp32++;
 
-  /* We call this handler every 1ms so 1000ms = 1s on/off. */
-  if (temp32 == ENCODER_MEASURE_TICKS) {
+  // We call this handler every 1ms so 1000ms = 1s on/off. 
+  if (temp32 >= ENCODER_MEASURE_TICKS) {
     gpio_toggle(GPIOC, GPIO13);
     temp32 = 0;
-    /* Read encoders */
+    // Read encoders
     former_left_encoder = new_left_encoder;
-    /* Read timer 2: left encoder information */
+    //Read timer 2: left encoder information
     new_left_encoder = (uint16_t)timer_get_counter(TIM2);
-    new_measure = true;
+    new_measure = 1;
   }
 }
+
 
 /*
  * @brief systick setup (with by 8 division)
@@ -38,23 +39,25 @@ void sys_tick_handler(void) {
  */
 void systick_setup(void) {
   
-  /* Init counter to 0 */
+  // Init counter to 0 
   temp32 = 0;
 
   nvic_set_priority(NVIC_SYSTICK_IRQ, 16);
   
-  /* 72MHz / 8 => 9000000 counts per second */
+  // 72MHz / 8 => 9000000 counts per second
   systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
 
-  /* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
-  /* SysTick interrupt every N clock pulses: set reload to N-1 */
+  // 9000000/9000 = 1000 overflows per second - every 1ms one interrupt
+  // SysTick interrupt every N clock pulses: set reload to N-1 
   systick_set_reload(8999);
   
   systick_interrupt_enable();
   
-  /* Start counting. */
+  // Start counting. 
   systick_counter_enable();
 }
+
+
 
 /*
  * @brief set gpio modes, enable gpio clocks
@@ -88,8 +91,8 @@ static void usart_setup(void) {
                 GPIO_USART1_TX);
 
     /* Setup UART parameters. */
-    usart_set_baudrate(USART1, 115200);
-    usart_set_databits(USART1, 9);
+    usart_set_baudrate(USART1, 38400);
+    usart_set_databits(USART1, 8);
     usart_set_stopbits(USART1, USART_STOPBITS_1);
     usart_set_mode(USART1, USART_MODE_TX);
     usart_set_parity(USART1, USART_PARITY_EVEN);
@@ -97,6 +100,9 @@ static void usart_setup(void) {
 
     /* Finally enable the USART. */
     usart_enable(USART1);
+
+    //nvic_set_priority(NVIC_USART1_IRQ, 16);
+    //nvic_enable_irq(NVIC_USART1_IRQ);
 }
 
 /*
@@ -211,18 +217,18 @@ int main(void) {
     gpio_clear(GPIOB, GPIO13);
 
     /* this value is the time each engine is active : max value is 1024 */
-    timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
-    timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
+    //timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
+    //timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
 
     systick_setup();
-
+    
     while (1) {
       
       if (new_measure)
         {
           /* Obtain the difference between the former and new measure */
           char diff_encoder_count[20];
-          sprintf(diff_encoder_count, "%u\n", new_left_encoder - former_left_encoder);
+          sprintf(diff_encoder_count, "%u\n", former_left_encoder - new_left_encoder);
 
           /* Send difference through the USART */
           for (int i = 0; i < strlen(diff_encoder_count); i++)
@@ -231,7 +237,7 @@ int main(void) {
               
             }
           // Finished transmission
-          new_measure = false;
+          new_measure = 0;
         }
     }
 
