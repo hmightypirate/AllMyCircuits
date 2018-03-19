@@ -2,6 +2,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/cm3/systick.h>
+#include <libopencm3/cm3/scb.h>
 
 uint32_t temp32;
 
@@ -24,6 +25,10 @@ void sys_tick_handler(void) {
 }
 
 int main(void) {
+    /* Change interrupt vector table location to avoid conflict with */
+    /* serial bootloader interrupt vectors */
+    SCB_VTOR = (uint32_t)0x08000000;
+    
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
     gpio_setup();
 
