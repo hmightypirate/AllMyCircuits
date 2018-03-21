@@ -1,3 +1,5 @@
+#define DISABLE_SYSTICK
+
 #include <string.h>
 #include <stdio.h>
 
@@ -8,7 +10,10 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
-//#include <libopencm3/cm3/systick.h>
+#include <libopencm3/cm3/scb.h>
+#ifdef DISABLE_SYSTICK
+#include <libopencm3/cm3/systick.h>
+#endif
 
 #define C0 0
 #define CX0 1
@@ -133,17 +138,19 @@ int _write(int file, char *ptr, int len)
     return -1;
 }
 
-//uint32_t temp32 = 0;
+#ifdef DISABLE_SYSTICK
+uint32_t temp32 = 0;
 
-//void sys_tick_handler(void) {
-//temp32++;
+void sys_tick_handler(void) {
+temp32++;
 
     /* We call this handler every 1ms so 1000ms = 1s on/off. */
-//    if (temp32 >= 1000) {
-//        gpio_toggle(GPIOC, GPIO13);
-//        temp32 = 0;
-//    }
-//}
+    if (temp32 >= 1000) {
+        gpio_toggle(GPIOC, GPIO13);
+        temp32 = 0;
+    }
+}
+#endif
 
 void gpio_setup(void) {
     /* Enable GPIOB clock (for PWM pins) */
@@ -159,19 +166,21 @@ void gpio_setup(void) {
     rcc_periph_clock_enable(RCC_GPIOA);
 }
 
-//void systick_setup(){
-    /* 72MHz / 8 => 9000000 counts per second */
-//    systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
+#ifdef DISABLE_SYSTICK
+void systick_setup(){
+   /* 72MHz / 8 => 9000000 counts per second */
+    systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
 
     /* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
     /* SysTick interrupt every N clock pulses: set reload to N-1 */
-//    systick_set_reload(8999);
+    systick_set_reload(8999);
 
-//    systick_interrupt_enable();
+    systick_interrupt_enable();
 
     /* Start counting. */
-//    systick_counter_enable();
-//}
+    systick_counter_enable();
+}
+#endif
 
 void usart_setup(void) {
 
@@ -287,10 +296,9 @@ int play_note(int note_number){
     //timer_set_repetition_counter(TIM3, repetition_values[note_number]);
     timer_set_period(TIM3, register_values[note_number]);
 
-    printf(" play_note(%d): prescaler %d, repetition %d, period %d\n"
+    printf(" play_note(%d): prescaler %d, period %d\n"
             , note_number
             , (int) prescaler_values[note_number]
-            , (int) repetition_values[note_number]
             , (int) register_values[note_number]);
 
     timer_set_oc_value(TIM3, TIM_OC1, register_values[note_number]/2);
@@ -300,12 +308,17 @@ int play_note(int note_number){
 
 
 int main(void) {
+    /* Change interrupt vector table location to avoid conflict with */
+    /* serial bootloader interrupt vectors */
+    SCB_VTOR = (uint32_t)0x08000000;
+
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
     gpio_setup();
     pwm_setup();
     usart_setup();
-    //systick_setup();
-
+#ifdef DISABLE_SYSTICK
+    systick_setup();
+#endif
     char welcome[20];
     sprintf(welcome, "%d\n", 42);
 
@@ -316,10 +329,14 @@ int main(void) {
     int note = 107;
 
     while (1) {
+#ifndef DISABLE_SYSTICK
         gpio_set(GPIOC, GPIO13);
+#endif
         for (int i = 0; i < 100000; ++i)
             __asm__("nop");
+#ifndef DISABLE_SYSTICK
         gpio_clear(GPIOC, GPIO13);
+#endif
         if (play_note(note) == -1){
             printf("Error on playing note %d\n", note);
         } else {
@@ -334,8 +351,6 @@ int main(void) {
 
         printf("Stop note\n");
         stop_note();
-
     }
-
     return 0;
 }
