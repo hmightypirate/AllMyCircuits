@@ -138,6 +138,7 @@ int _write(int file, char *ptr, int len)
     return -1;
 }
 
+
 #ifdef DISABLE_SYSTICK
 uint32_t temp32 = 0;
 
@@ -152,6 +153,7 @@ temp32++;
 }
 #endif
 
+
 void gpio_setup(void) {
     /* Enable GPIOB clock (for PWM pins) */
     rcc_periph_clock_enable(RCC_GPIOB);
@@ -165,6 +167,7 @@ void gpio_setup(void) {
 
     rcc_periph_clock_enable(RCC_GPIOA);
 }
+
 
 #ifdef DISABLE_SYSTICK
 void systick_setup(){
@@ -319,6 +322,7 @@ int main(void) {
 #ifdef DISABLE_SYSTICK
     systick_setup();
 #endif
+
     char welcome[20];
     sprintf(welcome, "%d\n", 42);
 
@@ -337,6 +341,7 @@ int main(void) {
 #ifndef DISABLE_SYSTICK
         gpio_clear(GPIOC, GPIO13);
 #endif
+
         if (play_note(note) == -1){
             printf("Error on playing note %d\n", note);
         } else {
