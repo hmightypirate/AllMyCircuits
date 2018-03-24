@@ -10,10 +10,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
-#include <libopencm3/cm3/scb.h>
-#ifdef DISABLE_SYSTICK
-#include <libopencm3/cm3/systick.h>
-#endif
+
 
 #define C0 0
 #define CX0 1
@@ -139,21 +136,6 @@ int _write(int file, char *ptr, int len)
 }
 
 
-#ifdef DISABLE_SYSTICK
-uint32_t temp32 = 0;
-
-void sys_tick_handler(void) {
-temp32++;
-
-    /* We call this handler every 1ms so 1000ms = 1s on/off. */
-    if (temp32 >= 1000) {
-        gpio_toggle(GPIOC, GPIO13);
-        temp32 = 0;
-    }
-}
-#endif
-
-
 void gpio_setup(void) {
     /* Enable GPIOB clock (for PWM pins) */
     rcc_periph_clock_enable(RCC_GPIOB);
@@ -172,23 +154,7 @@ void gpio_setup(void) {
 }
 
 
-#ifdef DISABLE_SYSTICK
-void systick_setup(){
-   /* 72MHz / 8 => 9000000 counts per second */
-    systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
-
-    /* 9000000/9000 = 1000 overflows per second - every 1ms one interrupt */
-    /* SysTick interrupt every N clock pulses: set reload to N-1 */
-    systick_set_reload(8999);
-
-    systick_interrupt_enable();
-
-    /* Start counting. */
-    systick_counter_enable();
-}
-#endif
-
-void usart_setup(void) {
+static void usart_setup(void) {
 
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_INPUT_PULL_UPDOWN,
             GPIO_USART1_TX);
@@ -295,7 +261,9 @@ int play_note(int note_number){
     }
 
     uint32_t prescaler_values[108] = {70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70};
-    //uint32_t repetition_values[108] = {16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16};
+
+    uint32_t repetition_values[108] = {16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16};
+
     uint32_t register_values[108] = {62023, 58549, 55262, 52137, 49226, 46453, 43861, 41390, 39062, 36875, 34799, 32849, 31011, 29266, 27623, 26075, 24613, 23231, 21925, 20695, 19534, 18437, 17402, 16424, 15503, 14632, 13811, 13037, 12304, 11614, 10962, 10347, 9766, 9218, 8701, 8212, 7751, 7316, 6906, 6518, 6152, 5807, 5481, 5173, 4898, 4608, 4350, 4106, 3875, 3658, 3452, 3258, 3075, 2903, 2740, 2586, 2441, 2304, 2174, 2052, 1937, 1828, 1726, 1629, 1537, 1451, 1369, 1292, 1220, 1151, 1087, 1026, 968, 914, 862, 814, 768, 725, 684, 646, 609, 575, 543, 512, 484, 456, 431, 406, 384, 362, 342, 322, 304, 287, 271, 256, 241, 228, 215, 203, 191, 180, 170, 161, 152, 143, 135, 127};
 
     timer_set_prescaler(TIM3, prescaler_values[note_number]);
@@ -304,8 +272,9 @@ int play_note(int note_number){
 
     printf(" play_note(%d): prescaler %d, period %d\n"
             , note_number
-            , (int) prescaler_values[note_number]
-            , (int) register_values[note_number]);
+            , prescaler_values[note_number]
+            , repetition_values[note_number]
+            , register_values[note_number]);
 
     timer_set_oc_value(TIM3, TIM_OC1, register_values[note_number]/2);
 
@@ -322,9 +291,6 @@ int main(void) {
     gpio_setup();
     pwm_setup();
     usart_setup();
-#ifdef DISABLE_SYSTICK
-    systick_setup();
-#endif
 
     char welcome[20];
     sprintf(welcome, "%d\n", 42);
