@@ -262,8 +262,8 @@ int main(void) {
   left_encoder_setup();
   right_encoder_setup();
   /* Configure right motor for forward */
-  gpio_set(GPIOB, GPIO10);
-  gpio_clear(GPIOB, GPIO11);
+  gpio_set(GPIOB, GPIO11);
+  gpio_clear(GPIOB, GPIO10);
 
   /* Configure left motor for forward */
   gpio_set(GPIOA, GPIO12);
@@ -271,7 +271,7 @@ int main(void) {
   
   /* this value is the time each engine is active : max value is 1024 */
   timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
-  timer_set_oc_value(TIM4, TIM_OC4, 900); // 0% duty for right motor (because it is not wired yet)
+  timer_set_oc_value(TIM4, TIM_OC4, 924); // 0% duty for right motor (because it is not wired yet)
 
   systick_setup();
 
