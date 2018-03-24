@@ -149,10 +149,7 @@ void left_encoder_setup()
   timer_ic_set_input(TIM2, TIM_IC2, TIM_IC_IN_TI2);
 
   /* enable counter */
-  timer_enable_counter(TIM2);
-
-  
-  
+  timer_enable_counter(TIM2);  
 }
 
 /*
@@ -176,7 +173,7 @@ void right_encoder_setup()
 
   /* set input channels  */
   timer_ic_set_input(TIM1, TIM_IC1, TIM_IC_IN_TI1);
-  timer_ic_set_input(TIM1, TIM_IC4, TIM_IC_IN_TI2);
+  timer_ic_set_input(TIM1, TIM_IC4, TIM_IC_IN_TI4);
 
   /* enable counter */
   timer_enable_counter(TIM1); 
@@ -286,7 +283,7 @@ int main(void) {
         char diff_encoder_count[20];
 
         /* Difference in left encoder */
-        if (former_left_encoder > new_left_encoder)
+        if (former_left_encoder >= new_left_encoder)
           {
             left_count = former_left_encoder - new_left_encoder;
           }
@@ -297,7 +294,7 @@ int main(void) {
           }
 
         /* Difference in right encoder */
-        if (former_right_encoder > new_right_encoder)
+        if (former_right_encoder >= new_right_encoder)
           {
             right_count = former_right_encoder - new_right_encoder;
           }
