@@ -14,6 +14,8 @@
 uint32_t temp32 = 0;
 uint16_t former_left_encoder = 0;
 uint16_t new_left_encoder = 0;
+uint16_t former_right_encoder = 0;
+uint16_t new_right_encoder = 0;
 uint16_t new_measure = 0;
 
 
@@ -29,6 +31,7 @@ void sys_tick_handler(void) {
     former_left_encoder = new_left_encoder;
     //Read timer 2: left encoder information
     new_left_encoder = (uint16_t)timer_get_counter(TIM2);
+    new_right_encoder = (uint16_t)timer_get_counter(TIM1);
     new_measure = 1;
   }
 }
@@ -67,19 +70,30 @@ void gpio_setup(void) {
   /* Enable GPIOB clock (for PWM and control pins) */
   rcc_periph_clock_enable(RCC_GPIOB);
 
+  /* Enable GPIO A */
+  rcc_periph_clock_enable(RCC_GPIOA);
+
+  /* Enable GPIOC clock (For internal LED */
+  rcc_periph_clock_enable(RCC_GPIOC);
+  
   /* Control GPIOs configuration for left motor */
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 GPIO12 | GPIO13);
 
-  /* Enable GPIOC clock (For internal LED */
-  rcc_periph_clock_enable(RCC_GPIOC);
-
+  /* Right motor control AIN2: PB5 */
+  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO5);
+  
+  /* Control GPIOs configuration for right motor */
+  /* Right motor control AIN1: PA12 */
+  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO12);
+    
   /* Set internal LED */
   gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 GPIO13);
 
-  /* Enable GPIO A: Usart */
-  rcc_periph_clock_enable(RCC_GPIOA);
+  
 }
 
 
@@ -108,12 +122,12 @@ static void usart_setup(void) {
 }
 
 /*
- * @brief setup encoder using Timer 2
+ * @brief setup of left encoder using Timer 2
  */
-void encoder_setup()
+void left_encoder_setup()
 {
 
-  /* Enable GPIO for encoder */
+  /* Enable GPIO for encoder (left encoder) */
   rcc_periph_clock_enable(RCC_TIM2);
   /* Enable Auxiliary functions I/O */
   rcc_periph_clock_enable(RCC_AFIO);
@@ -136,7 +150,38 @@ void encoder_setup()
 
   /* enable counter */
   timer_enable_counter(TIM2);
+
+  
+  
 }
+
+/*
+ * @brief setup of right encoder using Timer 1
+ */
+void right_encoder_setup()
+{
+
+  /* Enable GPIO for encoder (left encoder) */
+  rcc_periph_clock_enable(RCC_TIM1);
+  /* Enable Auxiliary functions I/O */
+  rcc_periph_clock_enable(RCC_AFIO);
+
+  timer_reset(RCC_TIM1);
+
+  /* No reset clock: full period */
+  timer_set_period(TIM1, 0xFFFF);
+
+  /* encoders in quadrature  */
+  timer_slave_set_mode(TIM1, TIM_SMCR_SMS_EM3);
+
+  /* set input channels  */
+  timer_ic_set_input(TIM1, TIM_IC1, TIM_IC_IN_TI1);
+  timer_ic_set_input(TIM1, TIM_IC4, TIM_IC_IN_TI2);
+
+  /* enable counter */
+  timer_enable_counter(TIM1); 
+}
+
 
 /*
  * @brief set pwm for motor control
@@ -218,19 +263,21 @@ int main(void) {
   gpio_setup();
   pwm_setup();
   usart_setup();
-  encoder_setup();
+  left_encoder_setup();
+  right_encoder_setup();
   /* Configure motor for forward */
   gpio_set(GPIOB, GPIO12);
   gpio_clear(GPIOB, GPIO13);
 
   /* this value is the time each engine is active : max value is 1024 */
   timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
-  timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
+  timer_set_oc_value(TIM4, TIM_OC4, 100); // 0% duty for right motor (because it is not wired yet)
 
   systick_setup();
 
-  uint16_t count = 0;
-
+  uint16_t left_count = 0;
+  uint16_t right_count = 0;
+  
   while (1) {
 
     if (new_measure)
@@ -238,24 +285,37 @@ int main(void) {
         /* Obtain the difference between the former and new measure */
         char diff_encoder_count[20];
 
+        /* Difference in left encoder */
         if (former_left_encoder > new_left_encoder)
           {
-            count = former_left_encoder - new_left_encoder;
-            sprintf(diff_encoder_count, "%u\n", count);
+            left_count = former_left_encoder - new_left_encoder;
           }
         else
           {
-            count = 65535 - new_left_encoder;
-            count += former_left_encoder;
-            sprintf(diff_encoder_count, "%u\n", count);
+            left_count = 65535 - new_left_encoder;
+            left_count += former_left_encoder;
           }
 
+        /* Difference in right encoder */
+        if (former_right_encoder > new_right_encoder)
+          {
+            right_count = former_right_encoder - new_right_encoder;
+          }
+        else
+          {
+            right_count = 65535 - new_right_encoder;
+            right_count += former_right_encoder;
+          }
+
+        sprintf(diff_encoder_count, "%u-%u\n", left_count, right_count);
+        
         /* Send difference through the USART */
         for (int i = 0; i < strlen(diff_encoder_count); i++)
           {
             usart_send_blocking(USART1, diff_encoder_count[i]);
 
           }
+        
         // Finished transmission
         new_measure = 0;
       }
