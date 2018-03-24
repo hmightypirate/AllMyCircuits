@@ -166,6 +166,9 @@ void gpio_setup(void) {
             GPIO13);
 
     rcc_periph_clock_enable(RCC_GPIOA);
+
+    /* Enable clock for USART3. */
+    rcc_periph_clock_enable(RCC_USART1);
 }
 
 
@@ -200,10 +203,10 @@ void usart_setup(void) {
 
     /* Parameters for compatibility with the Bluetooth module*/
     usart_set_baudrate(USART1, 115200);
-    usart_set_databits(USART1, 8);
+    usart_set_databits(USART1, 9);
     usart_set_stopbits(USART1, USART_STOPBITS_1);
     usart_set_mode(USART1, USART_MODE_TX);
-    usart_set_parity(USART1, USART_PARITY_NONE);
+    usart_set_parity(USART1, USART_PARITY_EVEN);
     usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
 
     /* Finally enable the USART. */
