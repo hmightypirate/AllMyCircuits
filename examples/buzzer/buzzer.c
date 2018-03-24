@@ -10,6 +10,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
+//#include <libopencm3/cm3/systick.h>
 
 
 #define C0 0
@@ -154,7 +155,7 @@ void gpio_setup(void) {
 }
 
 
-static void usart_setup(void) {
+void usart_setup(void) {
 
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_INPUT_PULL_UPDOWN,
             GPIO_USART1_TX);
@@ -291,6 +292,7 @@ int main(void) {
     gpio_setup();
     pwm_setup();
     usart_setup();
+    //systick_setup();
 
     char welcome[20];
     sprintf(welcome, "%d\n", 42);
