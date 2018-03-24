@@ -76,16 +76,15 @@ void gpio_setup(void) {
   /* Enable GPIOC clock (For internal LED */
   rcc_periph_clock_enable(RCC_GPIOC);
   
-  /* Control GPIOs configuration for left motor */
+  /* Control GPIOs configuration for right motor */
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-                GPIO12 | GPIO13);
+                GPIO10 | GPIO11);
 
-  /* Right motor control AIN2: PB5 */
+  /* Left motor control AIN2: PB5 */
   gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 GPIO5);
   
-  /* Control GPIOs configuration for right motor */
-  /* Right motor control AIN1: PA12 */
+  /* Control GPIOs configuration for left motor */
   gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 GPIO12);
     
@@ -262,13 +261,17 @@ int main(void) {
   usart_setup();
   left_encoder_setup();
   right_encoder_setup();
-  /* Configure motor for forward */
-  gpio_set(GPIOB, GPIO12);
-  gpio_clear(GPIOB, GPIO13);
+  /* Configure right motor for forward */
+  gpio_set(GPIOB, GPIO10);
+  gpio_clear(GPIOB, GPIO11);
 
+  /* Configure left motor for forward */
+  gpio_set(GPIOA, GPIO12);
+  gpio_clear(GPIOB, GPIO5);
+  
   /* this value is the time each engine is active : max value is 1024 */
   timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
-  timer_set_oc_value(TIM4, TIM_OC4, 100); // 0% duty for right motor (because it is not wired yet)
+  timer_set_oc_value(TIM4, TIM_OC4, 900); // 0% duty for right motor (because it is not wired yet)
 
   systick_setup();
 

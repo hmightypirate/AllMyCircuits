@@ -16,8 +16,8 @@ Encoder measurements are sent periodically through the serial port
 Motors:
 * PC13 -> LED integrated in the bluepill board.
 * PB08 and PB09 -> Timer 4 PWM CH3 (left motor) and CH4 (right motor).
-* PB12 and PB13 -> Motor driver control pins for left motor.
-* PA12 and PB5 -> Motor driver control pins for the right motor
+* PA12 and PB5 -> Motor driver control pins for left motor.
+* PB10 and PB11 -> Motor driver control pins for the right motor
    L        L  -> brake low
    H        L  -> forward
    L        H  -> reverse
