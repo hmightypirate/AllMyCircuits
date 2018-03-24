@@ -1,3 +1,4 @@
+#include <libopencm3/cm3/scb.h>
 #include <string.h>
 #include <stdio.h>
 #include <libopencm3/cm3/nvic.h>
@@ -87,22 +88,23 @@ void gpio_setup(void) {
  */
 static void usart_setup(void) {
 
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_INPUT_PULL_UPDOWN,
+  /* Enable USART */
+  rcc_periph_clock_enable(RCC_USART1);
+  
+  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_INPUT_PULL_UPDOWN,
                 GPIO_USART1_TX);
-
-    /* Setup UART parameters. */
-    usart_set_baudrate(USART1, 38400);
-    usart_set_databits(USART1, 8);
-    usart_set_stopbits(USART1, USART_STOPBITS_1);
-    usart_set_mode(USART1, USART_MODE_TX);
-    usart_set_parity(USART1, USART_PARITY_EVEN);
-    usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
-
-    /* Finally enable the USART. */
-    usart_enable(USART1);
-
-    //nvic_set_priority(NVIC_USART1_IRQ, 16);
-    //nvic_enable_irq(NVIC_USART1_IRQ);
+  
+  /* Setup UART parameters. */
+  usart_set_baudrate(USART1, 115200);
+  usart_set_databits(USART1, 9);
+  usart_set_stopbits(USART1, USART_STOPBITS_1);
+  usart_set_mode(USART1, USART_MODE_TX);
+  usart_set_parity(USART1, USART_PARITY_EVEN);
+  usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
+  
+  /* Finally enable the USART. */
+  usart_enable(USART1);
+  
 }
 
 /*
@@ -205,41 +207,59 @@ void pwm_setup() {
  *
  */
 int main(void) {
-    rcc_clock_setup_in_hse_8mhz_out_72mhz();
-    
-    /* Initial setup */
-    gpio_setup();
-    pwm_setup();
-    usart_setup();
-    encoder_setup();
-    /* Configure motor for forward */
-    gpio_set(GPIOB, GPIO12);
-    gpio_clear(GPIOB, GPIO13);
+  /* Change interrupt vector table location to avoid conflict with */
+  /* serial bootloader interrupt vectors */
+  SCB_VTOR = (uint32_t)0x08000000;
 
-    /* this value is the time each engine is active : max value is 1024 */
-    //timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
-    //timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
+  
+  rcc_clock_setup_in_hse_8mhz_out_72mhz();
+  
+  /* Initial setup */
+  gpio_setup();
+  pwm_setup();
+  usart_setup();
+  encoder_setup();
+  /* Configure motor for forward */
+  gpio_set(GPIOB, GPIO12);
+  gpio_clear(GPIOB, GPIO13);
+  
+  /* this value is the time each engine is active : max value is 1024 */
+  timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
+  timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
+  
+  systick_setup();
 
-    systick_setup();
-    
-    while (1) {
+  uint16_t count = 0;
+  
+  while (1) {
       
-      if (new_measure)
-        {
-          /* Obtain the difference between the former and new measure */
-          char diff_encoder_count[20];
-          sprintf(diff_encoder_count, "%u\n", former_left_encoder - new_left_encoder);
+    if (new_measure)
+      {
+        /* Obtain the difference between the former and new measure */
+        char diff_encoder_count[20];
 
-          /* Send difference through the USART */
-          for (int i = 0; i < strlen(diff_encoder_count); i++)
-            {
-              usart_send_blocking(USART1, diff_encoder_count[i]);
+        if (former_left_encoder > new_left_encoder)
+          {
+            count = former_left_encoder - new_left_encoder;
+            sprintf(diff_encoder_count, "%u\n", count);
+          }
+        else
+          {
+            count = 65535 - new_left_encoder;
+            count += former_left_encoder;
+            sprintf(diff_encoder_count, "%u\n", count);
+          }
+        
+        /* Send difference through the USART */
+        for (int i = 0; i < strlen(diff_encoder_count); i++)
+          {
+            usart_send_blocking(USART1, diff_encoder_count[i]);
               
-            }
-          // Finished transmission
-          new_measure = 0;
-        }
-    }
+          }
+        // Finished transmission
+        new_measure = 0;
+      }
+  }
 
-    return 0;
+  return 0;
 }
