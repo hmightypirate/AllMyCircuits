@@ -21,7 +21,7 @@ void sys_tick_handler(void) {
   // Increase systick calls
   temp32++;
 
-  // We call this handler every 1ms so 1000ms = 1s on/off. 
+  // We call this handler every 1ms so 1000ms = 1s on/off.
   if (temp32 >= ENCODER_MEASURE_TICKS) {
     gpio_toggle(GPIOC, GPIO13);
     temp32 = 0;
@@ -39,22 +39,22 @@ void sys_tick_handler(void) {
  *
  */
 void systick_setup(void) {
-  
-  // Init counter to 0 
+
+  // Init counter to 0
   temp32 = 0;
 
   nvic_set_priority(NVIC_SYSTICK_IRQ, 16);
-  
+
   // 72MHz / 8 => 9000000 counts per second
   systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
 
   // 9000000/9000 = 1000 overflows per second - every 1ms one interrupt
-  // SysTick interrupt every N clock pulses: set reload to N-1 
+  // SysTick interrupt every N clock pulses: set reload to N-1
   systick_set_reload(8999);
-  
+
   systick_interrupt_enable();
-  
-  // Start counting. 
+
+  // Start counting.
   systick_counter_enable();
 }
 
@@ -90,10 +90,10 @@ static void usart_setup(void) {
 
   /* Enable USART */
   rcc_periph_clock_enable(RCC_USART1);
-  
+
   gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_INPUT_PULL_UPDOWN,
                 GPIO_USART1_TX);
-  
+
   /* Setup UART parameters. */
   usart_set_baudrate(USART1, 115200);
   usart_set_databits(USART1, 9);
@@ -101,10 +101,10 @@ static void usart_setup(void) {
   usart_set_mode(USART1, USART_MODE_TX);
   usart_set_parity(USART1, USART_PARITY_EVEN);
   usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
-  
+
   /* Finally enable the USART. */
   usart_enable(USART1);
-  
+
 }
 
 /*
@@ -211,9 +211,9 @@ int main(void) {
   /* serial bootloader interrupt vectors */
   SCB_VTOR = (uint32_t)0x08000000;
 
-  
+
   rcc_clock_setup_in_hse_8mhz_out_72mhz();
-  
+
   /* Initial setup */
   gpio_setup();
   pwm_setup();
@@ -222,17 +222,17 @@ int main(void) {
   /* Configure motor for forward */
   gpio_set(GPIOB, GPIO12);
   gpio_clear(GPIOB, GPIO13);
-  
+
   /* this value is the time each engine is active : max value is 1024 */
   timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
   timer_set_oc_value(TIM4, TIM_OC4, 0); // 0% duty for right motor (because it is not wired yet)
-  
+
   systick_setup();
 
   uint16_t count = 0;
-  
+
   while (1) {
-      
+
     if (new_measure)
       {
         /* Obtain the difference between the former and new measure */
@@ -249,12 +249,12 @@ int main(void) {
             count += former_left_encoder;
             sprintf(diff_encoder_count, "%u\n", count);
           }
-        
+
         /* Send difference through the USART */
         for (int i = 0; i < strlen(diff_encoder_count); i++)
           {
             usart_send_blocking(USART1, diff_encoder_count[i]);
-              
+
           }
         // Finished transmission
         new_measure = 0;
