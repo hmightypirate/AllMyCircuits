@@ -4,14 +4,27 @@
 #include <libopencm3/cm3/systick.h>
 #include <libopencm3/cm3/scb.h>
 
+#define BLACKPILL
+
+#ifdef BLACKPILL
+        #define RCC_GPIOX RCC_GPIOB
+        #define GPIOX GPIOB
+        #define GPION GPIO12
+#else
+        #define RCC_GPIOX RCC_GPIOC
+        #define GPIOX GPIOC
+        #define GPION GPIO13
+#endif
+
+
 uint32_t temp32;
 
 static void gpio_setup(void) {
     /* Enable GPIOB clock. */
-    rcc_periph_clock_enable(RCC_GPIOC);
+    rcc_periph_clock_enable(RCC_GPIOX);
 
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-            GPIO13);
+    gpio_set_mode(GPIOX, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+            GPION);
 }
 
 void sys_tick_handler(void) {
@@ -19,7 +32,7 @@ void sys_tick_handler(void) {
 
     /* We call this handler every 1ms so 1000ms = 1s on/off. */
     if (temp32 == 1000) {
-        gpio_toggle(GPIOC, GPIO13);
+        gpio_toggle(GPIOX, GPION);
         temp32 = 0;
     }
 }
