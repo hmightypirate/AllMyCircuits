@@ -1,4 +1,4 @@
-RCC_INTERNAL_LED#include <string.h>
+#include <string.h>
 #include <stdio.h>
 
 #include <errno.h>
