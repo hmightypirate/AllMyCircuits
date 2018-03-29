@@ -5,9 +5,9 @@
 static void clock_setup(void) {
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
-    /* Enable GPIOC clock. */
+    /* Enable INTERNAL_LED_PORT clock. */
     rcc_periph_clock_enable(RCC_GPIOA);
-    rcc_periph_clock_enable(RCC_GPIOC);
+    rcc_periph_clock_enable(RCC_INTERNAL_LED);
 
     /* Enable clocks for GPIO port B (for GPIO_USART3_TX) and USART3. */
     rcc_periph_clock_enable(RCC_USART1);
@@ -34,8 +34,8 @@ static void usart_setup(void) {
 
 static void gpio_setup(void) {
     /* Set GPIO12 (in GPIO port C) to 'output push-pull'. */
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-            GPIO13);
+    gpio_set_mode(INTERNAL_LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+            INTERNAL_LED);
 }
 
 char welcome[] = "Echo test\n";
@@ -50,8 +50,7 @@ int main(void) {
         usart_send_blocking(USART1, welcome[i]);
     }
     while (1) {
-        gpio_toggle(GPIOC, GPIO13); /* LED on/off */
+        gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED); /* LED on/off */
         usart_send_blocking(USART1, usart_recv_blocking(USART1));
     }
 }
-
