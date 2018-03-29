@@ -68,6 +68,8 @@ void systick_setup(){
     systick_counter_enable();
 }
 
+
+
 int main(void) {
     /* Change interrupt vector table location to avoid conflict with */
     /* serial bootloader interrupt vectors */
@@ -78,9 +80,10 @@ int main(void) {
     systick_setup();
     setup_buzzer();
 
-    //beep(NOTE_B5,2000);
-
-    play_melody();
+    beep_blocking(NOTE_B5,2000);
+    silence_blocking(100);
+    beep_blocking(NOTE_C5,1000);
+    //play_melody();
 
     while (1) {}
     return 0;

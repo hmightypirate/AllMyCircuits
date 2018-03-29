@@ -71,8 +71,26 @@ int beep(int tone, int duration) {
     return 0;
 }
 
-int silence() {
+int stop() {
     timer_set_oc_value(TIM3, TIM_OC1, 0);
+    return 0;
+}
+
+int silence(duration) {
+    beep_remaining = duration;
+    timer_set_oc_value(TIM3, TIM_OC1, 0);
+    return 0;
+}
+
+uint32_t get_beep_remaining(){
+    return beep_remaining;
+}
+
+int silence_blocking(int duration) {
+    silence(duration);
+    while(get_beep_remaining() > 0){
+                  __asm__("nop");
+    }
     return 0;
 }
 
@@ -85,8 +103,11 @@ uint32_t buzzer_systick() {
     return beep_remaining;
 }
 
-uint32_t get_beep_remaining(){
-    return beep_remaining;
+void beep_blocking(int tone, int duration) {
+    beep(tone,duration);
+    while(get_beep_remaining() > 0){
+                  __asm__("nop");
+    }
 }
 
 void play_melody() {
@@ -144,11 +165,11 @@ void play_melody() {
         12, 12, 12, 12,
       };
 
-      int size = sizeof(melody) / sizeof(int);
-      for (int thisNote = 0; thisNote < size; thisNote++) {
+      int melody_size = sizeof(melody) / sizeof(int);
+      for (int thisNote = 0; thisNote < melody_size; thisNote++) {
           int noteDuration = 1000 / tempo[thisNote];
 
-          beep(melody[thisNote],noteDuration);
+          beep(NOTE_CS5,1000);
 //          while(get_beep_remaining() > 0){
 //              __asm__("nop");
 //          }
