@@ -1,4 +1,4 @@
-#define DISABLE_SYSTICK
+//#define DISABLE_SYSTICK
 
 #include <string.h>
 #include <stdio.h>

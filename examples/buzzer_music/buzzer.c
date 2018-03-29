@@ -1,4 +1,4 @@
-RCC_INTERNAL_LED#include <string.h>
+#include <string.h>
 #include <stdio.h>
 
 #include <errno.h>
@@ -11,7 +11,7 @@ RCC_INTERNAL_LED#include <string.h>
 #include <libopencm3/cm3/scb.h>
 #include <libopencm3/cm3/systick.h>
 
-#include "./libmusic.h"
+#include "libmusic.h"
 
 
 
