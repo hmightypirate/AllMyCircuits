@@ -148,6 +148,72 @@ void motor_pwm_setup(void)
   timer_enable_counter(TIM4);
 }
 
+void sensor_setup(void)
+{
+    int i;
+
+    /* Make sure the ADC doesn't run during config. */
+    adc_power_off(SENSOR_ADC);
+
+    /* We configure everything for one single conversion. */
+    adc_disable_scan_mode(SENSOR_ADC);
+    adc_set_single_conversion_mode(SENSOR_ADC);
+    adc_disable_external_trigger_regular(SENSOR_ADC);
+    adc_set_right_aligned(ADC1);
+    /* We want to read the temperature sensor, so we have to enable it. */
+
+    adc_set_sample_time_on_all_channels(SENSOR_ADC,
+                                        ADC_SMPR_SMP_28DOT5CYC);
+
+    adc_power_on(SENSOR_ADC);
+
+    /* Wait for ADC starting up. */
+    for (i = 0; i < 800000; i++)    /* Wait a bit. */
+        __asm__("nop");
+
+    adc_reset_calibration(SENSOR_ADC);
+    adc_calibrate(SENSOR_ADC);
+}
+
+void gpio_setup(void)
+{
+  /* Sensors */
+  gpio_set_mode(SENSOR_0_GPIO, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_0_PORT);
+  gpio_set_mode(SENSOR_1_GPIO, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_1_PORT);
+  gpio_set_mode(SENSOR_2_GPIO, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_2_PORT);
+  gpio_set_mode(SENSOR_3_GPIO, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_3_PORT);
+  gpio_set_mode(SENSOR_4_GPIO, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_4_PORT);
+  gpio_set_mode(SENSOR_5_GPIO, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_5_PORT);
+  gpio_set_mode(SENSOR_6_GPIO, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_6_PORT);
+  gpio_set_mode(SENSOR_7_GPIO, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_7_PORT);
+
+  /* Set internal LED */
+  gpio_set_mode(LED_GPIO, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                LED_PORT);
+  
+  /* Set motor control ports */
+  /* Control GPIOs configuration for right motor */
+  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO10 | GPIO11);
+
+  /* Left motor control AIN2: PB5 */
+  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO5);
+  
+  /* Control GPIOs configuration for left motor */
+  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO12);
+}
+  
+
 
 /* 
  * @brief setup of microcontroller functionality
@@ -162,6 +228,7 @@ void setup(void)
   rcc_clock_setup_in_hse_8mhz_out_72mhz();
   
   clock_setup();
+  gpio_setup();
   usart_setup();
   motor_pwm_setup();
   /* left encoder */
@@ -179,6 +246,7 @@ void setup(void)
                 RIGHT_ENCODER_CHANNEL1_TI,
                 RIGHT_ENCODER_CHANNEL2_TI);
 
+  sensor_setup();
   // TODO: GPIO (sensor, motor control and LED)
 }
 

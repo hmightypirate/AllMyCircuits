@@ -6,6 +6,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/adc.h>
 
 /** 
  * Maximum PWM period 
@@ -50,6 +51,39 @@
 #define RIGHT_ENCODER_CHANNEL1_TI TIM_IC_IN_TI1
 #define RIGHT_ENCODER_CHANNEL2_TI TIM_IC_IN_TI4
 
+/* Sensors */
+#define SENSOR_ADC ADC1
+#define SENSOR_0_GPIO GPIOA
+#define SENSOR_0_PORT GPIO0
+#define SENSOR_1_GPIO GPIOA
+#define SENSOR_1_PORT GPIO1
+#define SENSOR_2_GPIO GPIOA
+#define SENSOR_2_PORT GPIO2
+#define SENSOR_3_GPIO GPIOA
+#define SENSOR_3_PORT GPIO3
+#define SENSOR_4_GPIO GPIOA
+#define SENSOR_4_PORT GPIO4
+#define SENSOR_5_GPIO GPIOA
+#define SENSOR_5_PORT GPIO5
+#define SENSOR_6_GPIO GPIOA
+#define SENSOR_6_PORT GPIO6
+#define SENSOR_7_GPIO GPIOA
+#define SENSOR_7_PORT GPIO7
+
+/* LED */
+#define LED_GPIO GPIOC
+#define LED_PORT GPIO13
+
+/* MOTOR CONTROL */
+#define LEFT_MOTOR_IN1_GPIO GPIOA
+#define LEFT_MOTOR_IN1_PORT GPIO12
+#define LEFT_MOTOR_IN2_GPIO GPIOB
+#define LEFT_MOTOR_IN2_PORT GPIO5
+
+#define RIGHT_MOTOR_IN1_GPIO GPIOB
+#define RIGHT_MOTOR_IN1_PORT GPIO10
+#define RIGHT_MOTOR_IN2_GPIO GPIOB
+#define RIGHT_MOTOR_IN2_PORT GPIO11
 
 void setup(void);
 
