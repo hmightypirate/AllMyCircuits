@@ -1,7 +1,7 @@
 sinclude ../../rules.mk
 
 
-CSRC = *.c
+CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
 agonizing_automobile.elf: $(OBJ)
@@ -19,7 +19,7 @@ clean_all:
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: agonzing_automobile.bin
+bin: agonizing_automobile.bin
 
 all: libopencm3 agonizing_automobile.bin
 
