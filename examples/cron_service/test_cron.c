@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdio.h>
-
 #include <errno.h>
 #include <unistd.h>
+
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
@@ -12,25 +12,7 @@
 #include <libopencm3/cm3/systick.h>
 
 #include "cron.h"
-
 #include "buzzer.h"
-
-
-int _write(int file, char *ptr, int len)
-{
-    int i;
-
-    if (file == 1) {
-        for (i = 0; i < len; i++)
-            usart_send_blocking(USART1, ptr[i]);
-        return i;
-    }
-
-    errno = EIO;
-    return -1;
-}
-
-uint32_t beep_end = 0;
 
 void gpio_setup(void) {
     /* Enable GPIOB clock (for PWM pins) */
@@ -58,14 +40,14 @@ int main(void) {
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
     gpio_setup();
     cron_setup();
+    buzzer_setup();
     cron_add(led_blink);
-    //setup_buzzer();
 
-    //beep_blocking(NOTE_B5,2000);
-    //silence_blocking(100);
-    //beep_blocking(NOTE_C5,1000);
-    //play_melody();
+    beep_blocking(NOTE_C5,500);
 
-    while (1) {}
+    while (1) {
+        play_melody_blocking();
+        silence_blocking(1000);
+    }
     return 0;
 }
