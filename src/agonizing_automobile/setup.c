@@ -239,6 +239,7 @@ void setup(void)
                 LEFT_ENCODER_CHANNEL1_TI,
                 LEFT_ENCODER_CHANNEL2_TI);
 
+  /* Right encoder */
   encoder_setup(RIGHT_ENCODER_TIMER,
                 RIGHT_ENCODER_AFIO,
                 RIGHT_ENCODER_CHANNEL1,
@@ -246,7 +247,8 @@ void setup(void)
                 RIGHT_ENCODER_CHANNEL1_TI,
                 RIGHT_ENCODER_CHANNEL2_TI);
 
+  /* Line sensor setup */
   sensor_setup();
-  // TODO: GPIO (sensor, motor control and LED)
+
 }
 

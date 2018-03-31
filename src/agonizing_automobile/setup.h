@@ -7,11 +7,8 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/adc.h>
+#include "commons.h"
 
-/** 
- * Maximum PWM period 
-*/
-#define MAX_VEL_MOTOR 1024
 
 /* 
  *Active if alternate functions of pins are used 
