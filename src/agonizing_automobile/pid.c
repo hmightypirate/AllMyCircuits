@@ -1,6 +1,35 @@
 #include "pid.h"
 
+/*
+  PID values
+  k_p = (0.3 * 100)
+  k_i = 0
+  k_d = 10 (* 100)
 
+ */
+static uint32_t k_p = 30;  /* 0.3 * 100 */
+static uint32_t k_i = 0; /* integral part */
+static uint32_t k_d = 1000; /* derivative term */ 
+
+static long integral = 0;
+static int derivative = 0;
+static int former_proportional = 0;
+
+/*
+ * @brief resets pid variables
+ */
+void reset_pid()
+{
+  former_proportional = 0;
+  derivative = 0;
+  integral = 0;
+}
+
+/*
+ * @brief pid calculation
+ *
+ * @param[in] proportional current measure of sensors
+ */
 int pid(int proportional)
 {
   int error;
