@@ -2,6 +2,33 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
 
+static void clock_setup(void);
+static void usart_setup(void);
+static void gpio_setup(void);
+
+char welcome[] = "Echo test\n";
+#define WELCOME_SIZE 10
+
+
+
+
+int main(void) {
+    clock_setup();
+    gpio_setup();
+    usart_setup();
+
+    for (int i = 0; i < WELCOME_SIZE; i++){
+        usart_send_blocking(USART1, welcome[i]);
+    }
+    while (1) {
+        gpio_toggle(GPIOC, GPIO13); /* LED on/off */
+        usart_send_blocking(USART1, usart_recv_blocking(USART1));
+    }
+}
+
+
+
+
 static void clock_setup(void) {
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
@@ -37,21 +64,3 @@ static void gpio_setup(void) {
     gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
             GPIO13);
 }
-
-char welcome[] = "Echo test\n";
-#define WELCOME_SIZE 10
-
-int main(void) {
-    clock_setup();
-    gpio_setup();
-    usart_setup();
-
-    for (int i = 0; i < WELCOME_SIZE; i++){
-        usart_send_blocking(USART1, welcome[i]);
-    }
-    while (1) {
-        gpio_toggle(GPIOC, GPIO13); /* LED on/off */
-        usart_send_blocking(USART1, usart_recv_blocking(USART1));
-    }
-}
-
