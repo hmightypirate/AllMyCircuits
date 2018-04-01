@@ -1,5 +1,4 @@
 
-
 #define C0 0
 #define CX0 1
 #define D0 2
@@ -108,7 +107,6 @@
 #define A8 105
 #define AX8 106
 #define B8 107
-
 #define R 108 // no note, or rest
 
 

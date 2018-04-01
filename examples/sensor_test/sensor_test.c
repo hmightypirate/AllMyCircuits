@@ -47,7 +47,7 @@ static void clock_setup(void)
 
     /* Enable GPIOC clock. */
     rcc_periph_clock_enable(RCC_GPIOA);
-        rcc_periph_clock_enable(RCC_GPIOC);
+    rcc_periph_clock_enable(RCC_INTERNAL_LED);
 
     /* Enable clocks for GPIO port B (for GPIO_USART3_TX) and USART3. */
     rcc_periph_clock_enable(RCC_USART1);
@@ -123,8 +123,8 @@ static void adc_setup(void)
 static void gpio_setup(void)
 {
     /* Set GPIO12 (in GPIO port C) to 'output push-pull'. */
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ,
-              GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+    gpio_set_mode(INTERNAL_LED_PORT, GPIO_MODE_OUTPUT_2_MHZ,
+              GPIO_CNF_OUTPUT_PUSHPULL, INTERNAL_LED);
 }
 
 
@@ -151,7 +151,7 @@ int main(void)
 
     /* Blink the LED (PC12) on the board with every transmitted byte. */
     while (1) {
-        gpio_toggle(GPIOC, GPIO13); /* LED on/off */
+        gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED); /* LED on/off */
 
                 uint16_t input_adc0 = read_adc_naiive(0);
                 uint16_t input_adc1 = read_adc_naiive(1);
