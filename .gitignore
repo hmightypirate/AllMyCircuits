@@ -8,3 +8,5 @@ stm32loader.py
 .project
 .settings
 *.orig
+.vscode
+.idea
