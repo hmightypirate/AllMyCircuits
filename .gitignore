@@ -2,6 +2,7 @@
 *.bin
 *.o
 *.d
+*.a
 #
 stm32loader.py
 .cproject
