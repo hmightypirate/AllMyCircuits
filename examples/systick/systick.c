@@ -8,10 +8,10 @@ uint32_t temp32;
 
 static void gpio_setup(void) {
     /* Enable GPIOB clock. */
-    rcc_periph_clock_enable(RCC_GPIOC);
+    rcc_periph_clock_enable(RCC_INTERNAL_LED);
 
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-            GPIO13);
+    gpio_set_mode(INTERNAL_LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+            INTERNAL_LED);
 }
 
 void sys_tick_handler(void) {
@@ -19,7 +19,7 @@ void sys_tick_handler(void) {
 
     /* We call this handler every 1ms so 1000ms = 1s on/off. */
     if (temp32 == 1000) {
-        gpio_toggle(GPIOC, GPIO13);
+        gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
         temp32 = 0;
     }
 }
@@ -28,7 +28,7 @@ int main(void) {
     /* Change interrupt vector table location to avoid conflict with */
     /* serial bootloader interrupt vectors */
     SCB_VTOR = (uint32_t)0x08000000;
-    
+
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
     gpio_setup();
 

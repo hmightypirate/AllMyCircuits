@@ -148,7 +148,7 @@ temp32++;
 
     /* We call this handler every 1ms so 1000ms = 1s on/off. */
     if (temp32 >= 1000) {
-        gpio_toggle(GPIOC, GPIO13);
+        gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
         temp32 = 0;
     }
 }
@@ -158,12 +158,12 @@ void gpio_setup(void) {
     /* Enable GPIOB clock (for PWM pins) */
     rcc_periph_clock_enable(RCC_GPIOB);
 
-    /* Enable GPIOC clock (For internal LED */
-    rcc_periph_clock_enable(RCC_GPIOC);
+    /* Enable INTERNAL_LED_PORT clock (For internal LED */
+    rcc_periph_clock_enable(RCC_INTERNAL_LED);
 
     /* Set internal LED */
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-            GPIO13);
+    gpio_set_mode(INTERNAL_LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+            INTERNAL_LED);
 
     rcc_periph_clock_enable(RCC_GPIOA);
 
@@ -335,12 +335,12 @@ int main(void) {
 
     while (1) {
 #ifndef DISABLE_SYSTICK
-        gpio_set(GPIOC, GPIO13);
+        gpio_set(INTERNAL_LED_PORT, INTERNAL_LED);
 #endif
         for (int i = 0; i < 100000; ++i)
             __asm__("nop");
 #ifndef DISABLE_SYSTICK
-        gpio_clear(GPIOC, GPIO13);
+        gpio_clear(INTERNAL_LED_PORT, INTERNAL_LED);
 #endif
         if (play_note(note) == -1){
             printf("Error on playing note %d\n", note);

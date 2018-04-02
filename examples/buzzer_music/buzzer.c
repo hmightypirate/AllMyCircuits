@@ -33,11 +33,11 @@ int _write(int file, char *ptr, int len)
 uint32_t temp32 = 0;
 
 void sys_tick_handler(void) {
-temp32++;
+    temp32++;
 
     /* We call this handler every 0.1ms so 10000ms = 1s on/off. */
     if (temp32 >= 10000) {
-        gpio_toggle(GPIOC, GPIO13);
+        gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
         temp32 = 0;
     }
 
@@ -46,15 +46,15 @@ temp32++;
 
 
 void gpio_setup(void) {
-    /* Enable GPIOB clock (for PWM pins) */
-    rcc_periph_clock_enable(RCC_GPIOB);
+    /* Enable INTERNAL_LED_PORT clock (for PWM pins) */
+    rcc_periph_clock_enable(RCC_INTERNAL_LED);
 
     /* Enable GPIOC clock (For internal LED */
     rcc_periph_clock_enable(RCC_GPIOC);
 
     /* Set internal LED */
-    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-            GPIO13);
+    gpio_set_mode(INTERNAL_LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+            INTERNAL_LED);
     /* For USART (and buzzer) */
     rcc_periph_clock_enable(RCC_GPIOA);
 
@@ -126,7 +126,7 @@ int main(void) {
             ,  8, 8, 8,  8, 8, 8,  8, 8, 8,  8, 8, 8
             ,  8, 8, 8,  8, 8, 8,  8, 8, 8,  8, 8, 8
             ,  8, 8, 8,  8, 8, 8,  8, 8, 8,  8, 8, 8};
-    play_music(60, LENGTH, notes_pitch, notes_duration);
+    //play_music(60, LENGTH, notes_pitch, notes_duration);
 
     char welcome[20];
     sprintf(welcome, "%d\n", 42);
