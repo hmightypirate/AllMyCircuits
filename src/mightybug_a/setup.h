@@ -1,0 +1,87 @@
+#ifndef __SETUP_H
+#define __SETUP_H
+
+#include <libopencm3/cm3/scb.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/adc.h>
+#include "commons.h"
+
+
+/* 
+ *Active if alternate functions of pins are used 
+*/
+#define USE_ALTERNATE_FUNCTIONS 1
+#define NO_AFIO 0
+
+/* Wrapper of RCC timers */
+#define RCC_LEFT_ENCODER RCC_TIM2
+#define RCC_RIGHT_ENCODER RCC_TIM1
+#define RCC_PWM_ENGINE RCC_TIM4
+#define RCC_ADC_SENSORS RCC_ADC1
+
+/*
+ * Usart parameters
+ */
+#define USART_BAUDRATE 115200
+#define USART_DATABITS 9
+#define USART_STOPBITS USART_STOPBITS_1
+#define USART_MODE USART_MODE_TX_RX
+#define USART_PARITY USART_PARITY_EVEN
+#define USART_FLOWCONTROL USART_FLOWCONTROL_NONE
+
+
+/* Encoder parameters */
+#define LEFT_ENCODER_TIMER TIM2
+#define LEFT_ENCODER_AFIO AFIO_MAPR_TIM2_REMAP_FULL_REMAP
+#define LEFT_ENCODER_CHANNEL1 TIM_IC1
+#define LEFT_ENCODER_CHANNEL2 TIM_IC2
+#define LEFT_ENCODER_CHANNEL1_TI TIM_IC_IN_TI1
+#define LEFT_ENCODER_CHANNEL2_TI TIM_IC_IN_TI2
+
+#define RIGHT_ENCODER_TIMER TIM1
+#define RIGHT_ENCODER_AFIO NO_AFIO
+#define RIGHT_ENCODER_CHANNEL1 TIM_IC1
+#define RIGHT_ENCODER_CHANNEL2 TIM_IC4
+#define RIGHT_ENCODER_CHANNEL1_TI TIM_IC_IN_TI1
+#define RIGHT_ENCODER_CHANNEL2_TI TIM_IC_IN_TI4
+
+/* Sensors */
+#define SENSOR_ADC ADC1
+#define SENSOR_0_GPIO GPIOA
+#define SENSOR_0_PORT GPIO0
+#define SENSOR_1_GPIO GPIOA
+#define SENSOR_1_PORT GPIO1
+#define SENSOR_2_GPIO GPIOA
+#define SENSOR_2_PORT GPIO2
+#define SENSOR_3_GPIO GPIOA
+#define SENSOR_3_PORT GPIO3
+#define SENSOR_4_GPIO GPIOA
+#define SENSOR_4_PORT GPIO4
+#define SENSOR_5_GPIO GPIOA
+#define SENSOR_5_PORT GPIO5
+#define SENSOR_6_GPIO GPIOA
+#define SENSOR_6_PORT GPIO6
+#define SENSOR_7_GPIO GPIOA
+#define SENSOR_7_PORT GPIO7
+
+/* LED */
+#define LED_GPIO GPIOC
+#define LED_PORT GPIO13
+
+/* MOTOR CONTROL */
+#define LEFT_MOTOR_IN1_GPIO GPIOA
+#define LEFT_MOTOR_IN1_PORT GPIO12
+#define LEFT_MOTOR_IN2_GPIO GPIOB
+#define LEFT_MOTOR_IN2_PORT GPIO5
+
+#define RIGHT_MOTOR_IN1_GPIO GPIOB
+#define RIGHT_MOTOR_IN1_PORT GPIO10
+#define RIGHT_MOTOR_IN2_GPIO GPIOB
+#define RIGHT_MOTOR_IN2_PORT GPIO11
+
+void setup(void);
+
+#endif /* __SETUP_H */
