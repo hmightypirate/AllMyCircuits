@@ -11,9 +11,9 @@ static uint32_t k_p = 30;  /* 0.3 * 100 */
 static uint32_t k_i = 0; /* integral part */
 static uint32_t k_d = 1000; /* derivative term */ 
 
-static long integral = 0;
-static int derivative = 0;
-static int former_proportional = 0;
+static int64_t integral = 0;
+static int32_t derivative = 0;
+static int32_t former_proportional = 0;
 
 /*
  * @brief resets pid variables
@@ -30,9 +30,9 @@ void reset_pid()
  *
  * @param[in] proportional current measure of sensors
  */
-int pid(int proportional)
+int32_t pid(int32_t proportional)
 {
-  int error;
+  int32_t error;
   integral = integral + proportional;
   if (integral > 0 && integral > MAX_INTEGRAL)
     {
