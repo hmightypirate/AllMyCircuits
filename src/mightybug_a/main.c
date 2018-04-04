@@ -36,7 +36,7 @@ int main(void)
 
       /* motor control */
 
-      if (is_out_of_line())
+      if (!is_out_of_line())
         {
           motor_control(error);
         }
