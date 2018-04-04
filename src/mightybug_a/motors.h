@@ -10,5 +10,6 @@
 
 void reset_target_velocity(int target_vel);
 void motor_control(int error);
+void stop_motors();
 
 #endif /* __MOTORS_H */

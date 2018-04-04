@@ -23,5 +23,6 @@ void hard_reset_sensors(void);
 
 void read_line_sensors(uint16_t* sensor_value);
 int get_line_position(uint16_t* value);
+int is_out_of_line();
 
 #endif /* __SENSORS_H */

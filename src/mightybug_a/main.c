@@ -35,8 +35,15 @@ int main(void)
       error = pid(proportional);
 
       /* motor control */
-      motor_control(error);
-      
+
+      if (is_out_of_line())
+        {
+          motor_control(error);
+        }
+      else
+        {
+          stop_motors();
+        }
     }
   
   return 0;

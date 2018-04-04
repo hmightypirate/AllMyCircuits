@@ -159,4 +159,15 @@ void motor_control(int error)
   
 }
 
+/*
+ * @brief stop the motors
+ *
+ * @note: this function (to date) did not change the motor control signals
+ * 
+ */
+void stop_motors()
+{
+  set_motor_velocity(0, 0);
   
+}
+

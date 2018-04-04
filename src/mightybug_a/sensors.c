@@ -142,6 +142,15 @@ int get_line_position(uint16_t* value)
 }
 
 /*
+ * @brief return the out of line flag
+ * 
+ */
+int is_out_of_line()
+{
+  return out_of_line;
+}
+
+/*
  * @brief callibrate sensors
  */
 void calibrate_sensors()
