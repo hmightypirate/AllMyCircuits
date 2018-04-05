@@ -1,5 +1,5 @@
-#ifndef __SENSORS_H
-#define __SENSORS_H
+#ifndef __LED_H
+#define __LED_H
 
 #include "setup.h"
 #include <stdio.h>
@@ -13,4 +13,4 @@ void async_blink();
 void set_led();
 void clear_led();
 
-#endif /* __SENSORS_H */
+#endif /* __LED_H */
