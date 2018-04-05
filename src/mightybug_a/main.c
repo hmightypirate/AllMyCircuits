@@ -2,6 +2,7 @@
 #include "pid.h"
 #include "motors.h"
 #include "sensors.h"
+#include "led.h"
 
 /**
  * @brief Initial setup and main loop
@@ -22,6 +23,9 @@ int main(void)
   /* reset pid */
   reset_pid();
 
+  /* led: setting async period */
+  set_async_period(LED_ASYNC_PERIOD);
+  
   //FIXME: do some state machine here (callibration, running, etc)
   while(1)
     {
@@ -33,16 +37,22 @@ int main(void)
       /* pid control */
       int error = 0;
       error = pid(proportional);
-
+  
       /* motor control */
       if (!is_out_of_line())
         {
           motor_control(error);
+
+          // blinking: normal behaviour
+          async_blink();
         }
       else
         {
           // stop the motors if out of line
           stop_motors();
+
+          // sets the led
+          set_led();
         }
     }
   
