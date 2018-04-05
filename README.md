@@ -60,3 +60,4 @@ python stm32loader.py -p SERIAL_PORT -e -w -V -g 0x08000000 -v bluepill_test.bin
 * stm32loader.py: https://github.com/jsnyder/stm32loader
 * libopencm3: https://github.com/libopencm3/libopencm3
 * pill_blink: https://github.com/satoshinm/pill_blink
+* Large set of examples with the stm32f1 microcontroller: https://github.com/g4lvanix/STM32F1-workarea
