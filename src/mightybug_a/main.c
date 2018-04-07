@@ -4,10 +4,9 @@
 #include "sensors.h"
 #include "led.h"
 
-/**
+/*
  * @brief Initial setup and main loop
  */
-
 int main(void)
 {
   /* setup microcontroller */
