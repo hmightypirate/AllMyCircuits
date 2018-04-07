@@ -22,7 +22,7 @@ void async_blink()
 {
   if (num_calls >= async_period)
     {
-      gpio_toggle(LED_GPIO, LED_PORT);
+      gpio_toggle(LED_PORT, LED_PIN);
 
       // resetting counter
       num_calls = 0;
@@ -35,7 +35,7 @@ void async_blink()
  */
 void set_led()
 {
-  gpio_set(LED_GPIO, LED_PORT);
+  gpio_set(LED_PORT, LED_PIN);
 }
 
 /*
@@ -44,5 +44,5 @@ void set_led()
  */
 void clear_led()
 {
-  gpio_clear(LED_GPIO, LED_PORT);
+  gpio_clear(LED_PORT, LED_PIN);
 }

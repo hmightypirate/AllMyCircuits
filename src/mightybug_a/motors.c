@@ -120,18 +120,18 @@ void motor_control(int error)
   if (left_vel >= 0)
     {
       /* move left motor forward */
-      move_forward(LEFT_MOTOR_IN1_GPIO,
-                   LEFT_MOTOR_IN1_PORT,
-                   LEFT_MOTOR_IN2_GPIO,
-                   LEFT_MOTOR_IN2_PORT);
+      move_forward(LEFT_MOTOR_IN1_PORT,
+                   LEFT_MOTOR_IN1_PIN,
+                   LEFT_MOTOR_IN2_PORT,
+                   LEFT_MOTOR_IN2_PIN);
     }
   else
     {
       /* move left motor backward */
-      move_backward(LEFT_MOTOR_IN1_GPIO,
-                    LEFT_MOTOR_IN1_PORT,
-                    LEFT_MOTOR_IN2_GPIO,
-                    LEFT_MOTOR_IN2_PORT);
+      move_backward(LEFT_MOTOR_IN1_PORT,
+                    LEFT_MOTOR_IN1_PIN,
+                    LEFT_MOTOR_IN2_PORT,
+                    LEFT_MOTOR_IN2_PIN);
 
       left_vel = -left_vel;
     }
@@ -139,18 +139,18 @@ void motor_control(int error)
   if (right_vel >= 0)
     {
       /* move right motor forward */
-      move_forward(RIGHT_MOTOR_IN1_GPIO,
-                   RIGHT_MOTOR_IN1_PORT,
-                   RIGHT_MOTOR_IN2_GPIO,
-                   RIGHT_MOTOR_IN2_PORT);
+      move_forward(RIGHT_MOTOR_IN1_PORT,
+                   RIGHT_MOTOR_IN1_PIN,
+                   RIGHT_MOTOR_IN2_PORT,
+                   RIGHT_MOTOR_IN2_PIN);
     }
   else
     {
       /* move right motor backward */
-      move_backward(RIGHT_MOTOR_IN1_GPIO,
-                    RIGHT_MOTOR_IN1_PORT,
-                    RIGHT_MOTOR_IN2_GPIO,
-                    RIGHT_MOTOR_IN2_PORT);
+      move_backward(RIGHT_MOTOR_IN1_PORT,
+                    RIGHT_MOTOR_IN1_PIN,
+                    RIGHT_MOTOR_IN2_PORT,
+                    RIGHT_MOTOR_IN2_PIN);
 
       right_vel = -right_vel;
     }

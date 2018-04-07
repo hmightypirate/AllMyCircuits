@@ -163,7 +163,7 @@ void calibrate_sensors()
  */
 void enable_sensors()
 {
-  gpio_set(SENSOR_ON_GPIO, SENSOR_ON_PORT);
+  gpio_set(SENSOR_ON_PORT, SENSOR_ON_PIN);
 }
 
 /*
@@ -171,5 +171,5 @@ void enable_sensors()
  */
 void disable_sensors()
 {
-  gpio_clear(SENSOR_ON_GPIO, SENSOR_ON_PORT);
+  gpio_clear(SENSOR_ON_PORT, SENSOR_ON_PIN);
 }

@@ -178,39 +178,43 @@ void sensor_setup(void)
 void gpio_setup(void)
 {
   /* Sensors */
-  gpio_set_mode(SENSOR_0_GPIO, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_ANALOG, SENSOR_0_PORT);
-  gpio_set_mode(SENSOR_1_GPIO, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_ANALOG, SENSOR_1_PORT);
-  gpio_set_mode(SENSOR_2_GPIO, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_ANALOG, SENSOR_2_PORT);
-  gpio_set_mode(SENSOR_3_GPIO, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_ANALOG, SENSOR_3_PORT);
-  gpio_set_mode(SENSOR_4_GPIO, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_ANALOG, SENSOR_4_PORT);
-  gpio_set_mode(SENSOR_5_GPIO, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_ANALOG, SENSOR_5_PORT);
-  gpio_set_mode(SENSOR_6_GPIO, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_ANALOG, SENSOR_6_PORT);
-  gpio_set_mode(SENSOR_7_GPIO, GPIO_MODE_INPUT,
-                GPIO_CNF_INPUT_ANALOG, SENSOR_7_PORT);
+  gpio_set_mode(SENSOR_0_PORT, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_0_PIN);
+  gpio_set_mode(SENSOR_1_PORT, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_1_PIN);
+  gpio_set_mode(SENSOR_2_PORT, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_2_PIN);
+  gpio_set_mode(SENSOR_3_PORT, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_3_PIN);
+  gpio_set_mode(SENSOR_4_PORT, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_4_PIN);
+  gpio_set_mode(SENSOR_5_PORT, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_5_PIN);
+  gpio_set_mode(SENSOR_6_PORT, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_6_PIN);
+  gpio_set_mode(SENSOR_7_PORT, GPIO_MODE_INPUT,
+                GPIO_CNF_INPUT_ANALOG, SENSOR_7_PIN);
 
   /* Set internal LED */
-  gpio_set_mode(LED_GPIO, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-                LED_PORT);
+  gpio_set_mode(LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                LED_PIN);
   
   /* Set motor control ports */
   /* Control GPIOs configuration for right motor */
-  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-                GPIO10 | GPIO11);
+  gpio_set_mode(RIGHT_MOTOR_IN1_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                RIGHT_MOTOR_IN1_PIN);
 
+  gpio_set_mode(RIGHT_MOTOR_IN2_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                RIGHT_MOTOR_IN2_PIN);
+
+  
   /* Left motor control AIN2: PB5 */
-  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-                GPIO5);
+  gpio_set_mode(LEFT_MOTOR_IN2_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                LEFT_MOTOR_IN2_PIN);
   
   /* Control GPIOs configuration for left motor */
-  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-                GPIO12);
+  gpio_set_mode(LEFT_MOTOR_IN1_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                LEFT_MOTOR_IN1_PIN);
 }
   
 
