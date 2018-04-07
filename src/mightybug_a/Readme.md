@@ -13,10 +13,10 @@ The car uses a PID controller to adapt the velocity of the motors to the current
 - sensors.h: black/white sensor values can be configured here. The FOLLOW_BLACK_LINE flag can be used to configure the car to follow white lines (if it is set to 0)
 
 ## Changelog
+c
+See Changelog.md
 
-* 1.0.0 (Agonizing Automobile)
-
-Release date: -
+## Known issues:
 
 ** initial loop: sensor + pid + motor control
 ** white and black line (line follower)
