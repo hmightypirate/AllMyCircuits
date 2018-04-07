@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 Used (Added, Changed, Fixed and Removed)
 
 
-## [Unreleased] - 
+## [Agonizing Automobile: Unreleased] - 
 
 ### Added
 - initial structure: sensor + pid + motor control
@@ -32,13 +32,13 @@ Used (Added, Changed, Fixed and Removed)
 	
 ## Known issues:
 
-** initial loop: sensor + pid + motor control
-** white and black line (line follower)
-** car stops if it is out of line
-** no parameter adaptation
-** no serial communication
-** no interruptions
-** no encoders
-** no systick
+- initial loop: sensor + pid + motor control
+- white and black line (line follower)
+- car stops if it is out of line
+- no parameter adaptation
+- no serial communication
+- no interruptions
+- no encoders
+- no systick
 
 
