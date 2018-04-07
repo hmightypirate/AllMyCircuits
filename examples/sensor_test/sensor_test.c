@@ -25,7 +25,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#define WAIT_NUMBER 80 // for a relevant wait time amount write 800000 or more
+#define WAIT_NUMBER 800000 // for a relevant wait time amount write 800000 or more
 
 int _write(int file, char *ptr, int len)
 {
@@ -45,8 +45,9 @@ static void clock_setup(void)
 {
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
-    /* Enable GPIOC clock. */
+    /* Enable GPIOA, GPIOB and GPIOC clock. */
     rcc_periph_clock_enable(RCC_GPIOA);
+    rcc_periph_clock_enable(RCC_GPIOB);
     rcc_periph_clock_enable(RCC_INTERNAL_LED);
 
     /* Enable clocks for GPIO port B (for GPIO_USART3_TX) and USART3. */
@@ -125,6 +126,11 @@ static void gpio_setup(void)
     /* Set GPIO12 (in GPIO port C) to 'output push-pull'. */
     gpio_set_mode(INTERNAL_LED_PORT, GPIO_MODE_OUTPUT_2_MHZ,
               GPIO_CNF_OUTPUT_PUSHPULL, INTERNAL_LED);
+
+    /* Set GPIO B1 to 'output push-pull' */
+    gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ,
+              GPIO_CNF_OUTPUT_PUSHPULL, GPIO1);
+
 }
 
 
@@ -148,6 +154,9 @@ int main(void)
     gpio_setup();
     usart_setup();
     adc_setup();
+
+    /* Enable sensors */
+    gpio_set(GPIOB, GPIO1);
 
     /* Blink the LED (PC12) on the board with every transmitted byte. */
     while (1) {
