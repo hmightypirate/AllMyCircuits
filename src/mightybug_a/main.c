@@ -25,6 +25,9 @@ int main(void)
 
   /* led: setting async period */
   set_async_period(LED_ASYNC_PERIOD);
+
+  /* enable sensors */
+  enable_sensors();
   
   //FIXME: do some state machine here (callibration, running, etc)
   while(1)
