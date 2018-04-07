@@ -50,6 +50,8 @@
 
 /* Sensors */
 #define SENSOR_ADC ADC1
+#define SENSOR_ON_GPIO GPIOB
+#define SENSOR_ON_PORT GPIO1
 #define SENSOR_0_GPIO GPIOA
 #define SENSOR_0_PORT GPIO0
 #define SENSOR_1_GPIO GPIOA

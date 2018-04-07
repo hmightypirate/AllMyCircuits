@@ -157,3 +157,19 @@ void calibrate_sensors()
 {
   //TODO
 }
+
+/*
+ * @brief enable sensors
+ */
+void enable_sensors()
+{
+  gpio_set(SENSOR_ON_GPIO, SENSOR_ON_PORT);
+}
+
+/*
+ * @brief disable sensors
+ */
+void disable_sensors()
+{
+  gpio_clear(SENSOR_ON_GPIO, SENSOR_ON_PORT);
+}
