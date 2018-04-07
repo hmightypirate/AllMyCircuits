@@ -13,9 +13,23 @@ The car uses a PID controller to adapt the velocity of the motors to the current
 - sensors.h: black/white sensor values can be configured here. The FOLLOW_BLACK_LINE flag can be used to configure the car to follow white lines (if it is set to 0)
 
 ## Changelog
-c
-See Changelog.md
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+
+Used (Added, Changed, Fixed and Removed)
+
+
+## [Unreleased] - 
+
+### Added
+- initial structure: sensor + pid + motor control
+- white and black line (line follower)
+- added basic pid	
+
+	
 ## Known issues:
 
 ** initial loop: sensor + pid + motor control
