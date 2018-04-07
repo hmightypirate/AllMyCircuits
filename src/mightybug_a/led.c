@@ -27,6 +27,8 @@ void async_blink()
       // resetting counter
       num_calls = 0;
     }
+  
+  num_calls++;
 }
 
 /*

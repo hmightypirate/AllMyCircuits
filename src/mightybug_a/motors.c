@@ -95,7 +95,7 @@ void motor_control(int error)
 
   left_vel = target_velocity + error;
   right_vel = target_velocity - error;
-  
+
   if (left_vel > MAX_VEL_MOTOR)
     {
       left_vel = MAX_VEL_MOTOR;
@@ -109,11 +109,11 @@ void motor_control(int error)
     {
       right_vel = MAX_VEL_MOTOR;
     }
-  else if (right_vel < MAX_VEL_MOTOR)
+  else if (right_vel < -MAX_VEL_MOTOR)
     {
       right_vel = -MAX_VEL_MOTOR;
     }
-
+  
   last_left_vel = left_vel;
   last_right_vel = right_vel;
 
