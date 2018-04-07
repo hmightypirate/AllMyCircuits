@@ -4,7 +4,7 @@
 #include "setup.h"
 #include <stdio.h>
 
-#define LED_ASYNC_PERIOD 100
+#define LED_ASYNC_PERIOD 1000
 
 //FIXME: it uses the internal led (make it configurable)
 

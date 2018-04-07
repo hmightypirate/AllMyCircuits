@@ -37,7 +37,7 @@ void async_blink()
  */
 void set_led()
 {
-  gpio_set(LED_PORT, LED_PIN);
+  gpio_clear(LED_PORT, LED_PIN);
 }
 
 /*
@@ -46,5 +46,5 @@ void set_led()
  */
 void clear_led()
 {
-  gpio_clear(LED_PORT, LED_PIN);
+  gpio_set(LED_PORT, LED_PIN);
 }

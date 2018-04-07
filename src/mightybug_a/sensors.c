@@ -70,6 +70,8 @@ int get_line_position(uint16_t* value)
   int pos = 0;
   int avg_sensors = 0;
   int sum_sensors = 0;
+
+  out_of_line = 0;
   
   for (int i = 0; i < NUM_SENSORS; i++)
     {

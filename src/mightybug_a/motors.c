@@ -93,8 +93,8 @@ void motor_control(int error)
       error = -MAX_PID_ERROR;
     }
 
-  left_vel = target_velocity + error;
-  right_vel = target_velocity - error;
+  left_vel = target_velocity - error;
+  right_vel = target_velocity + error;
 
   if (left_vel > MAX_VEL_MOTOR)
     {
