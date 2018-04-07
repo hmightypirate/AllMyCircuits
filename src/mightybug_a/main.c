@@ -11,7 +11,7 @@
 int main(void)
 {
   /* setup microcontroller */
-  setup();
+  setup_microcontroller();
 
   /* reset motors */
   reset_target_velocity(INITIAL_TARGET_VELOCITY);

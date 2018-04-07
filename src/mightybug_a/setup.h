@@ -84,6 +84,6 @@
 #define RIGHT_MOTOR_IN2_PORT GPIOB
 #define RIGHT_MOTOR_IN2_PIN GPIO11
 
-void setup(void);
+void setup_microcontroller(void);
 
 #endif /* __SETUP_H */

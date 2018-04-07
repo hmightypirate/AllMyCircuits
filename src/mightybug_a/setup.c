@@ -222,7 +222,7 @@ void gpio_setup(void)
 /* 
  * @brief setup of microcontroller functionality
  */
-void setup(void)
+void setup_microcontroller(void)
 {
   /* Change interrupt vector table location to avoid 
    *  conflict with serial bootloader interrupt vectors
