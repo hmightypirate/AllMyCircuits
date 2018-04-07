@@ -42,20 +42,20 @@ int main(void)
       error = pid(proportional);
   
       /* motor control */
-      if (!is_out_of_line())
-        {
-          motor_control(error);
-
-          // blinking: normal behaviour
-          async_blink();
-        }
-      else
+      if (is_out_of_line())
         {
           // stop the motors if out of line
           stop_motors();
 
           // sets the led
           set_led();
+        }
+      else
+        {
+          motor_control(error);
+                    
+          // blinking: normal behaviour
+          async_blink();
         }
     }
   
