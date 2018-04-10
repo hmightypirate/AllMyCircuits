@@ -18,6 +18,8 @@
 #define BLACK_MEASURE 2000
 #define WHITE_MEASURE 0
 
+#define THRESHOLD_CALLIBRATION 500
+
 void calibrate_sensors(void);
 void hard_reset_sensors(void);
 

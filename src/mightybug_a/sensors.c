@@ -7,6 +7,8 @@ uint8_t last_drift = LEFT_DRIFT;
 
 static int out_of_line = 0;
 
+/* This var stores the number of sensors correctly callibrated */
+static int sensors_callibrated = 0;
 
 /*
  * @brief reads a line sensor 
@@ -153,11 +155,37 @@ int is_out_of_line()
 }
 
 /*
- * @brief callibrate sensors
+ * @brief callibrate sensors (one step)
  */
 void calibrate_sensors()
 {
-  //TODO
+  //a variable to hold current sensor measures
+  uint16_t values[NUM_SENSORS];
+
+  read_line_sensors(values);
+
+  sensors_callibrated = 0;
+  
+  for (int i=0; i<NUM_SENSORS; i++)
+    {
+      /* check if current value is higher than previous max value */
+      if (values[i] > black_sensors[i])
+        {
+          black_sensors[i] = values[i];
+        }
+      /* check if current value is lower than previous min value */
+      if (values[i] < white_sensors[i])
+        {
+           white_sensors[i] = values[i];
+        }
+      
+      threshold[i] = (black_sensors[i] + white_sensors[i])/2;
+
+      if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALLIBRATION)
+        {
+          sensors_callibrated++;
+        }      
+    }
 }
 
 /*
