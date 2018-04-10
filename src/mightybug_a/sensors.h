@@ -20,7 +20,7 @@
 
 #define THRESHOLD_CALLIBRATION 500
 
-void calibrate_sensors(void);
+void calibrate_sensors(uint16_t* values);
 void hard_reset_sensors(void);
 
 void enable_sensors(void);

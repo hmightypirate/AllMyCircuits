@@ -156,11 +156,12 @@ int is_out_of_line()
 
 /*
  * @brief callibrate sensors (one step)
+ *
+ * @param[in] values a variable that holds current measurements
+ *
  */
-void calibrate_sensors()
+void calibrate_sensors(uint16_t* values)
 {
-  //a variable to hold current sensor measures
-  uint16_t values[NUM_SENSORS];
 
   read_line_sensors(values);
 
