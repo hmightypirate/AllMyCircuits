@@ -2,6 +2,7 @@
 
 uint16_t black_sensors[NUM_SENSORS];
 uint16_t white_sensors[NUM_SENSORS];
+uint16_t callibrated_sensors[NUM_SENSORS];
 uint16_t threshold[NUM_SENSORS];
 uint8_t last_drift = LEFT_DRIFT;
 
@@ -185,7 +186,12 @@ void calibrate_sensors(uint16_t* values)
       if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALLIBRATION)
         {
           sensors_callibrated++;
-        }      
+          callibrated_sensors[i] = 1;
+        }
+      else
+        {
+          callibrated_sensors[i] = 0;
+        }
     }
 }
 
