@@ -11,6 +11,8 @@ static int out_of_line = 0;
 /* This var stores the number of sensors correctly callibrated */
 static int sensors_callibrated = 0;
 
+static int started_callibration = 0;
+
 /*
  * @brief reads a line sensor 
  * 
@@ -42,6 +44,22 @@ void hard_reset_sensors()
       white_sensors[i] = WHITE_MEASURE;
       threshold[i] = (black_sensors[i] - white_sensors[i])/2;
     }
+}
+
+/*
+ * @resets callibration values
+ *
+ * @note called automatically only once during callibration
+ */
+
+void reset_callibration_values()
+{
+  for (int i=0; i< NUM_SENSORS; i++)
+    {
+      black_sensors[i] = WHITE_MEASURE;
+      white_sensors[i] = BLACK_MEASURE;
+    }
+  started_callibration = 1;
 }
 
 /*
@@ -164,6 +182,12 @@ int is_out_of_line()
 void calibrate_sensors(uint16_t* values)
 {
 
+  /* reset callibration first time */
+  if (!started_callibration)
+    {
+      reset_callibration_values();
+    }
+  
   read_line_sensors(values);
 
   sensors_callibrated = 0;
