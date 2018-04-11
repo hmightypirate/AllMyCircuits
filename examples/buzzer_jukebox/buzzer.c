@@ -13,10 +13,32 @@
 
 #include "./libjukebox.h"
 
+//// Global timing, system tick related code
+volatile uint32_t milisecs_since_start = 0;
+
+void sys_tick_handler(void) {
+	milisecs_since_start++;
+}
 
 
-int _write(int file, char *ptr, int len)
-{
+// configure the system tick to interrupt each 1 msec
+void systick_setup(){
+   /* 72MHz / 8 => 9000000 counts per second */
+    systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
+
+    /* 9000000/9000 = 1000 overflows per second - one interrupt every 1ms*/
+    /* SysTick interrupt every N clock pulses: set reload to N-1 */
+    systick_set_reload(9000 -1);
+
+    systick_interrupt_enable();
+
+    /* Start counting. */
+    systick_counter_enable();
+}
+//// End of global timing, system tick related code
+
+
+int _write(int file, char *ptr, int len) {
     int i;
 
     if (file == 1) {
@@ -27,21 +49,6 @@ int _write(int file, char *ptr, int len)
 
     errno = EIO;
     return -1;
-}
-
-
-uint32_t temp32 = 0;
-
-void sys_tick_handler(void) {
-temp32++;
-
-    /* We call this handler every 0.1ms so 10000ms = 1s on/off. */
-    if (temp32 >= 10000) {
-        gpio_toggle(GPIOC, GPIO13);
-        temp32 = 0;
-    }
-
-    play_music_loop();
 }
 
 
@@ -60,21 +67,6 @@ void gpio_setup(void) {
 
     /* Enable clock for USART3. */
     rcc_periph_clock_enable(RCC_USART1);
-}
-
-// 0.1 msec per tick
-void systick_setup(){
-   /* 72MHz / 8 => 9000000 counts per second */
-    systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
-
-    /* 9000000/900 = 10000 overflows per second - every 0.1ms one interrupt */
-    /* SysTick interrupt every N clock pulses: set reload to N-1 */
-    systick_set_reload(900 -1);
-
-    systick_interrupt_enable();
-
-    /* Start counting. */
-    systick_counter_enable();
 }
 
 
@@ -96,9 +88,8 @@ void usart_setup(void) {
 }
 
 
-void wait(){
-  for (int i = 0; i < 10000000; i++) __asm__("nop");
-}
+#define STATE_LED_TOGGLE 0
+#define STATE_LED_ALREADY_TOGGLED 1
 
 int main(void) {
     /* Change interrupt vector table location to avoid conflict with */
@@ -113,18 +104,27 @@ int main(void) {
 
     jukebox_play_current();
 
-    char welcome[20];
-    sprintf(welcome, "%d\n", 42);
-
-    for (unsigned int i = 0; i < strlen(welcome); i++) {
-        usart_send_blocking(USART1, welcome[i]);
-    }
+    int state_led = STATE_LED_TOGGLE;
+    uint32_t last_milisec = milisecs_since_start;
 
     while (1) {
-        while (is_jukebox_playing() == 1){wait();}
-        wait();
-        jukebox_play_next();
-
+        if ((milisecs_since_start % 1000) == 0) {
+            if (state_led == STATE_LED_TOGGLE){
+                gpio_toggle(GPIOC, GPIO13);
+                printf("%d\n", (int)milisecs_since_start);
+                state_led = STATE_LED_ALREADY_TOGGLED;
+            }
+        }
+        if ((milisecs_since_start % 1000) == 1){
+            state_led = STATE_LED_TOGGLE;
+        }
+        if (is_jukebox_playing() == 0) {
+            jukebox_play_next();
+        }
+        if (last_milisec < milisecs_since_start) {
+            play_music_loop();
+            last_milisec = milisecs_since_start;
+        }
     }
     return 0;
 }

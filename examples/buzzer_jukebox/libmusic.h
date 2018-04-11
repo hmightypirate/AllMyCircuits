@@ -1,4 +1,5 @@
 
+#define LIBMUSIC_TICKS_PER_SECOND 1000
 
 #define C0 0
 #define CX0 1
@@ -228,7 +229,7 @@ void play_music(int beats_per_minute, int notes_number, int * notes_pitch
 
     play_note(A4);
     notes_index = 0;
-    system_ticks_per_beat_32ave = (10000 * 60 / beats_per_minute)/32;
+    system_ticks_per_beat_32ave = (LIBMUSIC_TICKS_PER_SECOND * 60 / beats_per_minute)/32;
     current_notes_pitch = notes_pitch;
     current_notes_duration = notes_duration;
     current_total_notes = notes_number;
