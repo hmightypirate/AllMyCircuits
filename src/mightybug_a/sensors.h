@@ -1,6 +1,7 @@
 #ifndef __SENSORS_H
 #define __SENSORS_H
 
+#include "commons.h"
 #include "setup.h"
 #include <stdio.h>
 
@@ -19,6 +20,9 @@
 #define WHITE_MEASURE 0
 
 #define THRESHOLD_CALLIBRATION 500
+
+/* extra delay between callibration calls in NOP operations */
+#define DELAY_CALLIBRATION_CALLS 300
 
 void calibrate_sensors(uint16_t* values);
 void hard_reset_sensors(void);

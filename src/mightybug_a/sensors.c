@@ -217,6 +217,15 @@ void calibrate_sensors(uint16_t* values)
           callibrated_sensors[i] = 0;
         }
     }
+
+  /* Add extra delay (in nop operations) after every callibration call */
+  DELAY(DELAY_CALLIBRATION_CALLS);
+  /*
+  for (int i=0; i < DELAY_CALLIBRATION_CALLS; i++)
+    {
+      __asm__("nop");
+    }
+  */
 }
 
 /*
