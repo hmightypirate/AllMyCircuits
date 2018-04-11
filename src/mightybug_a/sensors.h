@@ -19,11 +19,15 @@
 #define BLACK_MEASURE 2000
 #define WHITE_MEASURE 0
 
+#define SOFT_CALLIBRATION 1
 #define THRESHOLD_CALLIBRATION 500
 
 /* extra delay between callibration calls in NOP operations */
 #define DELAY_CALLIBRATION_CALLS 300
 
+/* Callibration functions */
+uint8_t get_callibrated_sensors()
+void reset_callibration_values(void);
 void calibrate_sensors(uint16_t* values);
 void hard_reset_sensors(void);
 
