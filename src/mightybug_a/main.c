@@ -3,6 +3,7 @@
 #include "motors.h"
 #include "sensors.h"
 #include "led.h"
+#include "fsm.h"
 
 /*
  * @brief Initial setup and main loop
@@ -17,7 +18,16 @@ int main(void)
 
   /* reset sensors */
   //FIXME: better do some callibration
-  hard_reset_sensors();
+
+  if (SOFT_CALLIBRATION)
+    {
+      hard_reset_sensors();
+    }
+  else
+    {
+      /* reset callibration values (needed for callibration) */
+      reset_callibration_values();
+    }
   
   /* reset pid */
   reset_pid();
@@ -34,27 +44,45 @@ int main(void)
       /* read data from sensors */
       uint16_t sensor_value[NUM_SENSORS];
       read_line_sensors(sensor_value);
-      int proportional = get_line_position(sensor_value);
-      
-      /* pid control */
-      int error = 0;
-      error = pid(proportional);
-  
-      /* motor control */
-      if (is_out_of_line())
-        {
-          // stop the motors if out of line
-          stop_motors();
 
-          // sets the led
-          set_led();
+      if (get_state() == CALLIBRATION_STATE)
+        {
+          calibrate_sensors(sensor_value);
+
+          /* FIXME: forcing running if all sensors are callibrated 
+             better do it after some event is detected or some time
+             has passed, or some command has been received
+           */
+          if (get_callibrated_sensors() == NUM_SENSORS)
+            {
+              update_state(GO_TO_RUN_EVENT);
+            }
         }
       else
         {
-          motor_control(error);
-                    
-          // blinking: normal behaviour
-          async_blink();
+          // Running 
+          int proportional = get_line_position(sensor_value);
+      
+          /* pid control */
+          int error = 0;
+          error = pid(proportional);
+  
+          /* motor control */
+          if (is_out_of_line())
+            {
+              // stop the motors if out of line
+              stop_motors();
+
+              // sets the led
+              set_led();
+            }
+          else
+            {
+              motor_control(error);
+              
+              // blinking: normal behaviour
+              async_blink();
+            }
         }
     }
   
