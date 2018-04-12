@@ -26,7 +26,7 @@
 #define DELAY_CALLIBRATION_CALLS 300
 
 /* Callibration functions */
-uint8_t get_callibrated_sensors()
+uint8_t get_callibrated_sensors(void);
 void reset_callibration_values(void);
 void calibrate_sensors(uint16_t* values);
 void hard_reset_sensors(void);
