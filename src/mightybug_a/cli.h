@@ -1,10 +1,12 @@
 #ifndef __CLI_H
 #define __CLI_H
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <libopencm3/stm32/usart.h>
+#include "pid.h"
 
 bool is_command_received(void);
 void execute_command(void);
@@ -19,5 +21,6 @@ void check_module(void);
 void clear_head_tail(void);
 void clear_command_line(void);
 void set_head_tail(char *origin);
+void check_command_pid(void);
 
 #endif /* __CLI_H */

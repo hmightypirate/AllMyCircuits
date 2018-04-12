@@ -77,6 +77,7 @@ void check_module() {
     set_head_tail(command_line);
     if (strcmp(head, "STOP") == 0) command_stop();
     else if (strcmp(head, "CAR") == 0) check_command_car();
+    else if (strcmp(head, "PID") == 0) check_command_pid();
 //     else if (strcmp(head, "MTR") == 0) check_command_motor();
 //     else if (strcmp(head, "ENC") == 0) check_command_encoder();
 //     else if (strcmp(head, "LIN") == 0) check_command_line();
@@ -121,5 +122,50 @@ void set_head_tail(char *origin) {
         tail[strlen(tail_ptr + 1)] = '\0';
     } else
         tail[0] = '\0';
-};
+}
 
+void check_command_pid() {
+
+    int k_value;
+
+    set_head_tail(tail);
+    if (strcmp(head, "SET") == 0) {
+        set_head_tail(tail);
+        k_value = atoi(tail);
+        if (strcmp(head, "KP") == 0) {
+            set_kp(k_value);
+            sprintf(message, "%i\n", k_value);
+            send_message(message);
+        } else if (strcmp(head, "KI") == 0) {
+            set_ki(k_value);
+            sprintf(message, "%i\n", k_value);
+            send_message(message);
+        } else if (strcmp(head, "KD") == 0) {
+            set_kd(k_value);
+            sprintf(message, "%i\n", k_value);
+            send_message(message);
+        } else {
+            send_message("Syntax: PID SET KP|KI|KD <value>\n");
+        }
+    } else if (strcmp(head, "GET") == 0) {
+        set_head_tail(tail);
+        int k_value;
+        if (strcmp(head, "KP") == 0) {
+            k_value = get_kp();
+            sprintf(message, "PID KP: %i\n", k_value);
+            send_message(message);
+        } else if (strcmp(head, "KI") == 0) {
+            k_value = get_ki();
+            sprintf(message, "PID KI: %i\n", k_value);
+            send_message(message);
+        } else if (strcmp(head, "KD") == 0) {
+            k_value = get_kd();
+            sprintf(message, "PID KD: %i\n", k_value);
+            send_message(message);
+        } else {
+            send_message("Syntax: PID GET KP|KI|KD <value>\n");
+        }        
+    } else {
+        send_message("Syntax: PID SET|GET KP|KI|KD <value>\n");
+    }
+}
