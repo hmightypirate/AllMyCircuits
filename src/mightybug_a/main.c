@@ -4,6 +4,7 @@
 #include "sensors.h"
 #include "led.h"
 #include "fsm.h"
+#include "cli.h"
 
 /*
  * @brief Initial setup and main loop
@@ -41,6 +42,11 @@ int main(void)
   //FIXME: do some state machine here (callibration, running, etc)
   while(1)
     {
+      if (is_command_received()) {
+        execute_command();
+      }
+      
+      
       /* read data from sensors */
       uint16_t sensor_value[NUM_SENSORS];
       read_line_sensors(sensor_value);

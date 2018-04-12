@@ -8,13 +8,15 @@ char message[80];
 
 bool command_received = true;
 
+bool is_command_received() {
+    return command_received;
+}
+
 void execute_command() {
     command_received = false;
     check_module();
     clear_command_line(); // TODO copy command_line to another variable to avoid usart rewriting before reading 
 }
-
-
 
 void send_usart(char *message) {
     for (int i = 0; i < (int)strlen(message); i++){

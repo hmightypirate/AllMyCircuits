@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include <libopencm3/stm32/usart.h>
 
+bool is_command_received(void);
+void execute_command(void);
 void usart1_isr(void);
 void send_usart(char *message);
 void send_message(char *message);
