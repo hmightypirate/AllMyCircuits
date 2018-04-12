@@ -45,7 +45,9 @@ int main(void)
       uint16_t sensor_value[NUM_SENSORS];
       read_line_sensors(sensor_value);
 
-      if (get_state() == CALLIBRATION_STATE)
+      state_e current_state = get_state();
+      
+      if (current_state == CALLIBRATION_STATE)
         {
           calibrate_sensors(sensor_value);
 

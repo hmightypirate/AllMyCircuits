@@ -8,6 +8,6 @@
 #define MAX_VEL_MOTOR 1024
 #define INITIAL_TARGET_VELOCITY 200
 
-#define DELAY(x) for (int i=0; i < x; i++) __asm__("nop");
+//#define DELAY(x) for (i=0; i < DELAY_CALLIBRATION_CALLS; i++) __asm__("nop");
 
 #endif /* __COMMONS_H */

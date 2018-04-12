@@ -16,3 +16,11 @@ void update_state(event_e new_event)
       current_state = RUNNING_STATE;
     }
 }
+
+/*
+ * @brief get current state
+ */
+state_e get_state()
+{
+  return current_state;
+}

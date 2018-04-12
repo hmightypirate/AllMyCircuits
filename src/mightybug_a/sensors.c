@@ -9,7 +9,7 @@ uint8_t last_drift = LEFT_DRIFT;
 static int out_of_line = 0;
 
 /* This var stores the number of sensors correctly callibrated */
-static int sensors_callibrated = 0;
+static uint8_t sensors_callibrated = 0;
 
 static int started_callibration = 0;
 
@@ -219,13 +219,12 @@ void calibrate_sensors(uint16_t* values)
     }
 
   /* Add extra delay (in nop operations) after every callibration call */
-  DELAY(DELAY_CALLIBRATION_CALLS);
-  /*
-  for (int i=0; i < DELAY_CALLIBRATION_CALLS; i++)
+  /*for (int i=0; i < x; i++)
     {
-      __asm__("nop");
-    }
-  */
+    __asm__("nop");
+    }*/
+  //DELAY(DELAY_CALLIBRATION_CALLS);
+     
 }
 
 /*
@@ -242,4 +241,13 @@ void enable_sensors()
 void disable_sensors()
 {
   gpio_clear(SENSOR_ON_PORT, SENSOR_ON_PIN);
+}
+
+
+/*
+ * @brief get the number of callibrated sensors
+ */
+uint8_t get_callibrated_sensors()
+{
+  return sensors_callibrated;
 }
