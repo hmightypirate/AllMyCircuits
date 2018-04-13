@@ -8,6 +8,7 @@
 #include <libopencm3/stm32/usart.h>
 #include "pid.h"
 #include "fsm.h"
+#include "sensors.h"
 
 bool is_command_received(void);
 void execute_command(void);
@@ -23,5 +24,6 @@ void clear_head_tail(void);
 void clear_command_line(void);
 void set_head_tail(char *origin);
 void check_command_pid(void);
+void check_command_line(void);
 
 #endif /* __CLI_H */

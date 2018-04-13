@@ -85,7 +85,7 @@ void check_module() {
     else if (strcmp(head, "PID") == 0) check_command_pid();
 //     else if (strcmp(head, "MTR") == 0) check_command_motor();
 //     else if (strcmp(head, "ENC") == 0) check_command_encoder();
-//     else if (strcmp(head, "LIN") == 0) check_command_line();
+    else if (strcmp(head, "LIN") == 0) check_command_line();
 //     else if (strcmp(head, "BUZ") == 0) check_command_buzzer();
 //     else if (strcmp(head, "RST") == 0) command_reset();
     else if (strcmp(head, "LED") == 0) check_command_led();
@@ -201,3 +201,35 @@ void check_command_fsm() {
         send_message("Syntax: FSM RUN|CAL");
     }
 }
+
+void print_values(uint16_t* values, int num_values) {
+    message[0] = '\0';
+    for (int i = 0; i < num_values; i++) {
+        sprintf(message, "%s%i ", message, values[i]);
+    }
+    
+    // Add a LF
+    message[strlen(message)] = '\0';
+    message[strlen(message)-1] = '\n';
+    send_message(message);
+}
+
+void check_command_line() {
+    set_head_tail(tail);
+    
+    /* read data from sensors */
+    if (is_head("VALUES")) {
+        uint16_t sensor_value[NUM_SENSORS];
+        read_line_sensors(sensor_value);
+        print_values(sensor_value, NUM_SENSORS);
+    } else if (is_head("THRESHOLDS")) {
+        print_values(get_thresholds(), NUM_SENSORS);
+    } else if (is_head("WHITES")) {
+        print_values(get_whites(), NUM_SENSORS);
+    } else if (is_head("BLACKS")) {
+        print_values(get_blacks(), NUM_SENSORS);
+    } else {
+        send_message("Syntax: LIN VALUES|WHITES|BLACKS|THRESHOLDS");
+    }
+}
+
