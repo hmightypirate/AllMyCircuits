@@ -129,47 +129,60 @@ void set_head_tail(char *origin) {
         tail[0] = '\0';
 }
 
-void check_command_pid() {
+void check_k_pid_set() {
+
+    set_head_tail(tail);
+
+    int k_value;
+    k_value = atoi(tail);
+
+    if (strcmp(head, "KP") == 0) {
+        set_kp(k_value);
+        sprintf(message, "%i\n", k_value);
+        send_message(message);
+    } else if (strcmp(head, "KI") == 0) {
+        set_ki(k_value);
+        sprintf(message, "%i\n", k_value);
+        send_message(message);
+    } else if (strcmp(head, "KD") == 0) {
+        set_kd(k_value);
+        sprintf(message, "%i\n", k_value);
+        send_message(message);
+    } else {
+        send_message("Syntax: PID SET KP|KI|KD <value>\n");
+    }
+}
+
+void check_k_pid_get() {
+    
+    set_head_tail(tail);
 
     int k_value;
 
+    if (strcmp(head, "KP") == 0) {
+        k_value = get_kp();
+        sprintf(message, "PID KP: %i\n", k_value);
+        send_message(message);
+    } else if (strcmp(head, "KI") == 0) {
+        k_value = get_ki();
+        sprintf(message, "PID KI: %i\n", k_value);
+        send_message(message);
+    } else if (strcmp(head, "KD") == 0) {
+        k_value = get_kd();
+        sprintf(message, "PID KD: %i\n", k_value);
+        send_message(message);
+    } else {
+        send_message("Syntax: PID GET KP|KI|KD <value>\n");
+    }      
+}
+
+void check_command_pid() {
     set_head_tail(tail);
+    
     if (strcmp(head, "SET") == 0) {
-        set_head_tail(tail);
-        k_value = atoi(tail);
-        if (strcmp(head, "KP") == 0) {
-            set_kp(k_value);
-            sprintf(message, "%i\n", k_value);
-            send_message(message);
-        } else if (strcmp(head, "KI") == 0) {
-            set_ki(k_value);
-            sprintf(message, "%i\n", k_value);
-            send_message(message);
-        } else if (strcmp(head, "KD") == 0) {
-            set_kd(k_value);
-            sprintf(message, "%i\n", k_value);
-            send_message(message);
-        } else {
-            send_message("Syntax: PID SET KP|KI|KD <value>\n");
-        }
+        check_k_pid_set();
     } else if (strcmp(head, "GET") == 0) {
-        set_head_tail(tail);
-        int k_value;
-        if (strcmp(head, "KP") == 0) {
-            k_value = get_kp();
-            sprintf(message, "PID KP: %i\n", k_value);
-            send_message(message);
-        } else if (strcmp(head, "KI") == 0) {
-            k_value = get_ki();
-            sprintf(message, "PID KI: %i\n", k_value);
-            send_message(message);
-        } else if (strcmp(head, "KD") == 0) {
-            k_value = get_kd();
-            sprintf(message, "PID KD: %i\n", k_value);
-            send_message(message);
-        } else {
-            send_message("Syntax: PID GET KP|KI|KD <value>\n");
-        }        
+        check_k_pid_get();
     } else {
         send_message("Syntax: PID SET|GET KP|KI|KD <value>\n");
     }
