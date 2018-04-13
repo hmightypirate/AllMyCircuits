@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <libopencm3/stm32/usart.h>
 #include "pid.h"
+#include "fsm.h"
 
 bool is_command_received(void);
 void execute_command(void);

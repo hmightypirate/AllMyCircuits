@@ -174,3 +174,17 @@ void check_command_pid() {
         send_message("Syntax: PID SET|GET KP|KI|KD <value>\n");
     }
 }
+
+
+void check_command_fsm() {
+    set_head_tail(tail);
+    if (is_head("RUN")) {
+        update_state(GO_TO_RUN_EVENT);
+        send_message("GO_TO_RUN");
+    } else if (is_head("CAL")) {
+        update_state(FORCE_CALLIBRATION_EVENT);
+        send_message("CALIBRATE");
+    } else {
+        send_message("Syntax: FSM RUN|CAL");
+    }
+}
