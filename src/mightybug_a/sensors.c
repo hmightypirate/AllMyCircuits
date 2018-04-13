@@ -251,3 +251,25 @@ uint8_t get_callibrated_sensors()
 {
   return sensors_callibrated;
 }
+
+
+/*
+ * @brief get value of white of each sensor
+ */
+uint16_t* get_whites() {
+  return white_sensors;
+}
+
+/*
+ * @brief get value of white of each sensor
+ */
+uint16_t* get_blacks() {
+  return black_sensors;
+}
+
+/*
+ * @brief get value of white of each sensor
+ */
+uint16_t* get_thresholds() {
+  return threshold;
+}

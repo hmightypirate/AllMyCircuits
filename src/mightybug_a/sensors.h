@@ -38,4 +38,8 @@ void read_line_sensors(uint16_t* sensor_value);
 int get_line_position(uint16_t* value);
 int is_out_of_line();
 
+uint16_t* get_whites(void);
+uint16_t* get_blacks(void);
+uint16_t* get_thresholds(void);
+
 #endif /* __SENSORS_H */
