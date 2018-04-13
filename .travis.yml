@@ -1,0 +1,38 @@
+udo: false
+language: c
+
+cache:
+  directories:
+    - $HOME/.gcc-arm-embedded
+
+addons:
+  apt:
+    packages:
+      - gcc-multilib
+
+matrix:
+  include:
+    - env: GHCVER=7.10.3 
+      addons: {apt: {packages: [ghc-7.10.3,gcc-multilib], sources: [hvr-ghc]}}
+    - env: GHCVER=8.0.2 
+      addons: {apt: {packages: [ghc-8.0.2,gcc-multilib], sources: [hvr-ghc]}}
+
+before_install:
+  # Set up the ARM GCC toolchain
+  - if [ ! -d $HOME/.gcc-arm-embedded/*/bin ];
+    then
+      mkdir -p $HOME/.gcc-arm-embedded;
+      wget https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q2-update/+download/gcc-arm-none-eabi-4_9-2015q2-20150609-linux.tar.bz2 -O- | tar xjf - -C $HOME/.gcc-arm-embedded;
+    fi
+  - echo $HOME/.gcc-arm-embedded/*/bin
+  - ls $HOME/.gcc-arm-embedded/*/bin
+  - export PATH=$HOME/.local/bin:/opt/ghc/$GHCVER/bin:$PATH
+  - ghc --version
+  - export PATH="$(echo $HOME/.gcc-arm-embedded/*/bin):$PATH"
+  - arm-none-eabi-gcc --version
+
+install:
+  - git submodule init
+  - git submodule update
+script:
+  - make
