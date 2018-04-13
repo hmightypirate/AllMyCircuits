@@ -95,8 +95,8 @@ void check_module() {
 
 
 void welcome_message() {
-    send_message("Agonizing Automobile CLI by Mighty Escuderida\n");
-    send_message("Version v0.1\n");
+    send_message("Bat Bolido CLI by Mighty Escuderida\n");
+    send_message("Version v1.1.0\n");
 }
 
 void send_message(char *message) {
