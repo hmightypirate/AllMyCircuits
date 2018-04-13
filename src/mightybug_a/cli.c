@@ -73,6 +73,11 @@ void clear_head_tail(void) {
     tail[0] = '\0';
 };
 
+bool is_head(char *key) {
+    if (strcmp(head, key) == 0) return true;
+    else return false;
+}
+
 void check_module() {
     set_head_tail(command_line);
     if (strcmp(head, "STOP") == 0) command_stop();
