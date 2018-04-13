@@ -136,15 +136,15 @@ void check_k_pid_set() {
     int k_value;
     k_value = atoi(tail);
 
-    if (strcmp(head, "KP") == 0) {
+    if (is_head("KP")) {
         set_kp(k_value);
         sprintf(message, "%i\n", k_value);
         send_message(message);
-    } else if (strcmp(head, "KI") == 0) {
+    } else if (is_head("KI")) {
         set_ki(k_value);
         sprintf(message, "%i\n", k_value);
         send_message(message);
-    } else if (strcmp(head, "KD") == 0) {
+    } else if (is_head("KD")) {
         set_kd(k_value);
         sprintf(message, "%i\n", k_value);
         send_message(message);
@@ -159,15 +159,15 @@ void check_k_pid_get() {
 
     int k_value;
 
-    if (strcmp(head, "KP") == 0) {
+    if (is_head("KP")) {
         k_value = get_kp();
         sprintf(message, "PID KP: %i\n", k_value);
         send_message(message);
-    } else if (strcmp(head, "KI") == 0) {
+    } else if (is_head("KI")) {
         k_value = get_ki();
         sprintf(message, "PID KI: %i\n", k_value);
         send_message(message);
-    } else if (strcmp(head, "KD") == 0) {
+    } else if (is_head("KD")) {
         k_value = get_kd();
         sprintf(message, "PID KD: %i\n", k_value);
         send_message(message);
@@ -178,7 +178,7 @@ void check_k_pid_get() {
 
 void check_command_pid() {
     set_head_tail(tail);
-    
+
     if (strcmp(head, "SET") == 0) {
         check_k_pid_set();
     } else if (strcmp(head, "GET") == 0) {
