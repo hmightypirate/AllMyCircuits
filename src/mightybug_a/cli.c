@@ -6,7 +6,7 @@ char head[20];
 char tail[80];
 char message[80];
 
-bool command_received = true;
+bool command_received = false;
 
 bool is_command_received() {
     return command_received;
