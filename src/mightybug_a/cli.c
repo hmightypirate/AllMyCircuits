@@ -209,7 +209,6 @@ void print_values(uint16_t* values, int num_values) {
     }
     
     // Add a LF
-    message[strlen(message)] = '\0';
     message[strlen(message)-1] = '\n';
     send_message(message);
 }
