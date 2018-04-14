@@ -4,6 +4,7 @@
 #include "sensors.h"
 #include "led.h"
 #include "fsm.h"
+#include "cli.h"
 
 /*
  * @brief Initial setup and main loop
@@ -41,6 +42,11 @@ int main(void)
   //FIXME: do some state machine here (callibration, running, etc)
   while(1)
     {
+      if (is_command_received()) {
+        execute_command();
+      }
+      
+      
       /* read data from sensors */
       uint16_t sensor_value[NUM_SENSORS];
       read_line_sensors(sensor_value);
@@ -51,14 +57,14 @@ int main(void)
         {
           calibrate_sensors(sensor_value);
 
-          /* FIXME: forcing running if all sensors are callibrated 
-             better do it after some event is detected or some time
-             has passed, or some command has been received
-           */
-          if (get_callibrated_sensors() == NUM_SENSORS)
-            {
-              update_state(GO_TO_RUN_EVENT);
-            }
+          // /* FIXME: forcing running if all sensors are callibrated 
+          //    better do it after some event is detected or some time
+          //    has passed, or some command has been received
+          //  */
+          // if (get_callibrated_sensors() == NUM_SENSORS)
+          //   {
+          //     update_state(GO_TO_RUN_EVENT);
+          //   }
         }
       else
         {

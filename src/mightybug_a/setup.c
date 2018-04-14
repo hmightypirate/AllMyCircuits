@@ -45,6 +45,9 @@ void clock_setup(void)
  */
 void usart_setup(void)
 {
+  nvic_set_priority(NVIC_USART1_IRQ, 16);
+  nvic_enable_irq(NVIC_USART1_IRQ);
+  
   gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_INPUT_PULL_UPDOWN,
                 GPIO_USART1_TX);
   gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
@@ -58,6 +61,8 @@ void usart_setup(void)
   usart_set_parity(USART1, USART_PARITY);
   usart_set_flow_control(USART1, USART_FLOWCONTROL);
   
+  /* Enable RX interruptions to usart1_isr() function */
+    usart_enable_rx_interrupt(USART1);
   /* Enable USART */
   usart_enable(USART1);
 }
