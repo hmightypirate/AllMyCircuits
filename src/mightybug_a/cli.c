@@ -83,7 +83,7 @@ void check_module() {
     if (strcmp(head, "STOP") == 0) command_stop();
     else if (strcmp(head, "CAR") == 0) check_command_car();
     else if (strcmp(head, "PID") == 0) check_command_pid();
-//     else if (strcmp(head, "MTR") == 0) check_command_motor();
+    else if (strcmp(head, "MTR") == 0) check_command_motor();
 //     else if (strcmp(head, "ENC") == 0) check_command_encoder();
     else if (strcmp(head, "LIN") == 0) check_command_line();
 //     else if (strcmp(head, "BUZ") == 0) check_command_buzzer();
@@ -233,3 +233,17 @@ void check_command_line() {
     }
 }
 
+void check_command_motor() {
+    set_head_tail(tail);
+    if (is_head("SET")) {
+        int velocity = atoi(tail);
+        reset_target_velocity(velocity);
+        sprintf(message, "%i\n", velocity);
+        send_message(message);
+    } else if (is_head("GET")) {
+        sprintf(message, "%i\n", get_target_velocity());
+        send_message(message);
+    } else {
+        send_message("Syntax: MTR SET|GET");
+    }
+}

@@ -9,6 +9,7 @@
 #include "pid.h"
 #include "fsm.h"
 #include "sensors.h"
+#include "motors.h"
 
 bool is_command_received(void);
 void execute_command(void);
@@ -26,5 +27,6 @@ void set_head_tail(char *origin);
 void check_command_pid(void);
 void check_command_line(void);
 void check_command_fsm(void);
+void check_command_motor(void);
 
 #endif /* __CLI_H */
