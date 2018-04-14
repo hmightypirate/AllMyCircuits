@@ -89,6 +89,7 @@ void check_module() {
 //     else if (strcmp(head, "BUZ") == 0) check_command_buzzer();
 //     else if (strcmp(head, "RST") == 0) command_reset();
     else if (strcmp(head, "LED") == 0) check_command_led();
+    else if (strcmp(head, "FSM") == 0) check_command_fsm();
     else command_unknown(head);
     clear_head_tail();
 };

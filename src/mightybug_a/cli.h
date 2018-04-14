@@ -25,5 +25,6 @@ void clear_command_line(void);
 void set_head_tail(char *origin);
 void check_command_pid(void);
 void check_command_line(void);
+void check_command_fsm(void);
 
 #endif /* __CLI_H */
