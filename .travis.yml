@@ -26,5 +26,5 @@ before_install:
 install:
 
 script:
-  - cd examples/bluepill_test
+  - cd src/mightybug_a
   - make all
