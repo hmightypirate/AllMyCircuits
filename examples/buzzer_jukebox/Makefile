@@ -1,7 +1,7 @@
 sinclude ../../rules.mk
 
 
-CSRC = buzzer.c
+CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
 buzzer.elf: $(OBJ)

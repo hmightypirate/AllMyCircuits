@@ -11,7 +11,7 @@
 #include <libopencm3/cm3/scb.h>
 #include <libopencm3/cm3/systick.h>
 
-#include "./libjukebox.h"
+#include "libjukebox.h"
 
 //// Global timing, system tick related code
 volatile uint32_t milisecs_since_start = 0;
