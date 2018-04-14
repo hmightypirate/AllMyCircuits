@@ -105,8 +105,8 @@ int play_note(int note_number){
 int notes_index = 0;
 int enable_music = 0;
 int system_ticks_per_beat_32ave = 0;
-int * current_notes_pitch = NULL;
-int * current_notes_duration = NULL;
+uint8_t * current_notes_pitch = NULL;
+uint8_t * current_notes_duration = NULL;
 int current_total_notes = 0;
 int wait_ticks = 0;
 
