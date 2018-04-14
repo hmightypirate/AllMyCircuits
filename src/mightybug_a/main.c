@@ -65,6 +65,12 @@ int main(void)
           //   {
           //     update_state(GO_TO_RUN_EVENT);
           //   }
+      
+          /* stop motors during callibration */
+          stop_motors();
+
+          /* led is off during callibration */
+          clear_led();
         }
       else
         {
