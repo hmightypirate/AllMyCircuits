@@ -75,6 +75,13 @@ void reset_target_velocity(int target_vel)
 }
 
 /*
+ * @brief get current target velocity
+ */
+int get_target_velocity(void) {
+  return target_velocity;
+}
+
+/*
  * given an error, obtain the velocity for the left and right motors 
  *
  * @param[in] error pid error (typically line position error) 
