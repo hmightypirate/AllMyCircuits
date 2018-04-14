@@ -1,0 +1,30 @@
+sudo: false
+language: c
+
+cache:
+  directories:
+    - $HOME/.gcc-arm-embedded
+
+addons:
+  apt:
+    packages:
+      - gcc-multilib
+
+before_install:
+  # Set up the ARM GCC toolchain
+  - if [ ! -d $HOME/.gcc-arm-embedded/*/bin ];
+    then
+      mkdir -p $HOME/.gcc-arm-embedded;
+      wget https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q2-update/+download/gcc-arm-none-eabi-4_9-2015q2-20150609-linux.tar.bz2 -O- | tar xjf - -C $HOME/.gcc-arm-embedded;
+    fi
+  - echo $HOME/.gcc-arm-embedded/*/bin
+  - ls $HOME/.gcc-arm-embedded/*/bin
+  - export PATH=$HOME/.local/bin:/opt/ghc/$GHCVER/bin:$PATH
+  - export PATH="$(echo $HOME/.gcc-arm-embedded/*/bin):$PATH"
+  - arm-none-eabi-gcc --version
+
+install:
+
+script:
+  - cd src/mightybug_a
+  - make all
