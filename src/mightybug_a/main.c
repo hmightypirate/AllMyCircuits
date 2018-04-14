@@ -57,14 +57,14 @@ int main(void)
         {
           calibrate_sensors(sensor_value);
 
-          /* FIXME: forcing running if all sensors are callibrated 
-             better do it after some event is detected or some time
-             has passed, or some command has been received
-           */
-          if (get_callibrated_sensors() == NUM_SENSORS)
-            {
-              update_state(GO_TO_RUN_EVENT);
-            }
+          // /* FIXME: forcing running if all sensors are callibrated 
+          //    better do it after some event is detected or some time
+          //    has passed, or some command has been received
+          //  */
+          // if (get_callibrated_sensors() == NUM_SENSORS)
+          //   {
+          //     update_state(GO_TO_RUN_EVENT);
+          //   }
         }
       else
         {
