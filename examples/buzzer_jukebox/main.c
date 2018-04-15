@@ -12,6 +12,7 @@
 #include <libopencm3/cm3/systick.h>
 
 #include "libjukebox.h"
+#include "commons.h"
 
 //// Global timing, system tick related code
 volatile uint32_t milisecs_since_start = 0;
@@ -88,8 +89,6 @@ void usart_setup(void) {
 }
 
 
-#define STATE_LED_TOGGLE 0
-#define STATE_LED_ALREADY_TOGGLED 1
 
 int main(void) {
     /* Change interrupt vector table location to avoid conflict with */
