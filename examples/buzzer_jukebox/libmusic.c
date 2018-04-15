@@ -1,5 +1,15 @@
 #include "libmusic.h"
 
+int system_ticks_counter = 0;
+int notes_index = 0;
+uint8_t enable_music = 0;
+int system_ticks_per_beat_32ave = 0;
+uint8_t * current_notes_pitch = NULL;
+uint8_t * current_notes_duration = NULL;
+int current_total_notes = 0;
+/* wait ticks stores the number of ticks till the next note should be played */
+int wait_ticks = 0;
+
 void pwm_setup() {
 
     int use_alternate_gpio = 1;
@@ -64,6 +74,9 @@ void pwm_setup() {
     timer_enable_counter(TIM3);
 }
 
+/* 
+ * @brief setups pwm for music play
+ */
 void music_setup(){
     pwm_setup();
 }
@@ -102,20 +115,13 @@ int play_note(int note_number){
     return 1;
 }
 
-int notes_index = 0;
-int enable_music = 0;
-int system_ticks_per_beat_32ave = 0;
-uint8_t * current_notes_pitch = NULL;
-uint8_t * current_notes_duration = NULL;
-int current_total_notes = 0;
-int wait_ticks = 0;
 
 void play_music(int beats_per_minute, int notes_number, uint8_t * notes_pitch
         , uint8_t * notes_duration){
 
     play_note(A4);
     notes_index = 0;
-    system_ticks_per_beat_32ave = (LIBMUSIC_TICKS_PER_SECOND * 60 / beats_per_minute)/32;
+    system_ticks_per_beat_32ave = (LIBMUSIC_TICKS_PER_SECOND * 60 / beats_per_minute)/32;  //FIXME: some explanation is needed here
     current_notes_pitch = notes_pitch;
     current_notes_duration = notes_duration;
     current_total_notes = notes_number;
@@ -124,14 +130,17 @@ void play_music(int beats_per_minute, int notes_number, uint8_t * notes_pitch
     stop_note();
 }
 
-int tics = 0;
-int system_ticks_counter = 0;
+/* 
+ * @brief plays next note if the number of ticks exceed the number of waiting ticks
+ */
 void play_music_loop(){
 
+    /* returns if music is not enable */
     if (enable_music == 0) return;
     system_ticks_counter++;
 
     if (system_ticks_counter >= wait_ticks){
+      /* should play next note */
         system_ticks_counter = 0;
         play_note(current_notes_pitch[notes_index]);
         wait_ticks = system_ticks_per_beat_32ave * current_notes_duration[notes_index];
@@ -144,6 +153,17 @@ void play_music_loop(){
     }
 }
 
-int is_music_playing(){
-    return enable_music;
+/*
+ * @brief returns True if there is a song playing
+ */ 
+uint8_t is_music_playing(){
+  return enable_music;
+}
+
+/*
+ * @brief stops the music
+ */
+void stop_music_play()
+{
+  enable_music = 0;
 }

@@ -459,10 +459,12 @@ uint8_t init_jukebox_songs() {
     jukebox_song_list[SONG_XFILES_ORDER].notes_pitch = notes_pitch_XFILES;
     jukebox_song_list[SONG_XFILES_ORDER].notes_duration = notes_duration_XFILES;
 
-
     return JUKEBOX_SONGS_TOTAL_SONGS;
 }
 
+/* 
+ * @brief gets the number of songs
+ */
 uint8_t get_total_songs_number() {
 	return JUKEBOX_SONGS_TOTAL_SONGS;
 }

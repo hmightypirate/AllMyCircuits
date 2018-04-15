@@ -125,13 +125,11 @@
 
 void pwm_setup(void);
 void music_setup(void);
-void stop_note(void);
-int play_note(int note_number);
 void play_music(int beats_per_minute, int notes_number,
                 uint8_t * notes_pitch
                 , uint8_t * notes_duration);
 void play_music_loop(void);
-int is_music_playing(void);
-
+uint8_t is_music_playing(void);
+void stop_music_play(void);
   
 #endif /* __LIBMUSIC_H */
