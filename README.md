@@ -1,5 +1,7 @@
 # All My Circuits
 
+[![Build Status](https://travis-ci.org/hmightypirate/AllMyCircuits.svg?branch=develop)](https://travis-ci.org/hmightypirate/AllMyCircuits)
+
 This repository is intended to serve as a base project to build firmwares for cheap chinese _Bluepill_ boards based on STM32F103C8T6 Cortex M3 processor. We use [libopencm3](https://github.com/libopencm3/libopencm3) as our main library and flash the boards with a simple USB to serial converter using [stm32loader.py](https://github.com/jsnyder/stm32loader).
 
 # Initial setup
