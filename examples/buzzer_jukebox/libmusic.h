@@ -123,7 +123,6 @@
 
 #define R 108 // no note, or rest
 
-void music_setup(void);
 void play_music(int beats_per_minute, int notes_number,
                 uint8_t * notes_pitch
                 , uint8_t * notes_duration);

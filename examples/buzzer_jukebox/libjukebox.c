@@ -3,7 +3,6 @@
 int current_song; // The order in the jukebox array of the song currently loaded.
 
 void jukebox_setup(){
-    music_setup();
     init_jukebox_songs();
     current_song = 0;
 }
