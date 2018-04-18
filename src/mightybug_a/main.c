@@ -5,6 +5,8 @@
 #include "led.h"
 #include "fsm.h"
 #include "cli.h"
+#include "libjukebox.h"
+#include "cron.h"
 
 /*
  * @brief Initial setup and main loop
@@ -14,6 +16,9 @@ int main(void)
   /* setup microcontroller */
   setup_microcontroller();
 
+  /* setup jukebox */
+  jukebox_setup();
+  
   /* reset motors */
   reset_target_velocity(INITIAL_TARGET_VELOCITY);
 
@@ -71,6 +76,12 @@ int main(void)
 
           /* led is off during callibration */
           clear_led();
+ 
+          /* set song and play in loop */
+          jukebox_setcurrent_song(CALLIBRATION_SONG);
+          jukebox_play_in_loop(get_millisecs_since_start());
+           
+            
         }
       else
         {
@@ -89,6 +100,11 @@ int main(void)
 
               // sets the led
               set_led();
+
+              /* set song and play in loop */
+              jukebox_setcurrent_song(OUT_OF_LINE_SONG);
+              jukebox_play_in_loop(get_millisecs_since_start());
+
             }
           else
             {
@@ -96,6 +112,9 @@ int main(void)
               
               // blinking: normal behaviour
               async_blink();
+
+              /* stop the music */
+              stop_music_play();
             }
         }
     }
