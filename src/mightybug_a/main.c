@@ -15,9 +15,6 @@ int main(void)
 {
   /* setup microcontroller */
   setup_microcontroller();
-
-  /* setup jukebox */
-  jukebox_setup();
   
   /* reset motors */
   reset_target_velocity(INITIAL_TARGET_VELOCITY);
@@ -43,6 +40,9 @@ int main(void)
 
   /* enable sensors */
   enable_sensors();
+
+  /* setup jukebox */
+  jukebox_setup();
   
   //FIXME: do some state machine here (callibration, running, etc)
   while(1)
