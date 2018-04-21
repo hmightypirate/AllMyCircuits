@@ -18,10 +18,11 @@ void jukebox_setcurrent_song(int order){
 }
 
 void jukebox_play_current(){
-    play_music(jukebox_song_list[current_song].bpm
-        , jukebox_song_list[current_song].length
-        , jukebox_song_list[current_song].notes_pitch
-        , jukebox_song_list[current_song].notes_duration);
+  play_music(current_song,
+             jukebox_song_list[current_song].bpm,
+             jukebox_song_list[current_song].length,
+             jukebox_song_list[current_song].notes_pitch,
+             jukebox_song_list[current_song].notes_duration);
 }
 
 void jukebox_play_next(){
@@ -42,7 +43,13 @@ int is_jukebox_playing(){
 void jukebox_play_in_loop(uint32_t current_millisecs)
 {
 
+  /* we are not playing */
   if (!is_jukebox_playing()) {
+      jukebox_play_current();
+    }
+  /* we are playing another song */
+  else if (get_song_id() != current_song)
+    {
       jukebox_play_current();
     }
 

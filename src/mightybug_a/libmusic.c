@@ -1,12 +1,13 @@
 #include "libmusic.h"
 
+int song_id = 0;
 int system_ticks_counter = 0;
 int notes_index = 0;
 uint8_t enable_music = 0;
 int system_ticks_per_beat_32ave = 0;
 uint8_t * current_notes_pitch = NULL;
 uint8_t * current_notes_duration = NULL;
-int current_total_notes = 0;
+uint16_t current_total_notes = 0;
 /* wait ticks stores the number of ticks till the next note should be played */
 int wait_ticks = 0;
 
@@ -46,9 +47,10 @@ int play_note(int note_number){
 }
 
 
-void play_music(int beats_per_minute, int notes_number, uint8_t * notes_pitch
+void play_music(int song_id, int beats_per_minute, uint16_t notes_number, uint8_t * notes_pitch
         , uint8_t * notes_duration){
 
+  song_id = song_id;
     play_note(A4);
     notes_index = 0;
     system_ticks_per_beat_32ave = (LIBMUSIC_TICKS_PER_SECOND * 60 / beats_per_minute)/32;  //FIXME: some explanation is needed here
@@ -75,6 +77,7 @@ void play_music_loop(){
         play_note(current_notes_pitch[notes_index]);
         wait_ticks = system_ticks_per_beat_32ave * current_notes_duration[notes_index];
         notes_index++;
+        /* stop the music if we have reached the maximum number of notes */
         if (notes_index > current_total_notes){
             notes_index = 0;
             enable_music = 0;
@@ -88,6 +91,22 @@ void play_music_loop(){
  */ 
 uint8_t is_music_playing(){
   return enable_music;
+}
+
+/* 
+ * @brief get the number of notes of the song being played
+ */ 
+uint16_t get_current_total_notes(void)
+{
+   return current_total_notes;
+}
+
+/*
+ * @brief return the id of the song being played
+ */
+int get_song_id(void)
+{
+  return song_id;  
 }
 
 /*

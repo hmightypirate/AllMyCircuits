@@ -123,11 +123,15 @@
 
 #define R 108 // no note, or rest
 
-void play_music(int beats_per_minute, int notes_number,
-                uint8_t * notes_pitch
-                , uint8_t * notes_duration);
+void play_music(int song_id,
+                int beats_per_minute,
+                uint16_t notes_number,
+                uint8_t * notes_pitch,
+                uint8_t * notes_duration);
 void play_music_loop(void);
 uint8_t is_music_playing(void);
 void stop_music_play(void);
-  
+uint16_t get_current_total_notes(void);
+int get_song_id(void);
+
 #endif /* __LIBMUSIC_H */
