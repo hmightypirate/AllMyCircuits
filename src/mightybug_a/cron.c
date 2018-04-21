@@ -10,7 +10,6 @@ void sys_tick_handler(void)
   millisecs_since_start++;
 }
 
-
 /*
  * @brief get the number of milliseconds since start
  */

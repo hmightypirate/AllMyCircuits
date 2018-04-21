@@ -17,6 +17,7 @@
 */
 #define MAX_VEL_MOTOR 1024
 #define INITIAL_TARGET_VELOCITY 200
+#define MAX_INT 65535
 
 /*
  * CLI Velocity Step
