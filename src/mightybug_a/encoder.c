@@ -1,19 +1,19 @@
 #include "encoder.h"
 
-uint16_t former_left_encoder = 0;
-uint16_t former_right_encoder = 0;
-uint16_t new_left_encoder = 0;
-uint16_t new_right_encoder = 0;
+static uint16_t former_left_encoder = 0;
+static uint16_t former_right_encoder = 0;
+static uint16_t new_left_encoder = 0;
+static uint16_t new_right_encoder = 0;
 
-uint8_t measures_done = 0;
+static uint8_t measures_done = 0;
 
-uint16_t left_encoder_ticks = 0;
-uint16_t right_encoder_ticks = 0;
-uint32_t left_velocity_count = 0;
-uint32_t right_velocity_count = 0;
+static uint32_t left_encoder_ticks = 0;
+static uint32_t right_encoder_ticks = 0;
+static uint32_t left_velocity = 0;
+static uint32_t right_velocity = 0;
 
 uint16_t systick_between_meas = SYSTICK_MEAS;
-uint16_t current_ticks = 0;
+static uint16_t current_ticks = 0;
 
 /*
  * @brief perform encoder measurements
@@ -50,9 +50,14 @@ void update_velocities_encoders(void)
 
       right_encoder_ticks = encoder_measurement(former_right_encoder,
                                                 new_right_encoder);
-
+      
+      /* ticks per ms */
       left_encoder_ticks = left_encoder_ticks/measures_done;
       right_encoder_ticks = right_encoder_ticks/measures_done;
+
+      /* obtain velocity */
+      left_velocity = (left_encoder_ticks * WHEEL_PERIMETER)/WHEEL_RATIO;
+      right_velocity = (right_encoder_ticks * WHEEL_PERIMETER)/WHEEL_RATIO;
       
       measures_done = 0;
     }
