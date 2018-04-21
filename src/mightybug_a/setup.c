@@ -320,15 +320,14 @@ void setup_microcontroller(void)
   SCB_VTOR = (uint32_t)0x08000000;
   rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
-  sensor_setup();
   clock_setup();
   
   gpio_setup();
   usart_setup();
   motor_pwm_setup();
-  //buzzer_pwm_setup();
-  /* left encoder */
-  
+  sensor_setup();
+  buzzer_pwm_setup();
+  /* left encoder */ 
   encoder_setup(LEFT_ENCODER_TIMER,
                 LEFT_ENCODER_AFIO,
                 LEFT_ENCODER_CHANNEL1,
@@ -347,7 +346,6 @@ void setup_microcontroller(void)
   
   
   /* Line sensor setup */
-  
   systick_setup();
 }
 

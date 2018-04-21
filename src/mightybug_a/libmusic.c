@@ -42,10 +42,10 @@ int play_note(int note_number){
 }
 
 
-void play_music(int song_id, int beats_per_minute, uint16_t notes_number, uint8_t * notes_pitch
+void play_music(int mysong_id, int beats_per_minute, uint16_t notes_number, uint8_t * notes_pitch
         , uint8_t * notes_duration){
 
-  song_id = song_id;
+  song_id = mysong_id;
   play_note(A4);
     notes_index = 0;
     system_ticks_per_beat_32ave = (LIBMUSIC_TICKS_PER_SECOND * 60 / beats_per_minute)/32;  //FIXME: some explanation is needed here

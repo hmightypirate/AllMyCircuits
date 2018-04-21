@@ -45,7 +45,7 @@ int main(void)
   /* setup jukebox */
   jukebox_setup();
 
-  
+  clear_led();
 
   /*
   uint32_t last_milisec = 0;
@@ -63,8 +63,8 @@ int main(void)
       play_note(A4);
 
     }
-  */
   
+  */
   
   //FIXME: do some state machine here (callibration, running, etc)
   while(1)
@@ -72,17 +72,20 @@ int main(void)
       if (is_command_received()) {
         execute_command();
       }
-            
+
+      
       /* read data from sensors */
       uint16_t sensor_value[NUM_SENSORS];
       read_line_sensors(sensor_value);
 
+ 
       state_e current_state = get_state();
       
       if (current_state == CALLIBRATION_STATE)
         {
+          
           calibrate_sensors(sensor_value);
-
+          
           // /* FIXME: forcing running if all sensors are callibrated 
           //    better do it after some event is detected or some time
           //    has passed, or some command has been received
@@ -96,13 +99,11 @@ int main(void)
           stop_motors();
 
           /* led is off during callibration */
+          
           set_led();
- 
           /* set song and play in loop */
           jukebox_setcurrent_song(CALLIBRATION_SONG);
-          jukebox_play_in_loop(get_millisecs_since_start());
-           
-          
+          jukebox_play_in_loop(get_millisecs_since_start());          
         }
       else
         {
@@ -120,7 +121,7 @@ int main(void)
               stop_motors();
 
               // sets the led
-              set_led();
+              clear_led();
 
               /* set song and play in loop */
               jukebox_setcurrent_song(OUT_OF_LINE_SONG);
