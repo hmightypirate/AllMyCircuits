@@ -123,6 +123,7 @@
 
 #define R 108 // no note, or rest
 
+int play_note(int note_number);
 void play_music(int song_id,
                 int beats_per_minute,
                 uint16_t notes_number,

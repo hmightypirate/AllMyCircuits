@@ -11,7 +11,10 @@ struct Song {
 	uint8_t *notes_duration;
 };
 
+
+
 #define JUKEBOX_SONGS_TOTAL_SONGS 3
+
 struct Song jukebox_song_list[JUKEBOX_SONGS_TOTAL_SONGS];
 
 /* Check the example buzzer_jukebox for a more commplete list of songs */

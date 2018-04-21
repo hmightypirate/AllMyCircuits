@@ -43,3 +43,5 @@ uint8_t init_jukebox_songs() {
 uint8_t get_total_songs_number() {
 	return JUKEBOX_SONGS_TOTAL_SONGS;
 }
+
+

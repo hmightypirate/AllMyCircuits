@@ -159,10 +159,10 @@ void motor_pwm_setup(void)
 void buzzer_pwm_setup(void)
 {
   
-    if (BUZZER_AFIO){
+  if (BUZZER_AFIO){
       /* Enable the alternate GPIO for output*/
-        gpio_primary_remap(AFIO_MAPR_SWJ_CFG_FULL_SWJ_NO_JNTRST
-                , BUZZER_AFIO);
+    gpio_primary_remap(AFIO_MAPR_SWJ_CFG_FULL_SWJ_NO_JNTRST
+                     , BUZZER_AFIO);
     } 
 
     /* Enable the GPIO for buzzer 
@@ -319,13 +319,16 @@ void setup_microcontroller(void)
 
   SCB_VTOR = (uint32_t)0x08000000;
   rcc_clock_setup_in_hse_8mhz_out_72mhz();
-  
+
+  sensor_setup();
   clock_setup();
+  
   gpio_setup();
   usart_setup();
   motor_pwm_setup();
-  buzzer_pwm_setup();
+  //buzzer_pwm_setup();
   /* left encoder */
+  
   encoder_setup(LEFT_ENCODER_TIMER,
                 LEFT_ENCODER_AFIO,
                 LEFT_ENCODER_CHANNEL1,
@@ -344,8 +347,7 @@ void setup_microcontroller(void)
   
   
   /* Line sensor setup */
-  sensor_setup();
-
+  
   systick_setup();
 }
 

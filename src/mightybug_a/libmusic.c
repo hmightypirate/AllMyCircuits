@@ -1,15 +1,15 @@
 #include "libmusic.h"
 
-int song_id = 0;
-int system_ticks_counter = 0;
-int notes_index = 0;
-uint8_t enable_music = 0;
-int system_ticks_per_beat_32ave = 0;
-uint8_t * current_notes_pitch = NULL;
-uint8_t * current_notes_duration = NULL;
-uint16_t current_total_notes = 0;
+static int song_id = 0;
+static int system_ticks_counter = 0;
+static int notes_index = 0;
+static uint8_t enable_music = 0;
+static int system_ticks_per_beat_32ave = 0;
+static uint8_t * current_notes_pitch = NULL;
+static uint8_t * current_notes_duration = NULL;
+static uint16_t current_total_notes = 0;
 /* wait ticks stores the number of ticks till the next note should be played */
-int wait_ticks = 0;
+static int wait_ticks = 0;
 
 
 void stop_note(){
@@ -36,11 +36,6 @@ int play_note(int note_number){
     //timer_set_repetition_counter(TIM3, repetition_values[note_number]);
     timer_set_period(TIM3, register_values[note_number]);
 
-    printf(" play_note(%d): prescaler %d, period %d\n"
-            , note_number
-            , (int) prescaler_values[note_number]
-            , (int) register_values[note_number]);
-
     timer_set_oc_value(TIM3, TIM_OC1, register_values[note_number]/2);
 
     return 1;
@@ -51,7 +46,7 @@ void play_music(int song_id, int beats_per_minute, uint16_t notes_number, uint8_
         , uint8_t * notes_duration){
 
   song_id = song_id;
-    play_note(A4);
+  play_note(A4);
     notes_index = 0;
     system_ticks_per_beat_32ave = (LIBMUSIC_TICKS_PER_SECOND * 60 / beats_per_minute)/32;  //FIXME: some explanation is needed here
     current_notes_pitch = notes_pitch;

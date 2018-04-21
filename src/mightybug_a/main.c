@@ -7,6 +7,7 @@
 #include "cli.h"
 #include "libjukebox.h"
 #include "cron.h"
+#include "libmusic.h"
 
 /*
  * @brief Initial setup and main loop
@@ -21,7 +22,6 @@ int main(void)
 
   /* reset sensors */
   //FIXME: better do some callibration
-
   if (SOFT_CALLIBRATION)
     {
       hard_reset_sensors();
@@ -29,8 +29,9 @@ int main(void)
   else
     {
       /* reset callibration values (needed for callibration) */
-      reset_callibration_values();
+     reset_callibration_values();
     }
+  
   
   /* reset pid */
   reset_pid();
@@ -43,6 +44,27 @@ int main(void)
 
   /* setup jukebox */
   jukebox_setup();
+
+  
+
+  /*
+  uint32_t last_milisec = 0;
+  uint32_t millisecs_since_start = 0;
+
+  while(1)
+    {
+      millisecs_since_start = get_millisecs_since_start();
+
+      if ((millisecs_since_start % 1000) == 0) {
+        
+        gpio_toggle(GPIOC, GPIO13);
+      }
+      
+      play_note(A4);
+
+    }
+  */
+  
   
   //FIXME: do some state machine here (callibration, running, etc)
   while(1)
@@ -50,8 +72,7 @@ int main(void)
       if (is_command_received()) {
         execute_command();
       }
-      
-      
+            
       /* read data from sensors */
       uint16_t sensor_value[NUM_SENSORS];
       read_line_sensors(sensor_value);
@@ -75,13 +96,13 @@ int main(void)
           stop_motors();
 
           /* led is off during callibration */
-          clear_led();
+          set_led();
  
           /* set song and play in loop */
           jukebox_setcurrent_song(CALLIBRATION_SONG);
           jukebox_play_in_loop(get_millisecs_since_start());
            
-            
+          
         }
       else
         {
@@ -104,7 +125,7 @@ int main(void)
               /* set song and play in loop */
               jukebox_setcurrent_song(OUT_OF_LINE_SONG);
               jukebox_play_in_loop(get_millisecs_since_start());
-
+              
             }
           else
             {
