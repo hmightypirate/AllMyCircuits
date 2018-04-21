@@ -1,6 +1,6 @@
 #include "libjukebox.h"
 
-static int current_song; // The order in the jukebox array of the song currently loaded.
+static int current_song = 0; // The order in the jukebox array of the song currently loaded.
 static uint32_t last_millisec = 0;
 
 /*
@@ -18,6 +18,7 @@ void jukebox_setcurrent_song(int order){
 }
 
 void jukebox_play_current(){
+  
   play_music(current_song,
              jukebox_song_list[current_song].bpm,
              jukebox_song_list[current_song].length,

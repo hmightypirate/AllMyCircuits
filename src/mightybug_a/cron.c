@@ -1,6 +1,6 @@
 #include "cron.h"
 
-volatile uint32_t millisecs_since_start = 0;
+static volatile uint32_t millisecs_since_start = 0;
 
 /* 
  * @brief interrupt callback 
