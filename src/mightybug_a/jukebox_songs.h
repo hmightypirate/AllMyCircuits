@@ -20,14 +20,13 @@ struct Song jukebox_song_list[JUKEBOX_SONGS_TOTAL_SONGS];
 #define SONG_LEN_EUROPE 97
 #define SONG_VEL_EUROPE 140
 
-#define SONG_TEARS_IN_HEAVEN_ORDER 1
-#define SONG_LEN_TEARS_IN_HEAVEN 17
-#define SONG_VEL_TEARS_IN_HEAVEN 112
+#define SONG_INDIANAJONES_ORDER 1
+#define SONG_LEN_INDIANAJONES 55
+#define SONG_VEL_INDIANAJONES 250
 
-#define SONG_LIGHTMYFIRE_ORDER 2
-#define SONG_LEN_LIGHTMYFIRE 33
-#define SONG_VEL_LIGHTMYFIRE 140
-
+#define SONG_SUPERMAN_ORDER 2
+#define SONG_LEN_SUPERMAN 50
+#define SONG_VEL_SUPERMAN 200
 
 uint8_t init_jukebox_songs(void);
 uint8_t get_total_songs_number(void);
