@@ -8,6 +8,13 @@ static volatile uint32_t millisecs_since_start = 0;
 void sys_tick_handler(void)
 {
   millisecs_since_start++;
+
+  /* do encoder measurements 
+     
+     FIXME: check cron library
+     
+   */
+  update_encoder_ticks();
 }
 
 /*
