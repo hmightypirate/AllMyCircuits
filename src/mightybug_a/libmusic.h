@@ -9,6 +9,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/gpio.h>
+#include "setup.h"
 
 #define LIBMUSIC_TICKS_PER_SECOND 1000
 

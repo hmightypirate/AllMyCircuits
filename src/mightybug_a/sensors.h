@@ -14,7 +14,7 @@
 
 /* 1 for black line
    0 for white line */
-#define FOLLOW_BLACK_LINE 0
+#define FOLLOW_BLACK_LINE 1
 
 #define BLACK_MEASURE 2000
 #define WHITE_MEASURE 0
