@@ -97,6 +97,7 @@ void check_module() {
     else if (strcmp(head, "LED") == 0) check_command_led();
     else if (strcmp(head, "FSM") == 0) check_command_fsm();
     else if (strcmp(head, "CLK") == 0) check_command_clock();
+    else if (is_head("VER")) welcome_message();
     else command_unknown(head);
     clear_head_tail();
 };
