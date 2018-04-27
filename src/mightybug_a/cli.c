@@ -92,7 +92,7 @@ void check_module() {
     else if (strcmp(head, "MTR") == 0) check_command_motor();
 //     else if (strcmp(head, "ENC") == 0) check_command_encoder();
     else if (strcmp(head, "LIN") == 0) check_command_line();
-//     else if (strcmp(head, "BUZ") == 0) check_command_buzzer();
+    else if (strcmp(head, "BUZ") == 0) check_command_buzzer();
 //     else if (strcmp(head, "RST") == 0) command_reset();
     else if (strcmp(head, "LED") == 0) check_command_led();
     else if (strcmp(head, "FSM") == 0) check_command_fsm();
@@ -263,5 +263,18 @@ void check_command_clock() {
         send_message(message);        
     } else {
         send_message("Syntax: CLK GET");
+    }
+}
+
+void check_command_buzzer() {
+    set_head_tail(tail);
+    if (is_head("ON")) {
+        play_music_loop();
+        send_message("Buzzer music ON");
+    } else if (is_head("OFF")) {
+        stop_music_play();
+        send_message("Buzzer music OFF");
+    } else {
+        send_message("Syntax: BUZ ON|OFF");
     }
 }
