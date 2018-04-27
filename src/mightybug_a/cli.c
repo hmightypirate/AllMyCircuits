@@ -90,6 +90,7 @@ void check_module() {
 //     else if (strcmp(head, "RST") == 0) command_reset();
     else if (strcmp(head, "LED") == 0) check_command_led();
     else if (strcmp(head, "FSM") == 0) check_command_fsm();
+    else if (strcmp(head, "CLK") == 0) check_command_clock();
     else command_unknown(head);
     clear_head_tail();
 };
@@ -244,6 +245,16 @@ void check_command_motor() {
         sprintf(message, "%i\n", get_target_velocity());
         send_message(message);
     } else {
-        send_message("Syntax: MTR SET|GET");
+        send_message("Syntax: MTR SET|GET [<value>]");
+    }
+}
+
+void check_command_clock() {
+    set_head_tail(tail);
+    if (is_head("GET")) {
+        sprintf(message, "%i\n", get_millisecs_since_start());
+        send_message(message);        
+    } else {
+        send_message("Syntax: CLK GET");
     }
 }
