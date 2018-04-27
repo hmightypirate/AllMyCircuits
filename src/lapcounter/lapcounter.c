@@ -148,19 +148,19 @@ void exti_setup(void) {
 void exti0_isr(void) {
 	exti_reset_request(EXTI0);
 
-	//if (exti_direction == FALLING) {
-	//	gpio_set(INTERNAL_LED_PORT, INTERNAL_LED);
-	//	exti_direction = RISING;
-	//	exti_set_trigger(EXTI0, EXTI_TRIGGER_RISING);
-	//} else {
+	if (exti_direction == FALLING) {
+		gpio_set(INTERNAL_LED_PORT, INTERNAL_LED);
+		exti_direction = RISING;
+		exti_set_trigger(EXTI0, EXTI_TRIGGER_RISING);
+	} else {
 		gpio_clear(INTERNAL_LED_PORT, INTERNAL_LED);
 		exti_direction = FALLING;
     if(millis - last_rising > NOBOUNCE) {
       laptime = millis - last_rising;
       last_rising = millis;
     }
-		//exti_set_trigger(EXTI0, EXTI_TRIGGER_FALLING);
-	//}
+		exti_set_trigger(EXTI0, EXTI_TRIGGER_FALLING);
+	}
 }
 
 
