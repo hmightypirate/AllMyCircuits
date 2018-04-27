@@ -37,6 +37,16 @@ void usart1_isr(void) {
     }
 }
 
+void clear_head_tail(void) {
+    head[0] = '\0';
+    tail[0] = '\0';
+};
+
+bool is_head(char *key) {
+    if (strcmp(head, key) == 0) return true;
+    else return false;
+}
+
 void command_stop() {
     send_message("STOPPING\n");
 };
@@ -59,24 +69,20 @@ void check_command_car() {
 
 void check_command_led() {
     set_head_tail(tail);
-    if (strcmp(head, "ON") == 0) {
+    if (is_head("ON")) {
+        set_led();
         send_message("LED ON\n");
-    } else if (strcmp(head, "OFF") == 0) {
+    } else if (is_head("OFF")) {
+        clear_led();
         send_message("LED OFF\n");
-    } else {
+    } else if (is_head("BLINK")) {
+        async_blink();
         send_message("LED BLINK\n");
+    } else {
+        send_message("Syntax: LED ON|OFF|BLINK\n");
     }
 };
 
-void clear_head_tail(void) {
-    head[0] = '\0';
-    tail[0] = '\0';
-};
-
-bool is_head(char *key) {
-    if (strcmp(head, key) == 0) return true;
-    else return false;
-}
 
 void check_module() {
     set_head_tail(command_line);

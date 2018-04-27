@@ -11,6 +11,7 @@
 #include "sensors.h"
 #include "motors.h"
 #include "cron.h"
+#include "led.h"
 
 bool is_command_received(void);
 void execute_command(void);
