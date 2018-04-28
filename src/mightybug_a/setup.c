@@ -292,7 +292,7 @@ void gpio_setup(void)
                 LEFT_MOTOR_IN1_PIN);
 
   /* Battery level measure */
-  gpio_set_mode(BATTERY_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+  gpio_set_mode(BATTERY_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG,
                 BATTERY_PIN);
   
 }
