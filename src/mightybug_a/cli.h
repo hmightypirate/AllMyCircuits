@@ -12,7 +12,7 @@
 #include "motors.h"
 #include "cron.h"
 #include "led.h"
-#include "libmusic.h"
+#include "libjukebox.h"
 
 bool is_command_received(void);
 void execute_command(void);

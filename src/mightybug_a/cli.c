@@ -279,10 +279,10 @@ void check_command_clock() {
 void check_command_buzzer() {
     set_head_tail(tail);
     if (is_head("ON")) {
-        play_music_loop();
+        enable_jukebox();
         send_message("Buzzer music ON");
     } else if (is_head("OFF")) {
-        stop_music_play();
+        disable_jukebox();
         send_message("Buzzer music OFF");
     } else {
         send_message("Syntax: BUZ ON|OFF");
