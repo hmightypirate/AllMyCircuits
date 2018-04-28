@@ -2,11 +2,16 @@
 
 uint16_t black_sensors[NUM_SENSORS];
 uint16_t white_sensors[NUM_SENSORS];
+uint16_t callibrated_sensors[NUM_SENSORS];
 uint16_t threshold[NUM_SENSORS];
 uint8_t last_drift = LEFT_DRIFT;
 
 static int out_of_line = 0;
 
+/* This var stores the number of sensors correctly callibrated */
+static uint8_t sensors_callibrated = 0;
+
+static int started_callibration = 0;
 
 /*
  * @brief reads a line sensor 
@@ -39,6 +44,22 @@ void hard_reset_sensors()
       white_sensors[i] = WHITE_MEASURE;
       threshold[i] = (black_sensors[i] - white_sensors[i])/2;
     }
+}
+
+/*
+ * @resets callibration values
+ *
+ * @note called automatically only once during callibration
+ */
+
+void reset_callibration_values()
+{
+  for (int i=0; i< NUM_SENSORS; i++)
+    {
+      black_sensors[i] = WHITE_MEASURE;
+      white_sensors[i] = BLACK_MEASURE;
+    }
+  started_callibration = 1;
 }
 
 /*
@@ -153,11 +174,57 @@ int is_out_of_line()
 }
 
 /*
- * @brief callibrate sensors
+ * @brief callibrate sensors (one step)
+ *
+ * @param[in] values a variable that holds current measurements
+ *
  */
-void calibrate_sensors()
+void calibrate_sensors(uint16_t* values)
 {
-  //TODO
+
+  /* reset callibration first time */
+  if (!started_callibration)
+    {
+      reset_callibration_values();
+    }
+  
+  read_line_sensors(values);
+
+  sensors_callibrated = 0;
+  
+  for (int i=0; i<NUM_SENSORS; i++)
+    {
+      /* check if current value is higher than previous max value */
+      if (values[i] > black_sensors[i])
+        {
+          black_sensors[i] = values[i];
+        }
+      /* check if current value is lower than previous min value */
+      if (values[i] < white_sensors[i])
+        {
+           white_sensors[i] = values[i];
+        }
+      
+      threshold[i] = (black_sensors[i] + white_sensors[i])/2;
+
+      if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALLIBRATION)
+        {
+          sensors_callibrated++;
+          callibrated_sensors[i] = 1;
+        }
+      else
+        {
+          callibrated_sensors[i] = 0;
+        }
+    }
+
+  /* Add extra delay (in nop operations) after every callibration call */
+  /*for (int i=0; i < x; i++)
+    {
+    __asm__("nop");
+    }*/
+  //DELAY(DELAY_CALLIBRATION_CALLS);
+     
 }
 
 /*
@@ -174,4 +241,35 @@ void enable_sensors()
 void disable_sensors()
 {
   gpio_clear(SENSOR_ON_PORT, SENSOR_ON_PIN);
+}
+
+
+/*
+ * @brief get the number of callibrated sensors
+ */
+uint8_t get_callibrated_sensors()
+{
+  return sensors_callibrated;
+}
+
+
+/*
+ * @brief get value of white of each sensor
+ */
+uint16_t* get_whites() {
+  return white_sensors;
+}
+
+/*
+ * @brief get value of white of each sensor
+ */
+uint16_t* get_blacks() {
+  return black_sensors;
+}
+
+/*
+ * @brief get value of white of each sensor
+ */
+uint16_t* get_thresholds() {
+  return threshold;
 }

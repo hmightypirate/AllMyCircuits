@@ -8,13 +8,14 @@ OPENCM3_DIR := $(wildcard $(LIBPATHS:=/locm3.sublime-project))
 OPENCM3_DIR := $(firstword $(dir $(OPENCM3_DIR)))
 
 ### CHANGE THIS LINE TO SELECT BLUEPILL OR BLACKPILL
-#PILL = BLACK
-
 ifeq ($(PILL), BLACK)
 PILLFLAGS = -DINTERNAL_LED=GPIO12 -DINTERNAL_LED_PORT=GPIOB -DRCC_INTERNAL_LED=RCC_GPIOB
 else
 PILLFLAGS = -DINTERNAL_LED=GPIO13 -DINTERNAL_LED_PORT=GPIOC -DRCC_INTERNAL_LED=RCC_GPIOC
 endif
+
+
+$(info $$PILL is [${PILL}])
 
 ifeq ($(strip $(OPENCM3_DIR)),)
 $(warning Cannot find libopencm3 library in the standard search paths.)
@@ -43,4 +44,3 @@ libopencm3:
 		git submodule update; \
 	fi
 	$(MAKE) -C ${OPENCM3_DIR} lib/stm32/f1
-

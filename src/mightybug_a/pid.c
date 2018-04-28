@@ -51,3 +51,28 @@ int32_t pid(int32_t proportional)
   
   return error;
 }
+
+
+void set_kp(int kp) {
+  k_p = (uint32_t)kp;
+}
+
+void set_ki(int ki) {
+  k_i = (uint32_t)ki;
+}
+
+void set_kd(int kd) {
+  k_d = (uint32_t)kd;
+}
+
+int get_kp(void) {
+  return k_p;
+}
+
+int get_ki(void) {
+  return k_i;
+}
+
+int get_kd(void) {
+  return k_d;
+}

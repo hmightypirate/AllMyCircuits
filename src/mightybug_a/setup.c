@@ -30,6 +30,9 @@ void clock_setup(void)
   /* Enable TIMER for PWM engine */
   rcc_periph_clock_enable(RCC_PWM_ENGINE);
 
+  /* Enable TIMER for buzzer */
+  rcc_periph_clock_enable(RCC_PWM_BUZZER);
+
   /* Enable ADC clock (sensors) */
   rcc_periph_clock_enable(RCC_ADC_SENSORS);
   
@@ -45,6 +48,9 @@ void clock_setup(void)
  */
 void usart_setup(void)
 {
+  nvic_set_priority(NVIC_USART1_IRQ, 16);
+  nvic_enable_irq(NVIC_USART1_IRQ);
+  
   gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_INPUT_PULL_UPDOWN,
                 GPIO_USART1_TX);
   gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
@@ -58,6 +64,8 @@ void usart_setup(void)
   usart_set_parity(USART1, USART_PARITY);
   usart_set_flow_control(USART1, USART_FLOWCONTROL);
   
+  /* Enable RX interruptions to usart1_isr() function */
+    usart_enable_rx_interrupt(USART1);
   /* Enable USART */
   usart_enable(USART1);
 }
@@ -148,6 +156,68 @@ void motor_pwm_setup(void)
   timer_enable_counter(TIM4);
 }
 
+void buzzer_pwm_setup(void)
+{
+  
+  if (BUZZER_AFIO){
+      /* Enable the alternate GPIO for output*/
+    gpio_primary_remap(AFIO_MAPR_SWJ_CFG_FULL_SWJ_NO_JNTRST
+                     , BUZZER_AFIO);
+    } 
+
+    /* Enable the GPIO for buzzer 
+       FIXME: move to the setup gpio 
+       
+     */
+    gpio_set_mode(BUZZER_PORT, GPIO_MODE_OUTPUT_50_MHZ,
+                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, BUZZER_PIN);
+    
+    /* Set timer 3 mode to no divisor (72MHz), Edge-aligned, up-counting */
+    timer_set_mode(BUZZER_TIMER, TIM_CR1_CKD_CK_INT,
+                   TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+    /* Set divider to 3 */
+    timer_set_prescaler(BUZZER_TIMER, 3);
+    /* A timer update event is generated only after the specified number of
+     * repeat count cycles have been completed. */
+    timer_set_repetition_counter(BUZZER_TIMER, 0);
+    /* Enable Auto-Reload Buffering. */
+    timer_enable_preload(BUZZER_TIMER);
+    /* Enable the Timer to Run Continuously. */
+    timer_continuous_mode(BUZZER_TIMER);
+    /* Specify the timer period in the auto-reload register. */
+    timer_set_period(BUZZER_TIMER, 0);
+
+    /* The freq is 72 MHz / ((1+3)*(1+0)*(1+1024)) = 17560,975609756 Hz ->
+     * period of 56.9 uS*/
+
+    /* Timer Set Output Compare Mode.
+
+     Specifies how the comparator output will respond to a compare match. The
+     mode can be:
+
+     Frozen - the output does not respond to a match.
+     Active - the output assumes the active state on the first match.
+     Inactive - the output assumes the inactive state on the first match.
+     Toggle - The output switches between active and inactive states on each
+     match.
+     Force inactive. The output is forced low regardless of the compare
+     state.
+     Force active. The output is forced high regardless of the compare
+     state.
+     PWM1 - The output is active when the counter is less than the compare
+     register contents and inactive otherwise.
+     PWM2 - The output is inactive when the counter is less than the compare
+     register contents and active otherwise. */
+    timer_set_oc_mode(BUZZER_TIMER, BUZZER_OUTPUT_CHANNEL,
+                      BUZZER_OUTPUT_PWM);
+
+    timer_set_oc_value(BUZZER_TIMER, BUZZER_OUTPUT_CHANNEL, 0);
+
+    timer_enable_oc_output(BUZZER_TIMER, BUZZER_OUTPUT_CHANNEL);
+
+    timer_enable_counter(BUZZER_TIMER);
+}
+
 void sensor_setup(void)
 {
     int i;
@@ -218,6 +288,25 @@ void gpio_setup(void)
 }
   
 
+/*
+ * @brief systick setup
+ *
+ * @note configure the system tick to interrupt each 1 msec
+ */
+void systick_setup(){
+   /* 72MHz / 8 => 9000000 counts per second */
+    systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
+
+    /* 9000000/9000 = 1000 overflows per second - one interrupt every 1ms*/
+    /* SysTick interrupt every N clock pulses: set reload to N-1 */
+    systick_set_reload(9000 -1);
+
+    systick_interrupt_enable();
+
+    /* Start counting. */
+    systick_counter_enable();
+}
+
 
 /* 
  * @brief setup of microcontroller functionality
@@ -230,12 +319,15 @@ void setup_microcontroller(void)
 
   SCB_VTOR = (uint32_t)0x08000000;
   rcc_clock_setup_in_hse_8mhz_out_72mhz();
-  
+
   clock_setup();
+  
   gpio_setup();
   usart_setup();
   motor_pwm_setup();
-  /* left encoder */
+  sensor_setup();
+  buzzer_pwm_setup();
+  /* left encoder */ 
   encoder_setup(LEFT_ENCODER_TIMER,
                 LEFT_ENCODER_AFIO,
                 LEFT_ENCODER_CHANNEL1,
@@ -251,8 +343,9 @@ void setup_microcontroller(void)
                 RIGHT_ENCODER_CHANNEL1_TI,
                 RIGHT_ENCODER_CHANNEL2_TI);
 
+  
+  
   /* Line sensor setup */
-  sensor_setup();
-
+  systick_setup();
 }
 

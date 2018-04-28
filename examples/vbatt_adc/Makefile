@@ -4,7 +4,7 @@ sinclude ../../rules.mk
 CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-bat_bolido.elf: $(OBJ)
+sensor_test.elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -19,7 +19,6 @@ clean_all:
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: bat_bolido.bin
+bin: sensor_test.bin
 
-all: libopencm3 bat_bolido.bin
-
+all: libopencm3 sensor_test.bin
