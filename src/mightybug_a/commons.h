@@ -14,6 +14,11 @@
 #define MAX_VEL_MOTOR 1024
 #define INITIAL_TARGET_VELOCITY 200
 
+/*
+ * CLI Velocity Step
+ */ 
+#define VELOCITY_STEP 10
+
 //#define DELAY(x) for (i=0; i < DELAY_CALLIBRATION_CALLS; i++) __asm__("nop");
 
 
