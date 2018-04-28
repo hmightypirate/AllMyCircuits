@@ -52,7 +52,7 @@
 #define RIGHT_ENCODER_CHANNEL2_TI TIM_IC_IN_TI4
 
 /* Sensors */
-#define SENSOR_ADC ADC1
+#define SENSOR_ADC ADC1  //shared with battery level measurement
 #define SENSOR_ON_PORT GPIOB
 #define SENSOR_ON_PIN GPIO1
 #define SENSOR_0_PORT GPIOA
@@ -94,6 +94,12 @@
 #define BUZZER_PIN GPIO4
 #define BUZZER_OUTPUT_CHANNEL TIM_OC1
 #define BUZZER_OUTPUT_PWM TIM_OCM_PWM1
+
+/* Battery */
+#define BATTERY_PORT GPIOB
+#define BATTERY_PIN GPIO1
+#define BATTERY_CHANNEL 8
+#define AVG_BATTERY_SAMPLES 20
 
 void setup_microcontroller(void);
 

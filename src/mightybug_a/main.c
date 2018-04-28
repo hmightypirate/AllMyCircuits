@@ -8,6 +8,7 @@
 #include "libjukebox.h"
 #include "cron.h"
 #include "libmusic.h"
+#include "vbatt.h"
 
 /*
  * @brief Initial setup and main loop
@@ -73,11 +74,19 @@ int main(void)
         execute_command();
       }
 
+      /* should read battery? */
+      if (get_millisecs_since_start() % SYS_BETWEEN_READS == 0)
+        {
+          // Check if battery drained
+          if (has_batt_drained())
+            {
+              update_state(OUT_OF_BATTERY_EVENT);
+            }
+        }
       
       /* read data from sensors */
       uint16_t sensor_value[NUM_SENSORS];
       read_line_sensors(sensor_value);
-
  
       state_e current_state = get_state();
       
@@ -102,8 +111,23 @@ int main(void)
           
           set_led();
           /* set song and play in loop */
+          jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
+          jukebox_play_in_loop(get_millisecs_since_start());
+        }
+      else if (current_state == NO_BATTERY_STATE)
+        {
+          /* Disable sensors */
+          disable_sensors();
+          
+          /* Stop motors */
+          stop_motors();
+
+          /* Clear led */
+          clear_led();
+
+          /* set song */
           jukebox_setcurrent_song(CALLIBRATION_SONG);
-          jukebox_play_in_loop(get_millisecs_since_start());          
+          jukebox_play_in_loop(get_millisecs_since_start());
         }
       else
         {
