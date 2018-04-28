@@ -18,7 +18,7 @@ static uint16_t current_ticks = 0;
 /*
  * @brief perform encoder measurements
  */
-uint16_t encoder_measurement(uint16_t former_encoder, uint16_t new_encoder)
+static uint16_t encoder_measurement(uint16_t former_encoder, uint16_t new_encoder)
 {
   uint16_t encoder_ticks = 0;
   
@@ -63,6 +63,9 @@ void update_velocities_encoders(void)
     }
 }
 
+/*
+ * @brief obtain new measure of encoder ticks
+ */
 void update_encoder_ticks()
 {
   current_ticks += 1;
