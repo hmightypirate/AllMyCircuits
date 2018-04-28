@@ -32,6 +32,7 @@ void check_command_line(void);
 void check_command_fsm(void);
 void check_command_motor(void);
 void check_command_clock(void);
+void check_command_buzzer(void);
 void welcome_message(void);
 
 #endif /* __CLI_H */

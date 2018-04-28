@@ -252,12 +252,12 @@ void check_command_motor() {
         sprintf(message, "%i\n", get_target_velocity());
         send_message(message);
     } else if (is_head("INC")) {
-        uint32_t velocity = get_target_velocity() + VELOCITY_STEP;
+        int velocity = get_target_velocity() + VELOCITY_STEP;
         reset_target_velocity(velocity);
         sprintf(message, "%i\n", velocity);
         send_message(message);        
     } else if (is_head("DEC")) {
-        uint32_t velocity = get_target_velocity() - VELOCITY_STEP;
+        int velocity = get_target_velocity() - VELOCITY_STEP;
         reset_target_velocity(velocity);
         sprintf(message, "%i\n", velocity);
         send_message(message);
@@ -269,7 +269,7 @@ void check_command_motor() {
 void check_command_clock() {
     set_head_tail(tail);
     if (is_head("GET")) {
-        sprintf(message, "%i\n", get_millisecs_since_start());
+        sprintf(message, "%lu\n", get_millisecs_since_start());
         send_message(message);        
     } else {
         send_message("Syntax: CLK GET");
