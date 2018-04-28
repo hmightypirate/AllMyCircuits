@@ -2,6 +2,7 @@
 
 static int current_song = 0; // The order in the jukebox array of the song currently loaded.
 static uint32_t last_millisec = 0;
+static uint8_t enable_jukebox_signal = ENABLE_JUKEBOX_AT_START;
 
 /*
  * @brief jukebox setup
@@ -44,6 +45,9 @@ int is_jukebox_playing(){
 void jukebox_play_in_loop(uint32_t current_millisecs)
 {
 
+  if (!enable_jukebox_signal)
+    return;
+    
   /* we are not playing */
   if (!is_jukebox_playing()) {
       jukebox_play_current();
@@ -59,4 +63,24 @@ void jukebox_play_in_loop(uint32_t current_millisecs)
       play_music_loop();
       last_millisec = current_millisecs;
     }
+}
+
+/* 
+ * @brief enable jukebox
+ *
+ */
+void enable_jukebox()
+{
+  enable_jukebox_signal = 1;
+}
+
+/*
+ * @brief disable jukebox
+ */
+void disable_jukebox()
+{
+  // stopping the current note first
+  stop_music_play();
+  
+ enable_jukebox_signal = 0;
 }
