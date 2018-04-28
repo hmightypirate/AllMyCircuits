@@ -18,11 +18,27 @@ void execute_command() {
     clear_command_line(); // TODO copy command_line to another variable to avoid usart rewriting before reading 
 }
 
-void send_usart(char *message) {
-    for (int i = 0; i < (int)strlen(message); i++){
-        usart_send_blocking(USART1, message[i]);
+/**
+ * _write let use printf to write to serial port
+ */
+int _write(int file, char *ptr, int len) {
+    int i;
+
+    if (file == 1) {
+        for (i = 0; i < len; i++)
+            usart_send_blocking(USART1, ptr[i]);
+        return i;
     }
-};
+
+    errno = EIO;
+    return -1;
+}
+
+// void send_usart(char *message) {
+//     for (int i = 0; i < (int)strlen(message); i++){
+//         usart_send_blocking(USART1, message[i]);
+//     }
+// };
 
 void usart1_isr(void) {
     if (((USART_CR1(USART1) & USART_CR1_RXNEIE) != 0) &&
@@ -104,8 +120,8 @@ void check_module() {
 
 
 void welcome_message() {
-    send_message("Bat Bolido CLI by Mighty Escuderida\n");
-    send_message("Version v1.1.0\n");
+    printf("Bat Bolido CLI by Mighty Escuderida\n");
+    printf("Version v1.1.0\n");
 }
 
 void send_message(char *message) {
