@@ -24,6 +24,7 @@ static uint16_t read_adc_mean(uint8_t channel, int samples) {
 // returns battery in milivolts
 uint16_t read_vbatt() {
 
-	return read_adc_mean(8, 20) * 100 / 37;
+	return read_adc_mean(BATTERY_CHANNEL,
+                             AVG_BATTERY_SAMPLES) * 100 / 37;
 }
 

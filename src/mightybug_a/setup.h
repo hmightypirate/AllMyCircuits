@@ -98,6 +98,8 @@
 /* Battery */
 #define BATTERY_PORT GPIOB
 #define BATTERY_PIN GPIO1
+#define BATTERY_CHANNEL 8
+#define AVG_BATTERY_SAMPLES 20
 
 void setup_microcontroller(void);
 
