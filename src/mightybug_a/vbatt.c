@@ -29,13 +29,13 @@ static uint16_t read_adc_mean(uint8_t channel, int samples) {
 uint16_t read_vbatt() {
 
 	return read_adc_mean(BATTERY_CHANNEL,
-                             AVG_BATTERY_SAMPLES) * 100 / 37;
+                             AVG_BATTERY_SAMPLES) * 100 / RESISTOR_DIVISOR;
 }
 
 uint8_t has_batt_drained(void)
 {
   last_batt_meas = read_vbatt();
-  if (last_batt_meas < BATTYER_LIMIT_MV)
+  if (last_batt_meas < BATTERY_LIMIT_MV)
     {
       out_of_battery_flag = 1;
     }

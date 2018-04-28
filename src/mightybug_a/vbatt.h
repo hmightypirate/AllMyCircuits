@@ -4,7 +4,8 @@
 #include "setup.h"
 
 /* Battery limit in millivolts (2 cells) */
-#define BATTYER_LIMIT_MV 6400
+#define BATTERY_LIMIT_MV 6400
+#define RESISTOR_DIVISOR 37
 
 /* Time between battery readings: 1000 ms => 1s */
 #define SYS_BETWEEN_READS 1000
