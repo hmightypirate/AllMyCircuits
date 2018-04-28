@@ -109,5 +109,7 @@ int get_song_id(void)
  */
 void stop_music_play()
 {
+  // stops current note
+  stop_note();
   enable_music = 0;
 }
