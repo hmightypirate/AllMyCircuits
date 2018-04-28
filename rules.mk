@@ -44,4 +44,3 @@ libopencm3:
 		git submodule update; \
 	fi
 	$(MAKE) -C ${OPENCM3_DIR} lib/stm32/f1
-
