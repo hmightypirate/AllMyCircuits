@@ -251,12 +251,12 @@ void check_command_motor() {
     } else if (is_head("GET")) {
         sprintf(message, "%i\n", get_target_velocity());
         send_message(message);
-    } else if (is_head("INC") {
+    } else if (is_head("INC")) {
         uint32_t velocity = get_target_velocity() + VELOCITY_STEP;
         reset_target_velocity(velocity);
         sprintf(message, "%i\n", velocity);
         send_message(message);        
-    } else if (is_head("DEC") {
+    } else if (is_head("DEC")) {
         uint32_t velocity = get_target_velocity() - VELOCITY_STEP;
         reset_target_velocity(velocity);
         sprintf(message, "%i\n", velocity);
