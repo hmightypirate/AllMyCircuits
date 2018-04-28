@@ -218,6 +218,11 @@ void buzzer_pwm_setup(void)
     timer_enable_counter(BUZZER_TIMER);
 }
 
+/*
+ * @brief callibrate sensors adc
+ *
+ * @note this adc is shared among line sensors and battery measurements
+ */
 void sensor_setup(void)
 {
     int i;
@@ -285,6 +290,11 @@ void gpio_setup(void)
   /* Control GPIOs configuration for left motor */
   gpio_set_mode(LEFT_MOTOR_IN1_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 LEFT_MOTOR_IN1_PIN);
+
+  /* Battery level measure */
+  gpio_set_mode(BATTERY_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                BATTERY_PIN);
+  
 }
   
 
