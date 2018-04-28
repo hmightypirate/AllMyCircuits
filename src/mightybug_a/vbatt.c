@@ -1,5 +1,9 @@
 #include "vbatt.h"
 
+static uint16_t last_batt_meas = 0;
+// For safety reasons battery flag should not be set to 0 in the code
+static uint8_t out_of_battery_flag = 0;
+
 static uint16_t read_adc_naiive(uint8_t channel) {
 	uint8_t channel_array[1];
 	channel_array[0] = channel;
@@ -28,3 +32,18 @@ uint16_t read_vbatt() {
                              AVG_BATTERY_SAMPLES) * 100 / 37;
 }
 
+uint8_t has_batt_drained(void)
+{
+  last_batt_meas = read_vbatt();
+  if (last_batt_meas < BATTYER_LIMIT_MV)
+    {
+      out_of_battery_flag = 1;
+    }
+
+  return out_of_battery_flag;
+}
+
+uint16_t get_last_batt_meas(void)
+{
+  return last_batt_meas;
+}

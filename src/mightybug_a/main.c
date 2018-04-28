@@ -102,8 +102,24 @@ int main(void)
           
           set_led();
           /* set song and play in loop */
+          jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
+          jukebox_play_in_loop(get_millisecs_since_start());
+        }
+      else if (current_state == NO_BATTERY_STATE)
+        {
+          /* Disable sensors */
+          disable_sensors();
+          
+          /* Stop motors */
+          stop_motors();
+
+          /* Clear led */
+          clear_led();
+
+          /* set song */
           jukebox_setcurrent_song(CALLIBRATION_SONG);
           jukebox_play_in_loop(get_millisecs_since_start());          
+          
         }
       else
         {
