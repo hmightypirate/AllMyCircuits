@@ -57,6 +57,16 @@ Finally you can flash the new firmware with the command shown below. Remember to
 python stm32loader.py -p SERIAL_PORT -e -w -V -g 0x08000000 -v bluepill_test.bin
 ```
 
+## Blackpill
+
+The Makefiles are ready for using with the black pill (the newest blue pill version). Use the following commands to compile for the black pill:
+
+```
+PILL=BLACK make
+```
+
+or define PILL=BLACK as an environment variable
+
 # Related Projects
 
 * stm32loader.py: https://github.com/jsnyder/stm32loader
