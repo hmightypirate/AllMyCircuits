@@ -123,11 +123,6 @@ void welcome_message() {
     printf("Version v1.1.0\n");
 }
 
-void send_message(char *message) {
-    send_usart(message);
-};
-
-
 void clear_command_line(void) {
     command_line[0] = '\0';
     command_line_size = 0;
