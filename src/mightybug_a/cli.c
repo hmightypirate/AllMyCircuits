@@ -33,12 +33,6 @@ int _write(int file, char *ptr, int len) {
     return -1;
 }
 
-void send_usart(char *message) {
-    for (int i = 0; i < (int)strlen(message); i++){
-        usart_send_blocking(USART1, message[i]);
-    }
-};
-
 void usart1_isr(void) {
     if (((USART_CR1(USART1) & USART_CR1_RXNEIE) != 0) &&
     ((USART_SR(USART1) & USART_SR_RXNE) != 0)) {
