@@ -4,7 +4,6 @@ char command_line[80];
 int command_line_size = 0;
 char head[20];
 char tail[80];
-char message[80];
 
 bool command_received = false;
 
