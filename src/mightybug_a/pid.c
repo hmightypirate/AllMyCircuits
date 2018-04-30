@@ -38,7 +38,7 @@ int32_t pid(int32_t proportional)
     {
       integral = MAX_INTEGRAL;
     }
-  else if (integral < 0 && integral < MAX_INTEGRAL)
+  else if (integral < 0 && integral < -MAX_INTEGRAL)
     {
       integral = -MAX_INTEGRAL;
     }
@@ -47,7 +47,7 @@ int32_t pid(int32_t proportional)
   former_proportional = proportional;
 
   error = proportional * k_p + integral * k_i + derivative * k_d;
-  error = error/100;
+  error = error/PID_ERROR_DIVISOR;
   
   return error;
 }

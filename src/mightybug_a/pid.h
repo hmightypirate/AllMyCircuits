@@ -5,6 +5,7 @@
 
 #define MAX_INTEGRAL 100
 #define MAX_PID_ERROR 2000
+#define PID_ERROR_DIVISOR 100
 
 int32_t pid(int32_t proportional);
 void reset_pid();
