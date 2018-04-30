@@ -173,12 +173,12 @@ void check_k_pid_get() {
         printf("PID KP: %i\n", k_value);
     } else if (is_head("KI")) {
         k_value = get_ki();
-        printf(message, "PID KI: %i\n", k_value);
+        printf("PID KI: %i\n", k_value);
     } else if (is_head("KD")) {
         k_value = get_kd();
-        printf(message, "PID KD: %i\n", k_value);
+        printf("PID KD: %i\n", k_value);
     } else {
-        printf("Syntax: PID GET KP|KI|KD <value>\n");
+        printf("Syntax: PID GET KP|KI|KD\n");
     }
 }
 
@@ -190,7 +190,7 @@ void check_command_pid() {
     } else if (strcmp(head, "GET") == 0) {
         check_k_pid_get();
     } else {
-        printf("Syntax: PID SET|GET KP|KI|KD <value>\n");
+        printf("Syntax: PID SET|GET KP|KI|KD [<value>]\n");
     }
 }
 
@@ -199,12 +199,12 @@ void check_command_fsm() {
     set_head_tail(tail);
     if (is_head("RUN")) {
         update_state(GO_TO_RUN_EVENT);
-        printf("GO_TO_RUN");
+        printf("GO_TO_RUN\n");
     } else if (is_head("CAL")) {
         update_state(FORCE_CALLIBRATION_EVENT);
-        printf("CALIBRATE");
+        printf("CALIBRATE\n");
     } else {
-        printf("Syntax: FSM RUN|CAL");
+        printf("Syntax: FSM RUN|CAL\n");
     }
 }
 
@@ -241,7 +241,7 @@ void check_command_line() {
     } else if (is_head("BLACKS")) {
         print_values(get_blacks(), NUM_SENSORS);
     } else {
-        printf("Syntax: LIN VALUES|WHITES|BLACKS|THRESHOLDS");
+        printf("Syntax: LIN VALUES|WHITES|BLACKS|THRESHOLDS\n");
     }
 }
 
@@ -262,7 +262,7 @@ void check_command_motor() {
         reset_target_velocity(velocity);
         printf("%i\n", velocity);
     } else {
-        printf("Syntax: MTR SET|GET [<value>]");
+        printf("Syntax: MTR SET|GET [<value>]\n");
     }
 }
 
@@ -271,7 +271,7 @@ void check_command_clock() {
     if (is_head("GET")) {
         printf("%lu\n", get_millisecs_since_start());        
     } else {
-        printf("Syntax: CLK GET");
+        printf("Syntax: CLK GET\n");
     }
 }
 
@@ -279,11 +279,11 @@ void check_command_buzzer() {
     set_head_tail(tail);
     if (is_head("ON")) {
         enable_jukebox();
-        printf("Buzzer music ON");
+        printf("Buzzer music ON\n");
     } else if (is_head("OFF")) {
         disable_jukebox();
-        printf("Buzzer music OFF");
+        printf("Buzzer music OFF\n");
     } else {
-        printf("Syntax: BUZ ON|OFF");
+        printf("Syntax: BUZ ON|OFF\n");
     }
 }
