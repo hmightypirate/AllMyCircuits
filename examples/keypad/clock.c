@@ -1,13 +1,15 @@
 #include <libopencm3/cm3/systick.h>
 
-//// Global timing, system tick related code
-volatile uint32_t milisecs_since_start = 0;
+/* System timestamp in milliseconds since boot */
+volatile uint32_t millisecs_since_start = 0;
 
 void sys_tick_handler(void) {
-	milisecs_since_start++;
+	millisecs_since_start++;
 }
 
-// configure the system tick to interrupt each 1 msec
+/*
+ * @brief Configure the system tick to interrupt each 1 msec
+ */
 void system_clock_setup() {
     /* 72MHz / 8 => 9000000 counts per second */
     systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
@@ -21,8 +23,10 @@ void system_clock_setup() {
     /* Start counting. */
     systick_counter_enable();    
 }
-//// End of global timing, system tick related code
 
+/*
+ * @brief Read system timestamp
+ */
 uint32_t system_clock_get_milis() {
-    return milisecs_since_start;
+    return millisecs_since_start;
 }
