@@ -66,9 +66,9 @@ void command_unknown(char *command) {
 
 void check_command_car() {
     set_head_tail(tail);
-    if (strcmp(head, "PLAY") == 0) {
+    if (is_head("PLAY")) {
         printf("Go!\n");
-    } else if (strcmp(head, "STOP") == 0) {
+    } else if (is_head("STOP")) {
         command_stop();
     } else {
         command_unknown(head);
@@ -94,17 +94,17 @@ void check_command_led() {
 
 void check_module() {
     set_head_tail(command_line);
-    if (strcmp(head, "STOP") == 0) command_stop();
-    else if (strcmp(head, "CAR") == 0) check_command_car();
-    else if (strcmp(head, "PID") == 0) check_command_pid();
-    else if (strcmp(head, "MTR") == 0) check_command_motor();
-//     else if (strcmp(head, "ENC") == 0) check_command_encoder();
-    else if (strcmp(head, "LIN") == 0) check_command_line();
-    else if (strcmp(head, "BUZ") == 0) check_command_buzzer();
-//     else if (strcmp(head, "RST") == 0) command_reset();
-    else if (strcmp(head, "LED") == 0) check_command_led();
-    else if (strcmp(head, "FSM") == 0) check_command_fsm();
-    else if (strcmp(head, "CLK") == 0) check_command_clock();
+    if (is_head("STOP")) command_stop();
+    else if (is_head("CAR")) check_command_car();
+    else if (is_head("PID")) check_command_pid();
+    else if (is_head("MTR")) check_command_motor();
+//     else if (is_head("ENC")) check_command_encoder();
+    else if (is_head("LIN")) check_command_line();
+    else if (is_head("BUZ")) check_command_buzzer();
+//     else if (is_head("RST")) command_reset();
+    else if (is_head("LED")) check_command_led();
+    else if (is_head("FSM")) check_command_fsm();
+    else if (is_head("CLK")) check_command_clock();
     else if (is_head("VER")) welcome_message();
     else command_unknown(head);
     clear_head_tail();
