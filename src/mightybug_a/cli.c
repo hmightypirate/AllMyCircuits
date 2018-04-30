@@ -232,17 +232,6 @@ void check_command_fsm() {
     }
 }
 
-// void print_values(uint16_t* values, int num_values) {
-//     message[0] = '\0';
-//     for (int i = 0; i < num_values; i++) {
-//         sprintf(message, "%s%i ", message, values[i]);
-//     }
-    
-//     // Add a LF
-//     message[strlen(message)-1] = '\n';
-//     printf(message);
-// }
-
 void print_values(uint16_t* values, int num_values) {
     for (int i = 0; i < num_values; i++) {
         printf("%i ", values[i]);
