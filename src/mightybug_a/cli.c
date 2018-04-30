@@ -7,6 +7,30 @@ char tail[80];
 
 bool command_received = false;
 
+
+/**
+ * Private prototypes
+ */
+void usart1_isr(void);
+void send_usart(char *message);
+void send_message(char *message);
+void command_stop(void);
+void command_unknown(char *command);
+void check_command_car(void);
+void check_command_led(void);
+void check_module(void);
+void clear_head_tail(void);
+void clear_command_line(void);
+void set_head_tail(char *origin);
+void check_command_pid(void);
+void check_command_line(void);
+void check_command_fsm(void);
+void check_command_motor(void);
+void check_command_clock(void);
+void check_command_buzzer(void);
+void welcome_message(void);
+
+
 bool is_command_received() {
     return command_received;
 }
