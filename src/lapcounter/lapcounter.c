@@ -50,7 +50,9 @@ void print_int(uint32_t x) {
 
 // Enable internal LED
 static void gpio_setup(void) {
-    /* Enable GPIOB clock. */
+    /* Enable GPIOA clock. */
+    rcc_periph_clock_enable(RCC_GPIOA);
+    /* Enable clock for internal LED port */
     rcc_periph_clock_enable(RCC_INTERNAL_LED);
 
     gpio_set_mode(INTERNAL_LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
