@@ -270,9 +270,13 @@ void gpio_setup(void)
   gpio_set_mode(SENSOR_7_PORT, GPIO_MODE_INPUT,
                 GPIO_CNF_INPUT_ANALOG, SENSOR_7_PIN);
 
-  /* Set internal LED */
+  /* Set internal and LED */
   gpio_set_mode(LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 LED_PIN);
+
+  /* Set LED */
+  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO12);
   
   /* Set motor control ports */
   /* Control GPIOs configuration for right motor */

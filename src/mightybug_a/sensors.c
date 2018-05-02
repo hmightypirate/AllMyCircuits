@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "sensors.h"
 
 uint16_t black_sensors[NUM_SENSORS];

@@ -70,16 +70,22 @@ void check_command_car() {
 void check_command_led() {
     set_head_tail(tail);
     if (is_head("ON")) {
-        set_led();
+        set_green_led();
         send_message("LED ON\n");
     } else if (is_head("OFF")) {
-        clear_led();
+        clear_green_led();
         send_message("LED OFF\n");
     } else if (is_head("BLINK")) {
         async_blink();
         send_message("LED BLINK\n");
-    } else {
-        send_message("Syntax: LED ON|OFF|BLINK\n");
+    } else if (is_head("RED_ON")) {
+        set_red_led();
+        send_message("LED RED ON\n");
+    } else if (is_head("RED_OFF")) {
+        clear_red_led();
+        send_message("LED RED OFF\n");
+    } else{
+        send_message("Syntax: LED ON|OFF|BLINK|RED_ON|RED_OFF\n");
     }
 };
 

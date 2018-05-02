@@ -10,7 +10,9 @@
 
 void set_async_period(uint16_t async_calls);
 void async_blink();
-void set_led();
-void clear_led();
+void set_red_led();
+void clear_red_led();
+void set_green_led();
+void clear_green_led();
 
 #endif /* __LED_H */

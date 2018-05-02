@@ -32,19 +32,38 @@ void async_blink()
 }
 
 /*
- * @brief sets the led
+ * @brief sets the green led
  *
  */
-void set_led()
+void set_green_led()
 {
   gpio_clear(LED_PORT, LED_PIN);
 }
 
 /*
- * @brief clears the led
+ * @brief clears the green led
  *
  */
-void clear_led()
+void clear_green_led()
 {
   gpio_set(LED_PORT, LED_PIN);
+}
+
+
+/*
+ * @brief sets the red led
+ *
+ */
+void set_red_led()
+{
+  gpio_clear(GPIOB, GPIO12);
+}
+
+/*
+ * @brief clears the red led
+ *
+ */
+void clear_red_led()
+{
+  gpio_set(GPIOB, GPIO12);
 }

@@ -46,7 +46,7 @@ int main(void)
   /* setup jukebox */
   jukebox_setup();
 
-  clear_led();
+  clear_green_led();
 
   /*
   uint32_t last_milisec = 0;
@@ -70,6 +70,7 @@ int main(void)
   //FIXME: do some state machine here (callibration, running, etc)
   while(1)
     {
+	  set_red_led();
       if (is_command_received()) {
         execute_command();
       }
@@ -89,7 +90,7 @@ int main(void)
       read_line_sensors(sensor_value);
  
       state_e current_state = get_state();
-      
+      clear_red_led();
       if (current_state == CALLIBRATION_STATE)
         {
           
@@ -109,7 +110,7 @@ int main(void)
 
           /* led is off during callibration */
           
-          set_led();
+          set_green_led();
           /* set song and play in loop */
           jukebox_setcurrent_song(CALLIBRATION_SONG);
           jukebox_play_in_loop(get_millisecs_since_start());
@@ -122,8 +123,7 @@ int main(void)
           /* Stop motors */
           stop_motors();
 
-          /* Clear led */
-          clear_led();
+          clear_green_led();
 
           /* set song */
           jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
@@ -144,8 +144,7 @@ int main(void)
               // stop the motors if out of line
               stop_motors();
 
-              // sets the led
-              clear_led();
+              clear_green_led();
 
               /* set song and play in loop */
               jukebox_setcurrent_song(OUT_OF_LINE_SONG);
