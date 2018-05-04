@@ -4,9 +4,32 @@ char command_line[80];
 int command_line_size = 0;
 char head[20];
 char tail[80];
-char message[80];
 
 bool command_received = false;
+
+
+/**
+ * Private prototypes
+ */
+void usart1_isr(void);
+void send_usart(char *message);
+void send_message(char *message);
+void command_stop(void);
+void command_unknown(char *command);
+void check_command_car(void);
+void check_command_led(void);
+void check_module(void);
+void clear_head_tail(void);
+void clear_command_line(void);
+void set_head_tail(char *origin);
+void check_command_pid(void);
+void check_command_line(void);
+void check_command_fsm(void);
+void check_command_motor(void);
+void check_command_clock(void);
+void check_command_buzzer(void);
+void welcome_message(void);
+
 
 bool is_command_received() {
     return command_received;
@@ -18,11 +41,21 @@ void execute_command() {
     clear_command_line(); // TODO copy command_line to another variable to avoid usart rewriting before reading 
 }
 
-void send_usart(char *message) {
-    for (int i = 0; i < (int)strlen(message); i++){
-        usart_send_blocking(USART1, message[i]);
+/**
+ * _write let use printf to write to serial port
+ */
+int _write(int file, char *ptr, int len) {
+    int i;
+
+    if (file == 1) {
+        for (i = 0; i < len; i++)
+            usart_send_blocking(USART1, ptr[i]);
+        return i;
     }
-};
+
+    errno = EIO;
+    return -1;
+}
 
 void usart1_isr(void) {
     if (((USART_CR1(USART1) & USART_CR1_RXNEIE) != 0) &&
@@ -48,19 +81,18 @@ bool is_head(char *key) {
 }
 
 void command_stop() {
-    send_message("STOPPING\n");
+    printf("STOPPING\n");
 };
 
 void command_unknown(char *command) {
-    sprintf(message, "Unknown command: %s\n", command);
-    send_message(message);
+    printf("Unknown command: %s\n", command);
 };
 
 void check_command_car() {
     set_head_tail(tail);
-    if (strcmp(head, "PLAY") == 0) {
-        send_message("Go!\n");
-    } else if (strcmp(head, "STOP") == 0) {
+    if (is_head("PLAY")) {
+        printf("Go!\n");
+    } else if (is_head("STOP")) {
         command_stop();
     } else {
         command_unknown(head);
@@ -71,32 +103,32 @@ void check_command_led() {
     set_head_tail(tail);
     if (is_head("ON")) {
         set_led();
-        send_message("LED ON\n");
+        printf("LED ON\n");
     } else if (is_head("OFF")) {
         clear_led();
-        send_message("LED OFF\n");
+        printf("LED OFF\n");
     } else if (is_head("BLINK")) {
         async_blink();
-        send_message("LED BLINK\n");
+        printf("LED BLINK\n");
     } else {
-        send_message("Syntax: LED ON|OFF|BLINK\n");
+        printf("Syntax: LED ON|OFF|BLINK\n");
     }
 };
 
 
 void check_module() {
     set_head_tail(command_line);
-    if (strcmp(head, "STOP") == 0) command_stop();
-    else if (strcmp(head, "CAR") == 0) check_command_car();
-    else if (strcmp(head, "PID") == 0) check_command_pid();
-    else if (strcmp(head, "MTR") == 0) check_command_motor();
-//     else if (strcmp(head, "ENC") == 0) check_command_encoder();
-    else if (strcmp(head, "LIN") == 0) check_command_line();
-    else if (strcmp(head, "BUZ") == 0) check_command_buzzer();
-//     else if (strcmp(head, "RST") == 0) command_reset();
-    else if (strcmp(head, "LED") == 0) check_command_led();
-    else if (strcmp(head, "FSM") == 0) check_command_fsm();
-    else if (strcmp(head, "CLK") == 0) check_command_clock();
+    if (is_head("STOP")) command_stop();
+    else if (is_head("CAR")) check_command_car();
+    else if (is_head("PID")) check_command_pid();
+    else if (is_head("MTR")) check_command_motor();
+//     else if (is_head("ENC")) check_command_encoder();
+    else if (is_head("LIN")) check_command_line();
+    else if (is_head("BUZ")) check_command_buzzer();
+//     else if (is_head("RST")) command_reset();
+    else if (is_head("LED")) check_command_led();
+    else if (is_head("FSM")) check_command_fsm();
+    else if (is_head("CLK")) check_command_clock();
     else if (is_head("VER")) welcome_message();
     else command_unknown(head);
     clear_head_tail();
@@ -104,14 +136,9 @@ void check_module() {
 
 
 void welcome_message() {
-    send_message("Bat Bolido CLI by Mighty Escuderida\n");
-    send_message("Version v1.1.0\n");
+    printf("Bat Bolido CLI by Mighty Escuderida\n");
+    printf("Version v1.1.0\n");
 }
-
-void send_message(char *message) {
-    send_usart(message);
-};
-
 
 void clear_command_line(void) {
     command_line[0] = '\0';
@@ -147,18 +174,15 @@ void check_k_pid_set() {
 
     if (is_head("KP")) {
         set_kp(k_value);
-        sprintf(message, "%i\n", k_value);
-        send_message(message);
+        printf("%i\n", k_value);
     } else if (is_head("KI")) {
         set_ki(k_value);
-        sprintf(message, "%i\n", k_value);
-        send_message(message);
+        printf("%i\n", k_value);
     } else if (is_head("KD")) {
         set_kd(k_value);
-        sprintf(message, "%i\n", k_value);
-        send_message(message);
+        printf("%i\n", k_value);
     } else {
-        send_message("Syntax: PID SET KP|KI|KD <value>\n");
+        printf("Syntax: PID SET KP|KI|KD <value>\n");
     }
 }
 
@@ -170,19 +194,16 @@ void check_k_pid_get() {
 
     if (is_head("KP")) {
         k_value = get_kp();
-        sprintf(message, "PID KP: %i\n", k_value);
-        send_message(message);
+        printf("PID KP: %i\n", k_value);
     } else if (is_head("KI")) {
         k_value = get_ki();
-        sprintf(message, "PID KI: %i\n", k_value);
-        send_message(message);
+        printf("PID KI: %i\n", k_value);
     } else if (is_head("KD")) {
         k_value = get_kd();
-        sprintf(message, "PID KD: %i\n", k_value);
-        send_message(message);
+        printf("PID KD: %i\n", k_value);
     } else {
-        send_message("Syntax: PID GET KP|KI|KD <value>\n");
-    }      
+        printf("Syntax: PID GET KP|KI|KD\n");
+    }
 }
 
 void check_command_pid() {
@@ -193,7 +214,7 @@ void check_command_pid() {
     } else if (strcmp(head, "GET") == 0) {
         check_k_pid_get();
     } else {
-        send_message("Syntax: PID SET|GET KP|KI|KD <value>\n");
+        printf("Syntax: PID SET|GET KP|KI|KD [<value>]\n");
     }
 }
 
@@ -202,24 +223,20 @@ void check_command_fsm() {
     set_head_tail(tail);
     if (is_head("RUN")) {
         update_state(GO_TO_RUN_EVENT);
-        send_message("GO_TO_RUN");
+        printf("GO_TO_RUN\n");
     } else if (is_head("CAL")) {
         update_state(FORCE_CALLIBRATION_EVENT);
-        send_message("CALIBRATE");
+        printf("CALIBRATE\n");
     } else {
-        send_message("Syntax: FSM RUN|CAL");
+        printf("Syntax: FSM RUN|CAL\n");
     }
 }
 
 void print_values(uint16_t* values, int num_values) {
-    message[0] = '\0';
     for (int i = 0; i < num_values; i++) {
-        sprintf(message, "%s%i ", message, values[i]);
+        printf("%i ", values[i]);
     }
-    
-    // Add a LF
-    message[strlen(message)-1] = '\n';
-    send_message(message);
+    printf("\n");
 }
 
 void check_command_line() {
@@ -237,7 +254,7 @@ void check_command_line() {
     } else if (is_head("BLACKS")) {
         print_values(get_blacks(), NUM_SENSORS);
     } else {
-        send_message("Syntax: LIN VALUES|WHITES|BLACKS|THRESHOLDS");
+        printf("Syntax: LIN VALUES|WHITES|BLACKS|THRESHOLDS\n");
     }
 }
 
@@ -246,33 +263,28 @@ void check_command_motor() {
     if (is_head("SET")) {
         int velocity = atoi(tail);
         reset_target_velocity(velocity);
-        sprintf(message, "%i\n", velocity);
-        send_message(message);
+        printf("%i\n", velocity);
     } else if (is_head("GET")) {
-        sprintf(message, "%i\n", get_target_velocity());
-        send_message(message);
+        printf("%i\n", get_target_velocity());
     } else if (is_head("INC")) {
         int velocity = get_target_velocity() + VELOCITY_STEP;
         reset_target_velocity(velocity);
-        sprintf(message, "%i\n", velocity);
-        send_message(message);        
+        printf("%i\n", velocity);        
     } else if (is_head("DEC")) {
         int velocity = get_target_velocity() - VELOCITY_STEP;
         reset_target_velocity(velocity);
-        sprintf(message, "%i\n", velocity);
-        send_message(message);
+        printf("%i\n", velocity);
     } else {
-        send_message("Syntax: MTR SET|GET [<value>]");
+        printf("Syntax: MTR SET|GET [<value>]\n");
     }
 }
 
 void check_command_clock() {
     set_head_tail(tail);
     if (is_head("GET")) {
-        sprintf(message, "%lu\n", get_millisecs_since_start());
-        send_message(message);        
+        printf("%lu\n", get_millisecs_since_start());        
     } else {
-        send_message("Syntax: CLK GET");
+        printf("Syntax: CLK GET\n");
     }
 }
 
@@ -280,11 +292,11 @@ void check_command_buzzer() {
     set_head_tail(tail);
     if (is_head("ON")) {
         enable_jukebox();
-        send_message("Buzzer music ON");
+        printf("Buzzer music ON\n");
     } else if (is_head("OFF")) {
         disable_jukebox();
-        send_message("Buzzer music OFF");
+        printf("Buzzer music OFF\n");
     } else {
-        send_message("Syntax: BUZ ON|OFF");
+        printf("Syntax: BUZ ON|OFF\n");
     }
 }
