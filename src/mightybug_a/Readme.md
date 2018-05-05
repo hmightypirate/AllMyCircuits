@@ -21,7 +21,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Use the following tags: Added, Changed, Fixed and Removed
 
-## [Bat bolido: 2.0.0] - Unreleased
+## [Bat bolido: 1.1.0] - 05/05/2018
+
+### Added
+- FSM for car state: callibration, running and out of line detection
+- commands for changing PID ctes, car state, target velocity of motors, etc.
+- buzzer library. Changing musics regarding car state.
+- measure battery voltage
+- systick (buzzer, battery measure)
+- serial communication
+
+### Fixed
+- Bug corrections in pid
 
 
 ## [Agonizing Automobile: 1.0.0] - 09/04/2018
@@ -33,14 +44,7 @@ Use the following tags: Added, Changed, Fixed and Removed
 
 	
 ## Known issues:
-
-- initial loop: sensor + pid + motor control
-- white and black line (line follower)
 - car stops if it is out of line
-- no parameter adaptation
-- no serial communication
-- no interruptions
 - no encoders
-- no systick
 
 
