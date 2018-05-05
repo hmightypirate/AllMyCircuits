@@ -29,6 +29,7 @@ void check_command_motor(void);
 void check_command_clock(void);
 void check_command_buzzer(void);
 void welcome_message(void);
+void check_command_battery(void);
 
 
 bool is_command_received() {
@@ -130,6 +131,7 @@ void check_module() {
     else if (is_head("FSM")) check_command_fsm();
     else if (is_head("CLK")) check_command_clock();
     else if (is_head("VER")) welcome_message();
+    else if (is_head("BAT")) check_command_battery();
     else command_unknown(head);
     clear_head_tail();
 };
@@ -299,4 +301,8 @@ void check_command_buzzer() {
     } else {
         printf("Syntax: BUZ ON|OFF\n");
     }
+}
+
+void check_command_battery() {
+    printf("%u mV", read_vbatt());
 }
