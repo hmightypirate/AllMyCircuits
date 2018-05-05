@@ -38,7 +38,7 @@ int32_t pid(int32_t proportional)
     {
       integral = MAX_INTEGRAL;
     }
-  else if (integral < 0 && integral < MAX_INTEGRAL)
+  else if (integral < 0 && integral < -MAX_INTEGRAL)
     {
       integral = -MAX_INTEGRAL;
     }
@@ -47,7 +47,32 @@ int32_t pid(int32_t proportional)
   former_proportional = proportional;
 
   error = proportional * k_p + integral * k_i + derivative * k_d;
-  error = error/100;
+  error = error/PID_ERROR_DIVISOR;
   
   return error;
+}
+
+
+void set_kp(int kp) {
+  k_p = (uint32_t)kp;
+}
+
+void set_ki(int ki) {
+  k_i = (uint32_t)ki;
+}
+
+void set_kd(int kd) {
+  k_d = (uint32_t)kd;
+}
+
+int get_kp(void) {
+  return k_p;
+}
+
+int get_ki(void) {
+  return k_i;
+}
+
+int get_kd(void) {
+  return k_d;
 }

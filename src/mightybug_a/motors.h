@@ -9,6 +9,7 @@
 #define LEFT_INVERTED 0
 
 void reset_target_velocity(int target_vel);
+int get_target_velocity(void);
 void motor_control(int error);
 void stop_motors();
 

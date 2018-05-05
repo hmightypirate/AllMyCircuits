@@ -7,6 +7,8 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/adc.h>
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/cm3/systick.h>
 #include "commons.h"
 
 
@@ -21,6 +23,7 @@
 #define RCC_RIGHT_ENCODER RCC_TIM1
 #define RCC_PWM_ENGINE RCC_TIM4
 #define RCC_ADC_SENSORS RCC_ADC1
+#define RCC_PWM_BUZZER RCC_TIM3
 
 /*
  * Usart parameters
@@ -49,7 +52,7 @@
 #define RIGHT_ENCODER_CHANNEL2_TI TIM_IC_IN_TI4
 
 /* Sensors */
-#define SENSOR_ADC ADC1
+#define SENSOR_ADC ADC1  //shared with battery level measurement
 #define SENSOR_ON_PORT GPIOB
 #define SENSOR_ON_PIN GPIO1
 #define SENSOR_0_PORT GPIOA
@@ -83,6 +86,20 @@
 #define RIGHT_MOTOR_IN1_PIN GPIO11
 #define RIGHT_MOTOR_IN2_PORT GPIOB
 #define RIGHT_MOTOR_IN2_PIN GPIO10
+
+/* Buzzer */
+#define BUZZER_TIMER TIM3
+#define BUZZER_AFIO AFIO_MAPR_TIM3_REMAP_PARTIAL_REMAP
+#define BUZZER_PORT GPIOB
+#define BUZZER_PIN GPIO4
+#define BUZZER_OUTPUT_CHANNEL TIM_OC1
+#define BUZZER_OUTPUT_PWM TIM_OCM_PWM1
+
+/* Battery */
+#define BATTERY_PORT GPIOB
+#define BATTERY_PIN GPIO0
+#define BATTERY_CHANNEL 8
+#define AVG_BATTERY_SAMPLES 20
 
 void setup_microcontroller(void);
 
