@@ -75,6 +75,48 @@ void read_line_sensors(uint16_t* sensor_value)
     }
 }
 
+uint16_t trunc_to_range(uint16_t value, uint16_t min, uint16_t max)
+{
+  uint16_t trunc_value = value;
+
+  if (value < min) {
+    trunc_value = min;
+  } else if (value > max) {
+    trunc_value = max;
+  }
+
+  return trunc_value;
+}
+
+/*
+ * @brief rescale vale between min and max using scale steps
+ */
+uint16_t rescale_in_range(uint16_t value, uint16_t min, uint16_t max, uint16_t scale)
+{
+  return ((value - min) * (scale / (max - min)));
+}
+
+int get_last_known_position()
+{
+  int pos;
+
+  if (last_drift == LEFT_DRIFT) {
+    pos = 1*100;
+  } else {
+    pos = NUM_SENSORS * 100;
+  }
+
+  return pos;
+}
+
+void set_last_known_position(int pos)
+{
+  if (pos < ((NUM_SENSORS + 1) * 100/2)) 
+    last_drift = LEFT_DRIFT;
+  else 
+    last_drift = RIGHT_DRIFT;
+}
+
 /*
  * @brief transform sensor measures in line position
  *
@@ -94,69 +136,39 @@ int get_line_position(uint16_t* value)
 
   out_of_line = 0;
   
-  for (int i = 0; i < NUM_SENSORS; i++)
-    {
-      if (value[i] < white_sensors[i])
-        {
-          value[i] = white_sensors[i];
-        }
-      else if (value[i] > black_sensors[i])
-        {
-          value[i] = black_sensors[i];
-        }
+  for (int i = 0; i < NUM_SENSORS; i++) {
+    value[i] = trunc_to_range(value[i], white_sensors[i], black_sensors[i]);
+    line_value[i] = rescale_in_range(value[i], white_sensors[i], black_sensors[i], K_SENSOR);
+    
+    avg_sensors += (uint32_t)line_value[i]*(i+1)*100;
+    sum_sensors += line_value[i];
 
-      line_value[i] = ((value[i] - white_sensors[i]) *
-                           (K_SENSOR / (black_sensors[i] - white_sensors[i])));
-
-      //Check whites/blacks detected
-      if (value[i] > threshold[i])
-        {
-          blacks_detected += 1;
-        }
-      else if (value[i] < threshold[i])
-        {
-          whites_detected += 1;
-        }
-
-      avg_sensors += (uint32_t)line_value[i]*(i+1)*100;
-      sum_sensors += line_value[i];
-    }
+    //Check whites/blacks detected
+    if (value[i] > threshold[i]) blacks_detected += 1;
+    if (value[i] < threshold[i]) whites_detected += 1;
+  }
 
   if ((blacks_detected == 0 && FOLLOW_BLACK_LINE) ||
-      (whites_detected == 0 && !FOLLOW_BLACK_LINE))
-    {
+      (whites_detected == 0 && !FOLLOW_BLACK_LINE)) {
+      
       /* Out of line */
       out_of_line = 1;
       
-      if (last_drift == LEFT_DRIFT)
-        {
-          pos = 1*100;
-        }
-      else
-        {
-          pos = NUM_SENSORS * 100;
-        }
-    }
-  else
-    {
-      pos = avg_sensors/sum_sensors;
+      pos = get_last_known_position();
 
-      if (!FOLLOW_BLACK_LINE)
-        {
-          pos = (NUM_SENSORS + 1) * 100 - pos;
-        }
+  } else {
+      
+    pos = avg_sensors/sum_sensors;
 
-      if (pos < ((NUM_SENSORS + 1) * 100/2))
-        {
-          last_drift = LEFT_DRIFT;
-        }
-      else if (pos > ((NUM_SENSORS + 1) * 100/2))
-        {
-          last_drift = RIGHT_DRIFT;
-        }
+    if (!FOLLOW_BLACK_LINE) {
+        pos = (NUM_SENSORS + 1) * 100 - pos;
     }
 
-  /* Updating pos */
+    set_last_known_position(pos);
+
+  }
+
+  /* Zero-center position */
   pos = pos - (NUM_SENSORS + 1) * 100/2;
 
   return pos;
