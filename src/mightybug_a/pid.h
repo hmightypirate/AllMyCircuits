@@ -5,9 +5,9 @@
 
 #define MAX_INTEGRAL 100
 #define MAX_PID_ERROR 2000
-#define PID_ERROR_DIVISOR 100
+#define PID_CONTROL_DIVISOR 100
 
-int32_t pid(int32_t proportional);
+int32_t pid(int32_t error);
 void reset_pid();
 
 void set_kp(int);

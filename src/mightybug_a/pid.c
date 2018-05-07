@@ -1,19 +1,21 @@
 #include "pid.h"
 
-static uint32_t k_p = 100;
-static uint32_t k_i = 0;
-static uint32_t k_d = 0; 
+static uint32_t k_p = 100; // Proportional constant
+static uint32_t k_i = 0;   // Integral constant
+static uint32_t k_d = 0;   // Derivative constant
 
 static int64_t integral = 0;
 static int32_t derivative = 0;
-static int32_t former_proportional = 0;
+static int32_t proportional = 0;
+static int32_t last_error = 0;
 
 /*
  * @brief resets pid variables
  */
 void reset_pid()
 {
-  former_proportional = 0;
+  last_error = 0;
+  proportional = 0;
   derivative = 0;
   integral = 0;
 }
@@ -23,10 +25,10 @@ void reset_pid()
  *
  * @param[in] proportional current measure of sensors
  */
-int32_t pid(int32_t proportional)
+int32_t pid(int32_t error)
 {
-  int32_t error;
-  integral = integral + proportional;
+  int32_t control;
+  integral = integral + error;
   if (integral > 0 && integral > MAX_INTEGRAL)
     {
       integral = MAX_INTEGRAL;
@@ -36,13 +38,15 @@ int32_t pid(int32_t proportional)
       integral = -MAX_INTEGRAL;
     }
 
-  derivative = proportional - former_proportional;
-  former_proportional = proportional;
+  derivative = error - last_error;
+  last_error = error;
 
-  error = proportional * k_p + integral * k_i + derivative * k_d;
-  error = error/PID_ERROR_DIVISOR;
+  proportional = error;
+
+  control = proportional * k_p + integral * k_i + derivative * k_d;
+  control = control/PID_CONTROL_DIVISOR;
   
-  return error;
+  return control;
 }
 
 
