@@ -21,13 +21,16 @@ void reset_pid()
 }
 
 
-int32_t trunc_to_range(int32_t value, int32_t min, int32_t max) {
+int32_t trunc_to_range(int32_t value, int32_t min, int32_t max)
+{
   int32_t trunc_value = value;
+  
   if (value > max) {
     trunc_value = max;
   } else if (value < min) {
     trunc_value = min;
   }
+  
   return trunc_value;
 }
 
@@ -53,26 +56,32 @@ int32_t pid(int32_t error)
   return control;
 }
 
-void set_kp(int kp) {
+void set_kp(int kp)
+{
   k_p = (uint32_t)kp;
 }
 
-void set_ki(int ki) {
+void set_ki(int ki)
+{
   k_i = (uint32_t)ki;
 }
 
-void set_kd(int kd) {
+void set_kd(int kd)
+{
   k_d = (uint32_t)kd;
 }
 
-int get_kp(void) {
+int get_kp(void)
+{
   return k_p;
 }
 
-int get_ki(void) {
+int get_ki(void)
+{
   return k_i;
 }
 
-int get_kd(void) {
+int get_kd(void)
+{
   return k_d;
 }
