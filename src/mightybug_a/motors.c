@@ -64,6 +64,18 @@ void set_motor_velocity(int left_vel, int right_vel)
  
 }
 
+void set_left_motor_pwm(int value)
+{
+  if (LEFT_INVERTED) value = MAX_VEL_MOTOR - value;
+  timer_set_oc_value(TIM4, TIM_OC3, value);
+}
+
+void set_right_motor_pwm(int value)
+{
+  if (RIGHT_INVERTED) value = MAX_VEL_MOTOR - value;
+  timer_set_oc_value(TIM4, TIM_OC4, value);
+}
+
 /*
  * @brief resets target velocity to a given value
  *
@@ -81,69 +93,51 @@ int get_target_velocity(void) {
   return target_velocity;
 }
 
-/*
- * given an error, obtain the velocity for the left and right motors 
- *
- * @param[in] error pid error (typically line position error) 
- */
-void motor_control(int error)
+
+void left_motor_velocity(int velocity)
 {
-  int left_vel = 0;
-  int right_vel = 0;
+  if (velocity > MAX_VEL_MOTOR) {
+      velocity = MAX_VEL_MOTOR;
+  }
+  else if (velocity < -MAX_VEL_MOTOR) {
+      velocity = -MAX_VEL_MOTOR;
+  }
 
-  if (error > MAX_PID_ERROR)
-    {
-      error = MAX_PID_ERROR;
-    }
-  else if (error < -MAX_PID_ERROR)
-    {
-      error = -MAX_PID_ERROR;
-    }
+  last_left_vel = velocity;
 
-  left_vel = target_velocity - error;
-  right_vel = target_velocity + error;
-
-  if (left_vel > MAX_VEL_MOTOR)
-    {
-      left_vel = MAX_VEL_MOTOR;
-    }
-  else if (left_vel < -MAX_VEL_MOTOR)
-    {
-      left_vel = -MAX_VEL_MOTOR;
-    }
-
-  if (right_vel > MAX_VEL_MOTOR)
-    {
-      right_vel = MAX_VEL_MOTOR;
-    }
-  else if (right_vel < -MAX_VEL_MOTOR)
-    {
-      right_vel = -MAX_VEL_MOTOR;
-    }
-  
-  last_left_vel = left_vel;
-  last_right_vel = right_vel;
-
-  if (left_vel >= 0)
-    {
+  if (velocity >= 0) {
       /* move left motor forward */
       move_forward(LEFT_MOTOR_IN1_PORT,
                    LEFT_MOTOR_IN1_PIN,
                    LEFT_MOTOR_IN2_PORT,
                    LEFT_MOTOR_IN2_PIN);
-    }
-  else
-    {
+  } else {
       /* move left motor backward */
       move_backward(LEFT_MOTOR_IN1_PORT,
                     LEFT_MOTOR_IN1_PIN,
                     LEFT_MOTOR_IN2_PORT,
                     LEFT_MOTOR_IN2_PIN);
 
-      left_vel = -left_vel;
-    }
+      velocity = -velocity;
+  }
 
-  if (right_vel >= 0)
+  set_left_motor_pwm(velocity);
+}
+
+void right_motor_velocity(int velocity)
+{
+  if (velocity > MAX_VEL_MOTOR)
+    {
+      velocity = MAX_VEL_MOTOR;
+    }
+  else if (velocity < -MAX_VEL_MOTOR)
+    {
+      velocity = -MAX_VEL_MOTOR;
+    }
+  
+  last_right_vel = velocity;
+
+  if (velocity >= 0)
     {
       /* move right motor forward */
       move_forward(RIGHT_MOTOR_IN1_PORT,
@@ -159,10 +153,37 @@ void motor_control(int error)
                     RIGHT_MOTOR_IN2_PORT,
                     RIGHT_MOTOR_IN2_PIN);
 
-      right_vel = -right_vel;
+      velocity = -velocity;
     }
   
-  set_motor_velocity(left_vel, right_vel);
+  set_right_motor_pwm(velocity);
+
+}
+
+/*
+ * given an error, obtain the velocity for the left and right motors 
+ *
+ * @param[in] error pid error (typically line position error) 
+ */
+void motor_control(int control)
+{
+  int left_vel = 0;
+  int right_vel = 0;
+
+  if (control > MAX_PID_ERROR)
+    {
+      control = MAX_PID_ERROR;
+    }
+  else if (control < -MAX_PID_ERROR)
+    {
+      control = -MAX_PID_ERROR;
+    }
+
+  left_vel = target_velocity - control;
+  right_vel = target_velocity + control;
+
+  left_motor_velocity(left_vel);
+  right_motor_velocity(right_vel);
   
 }
 
@@ -174,7 +195,7 @@ void motor_control(int error)
  */
 void stop_motors()
 {
-  set_motor_velocity(0, 0);
-  
+  left_motor_velocity(0);
+  right_motor_velocity(0);
 }
 
