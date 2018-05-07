@@ -98,17 +98,15 @@ int get_line_position(uint16_t* value)
     {
       if (value[i] < white_sensors[i])
         {
-          line_value[i] = white_sensors[i];
+          value[i] = white_sensors[i];
         }
       else if (value[i] > black_sensors[i])
         {
-          line_value[i] = black_sensors[i];
+          value[i] = black_sensors[i];
         }
-      else
-        {
-          line_value[i] = ((value[i] - white_sensors[i]) *
-                           (K_SENSOR / (black_sensors[i] - white_sensors[i])));      
-        }
+
+      line_value[i] = ((value[i] - white_sensors[i]) *
+                           (K_SENSOR / (black_sensors[i] - white_sensors[i])));
 
       //Check whites/blacks detected
       if (value[i] > threshold[i])
