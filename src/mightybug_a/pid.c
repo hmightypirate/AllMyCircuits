@@ -1,8 +1,8 @@
 #include "pid.h"
 
-static uint32_t k_p = 100;  /* 0.3 * 100 */
-static uint32_t k_i = 0; /* integral part */
-static uint32_t k_d = 0; /* derivative term */ 
+static uint32_t k_p = 100;
+static uint32_t k_i = 0;
+static uint32_t k_d = 0; 
 
 static int64_t integral = 0;
 static int32_t derivative = 0;
