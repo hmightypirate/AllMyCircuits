@@ -198,8 +198,6 @@ void calibrate_sensors(uint16_t* values)
       reset_callibration_values();
     }
   
-  read_line_sensors(values);
-
   sensors_callibrated = 0;
   
   for (int i=0; i<NUM_SENSORS; i++)
