@@ -21,5 +21,5 @@ clean_all:
 
 bin: candid_car.bin
 
-all: libopencm3 bat_bolido.bin
+all: libopencm3 candid_car.bin
 
