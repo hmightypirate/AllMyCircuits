@@ -93,71 +93,83 @@ int get_target_velocity(void) {
   return target_velocity;
 }
 
-
-void left_motor_velocity(int velocity)
+int trunc_to_range(int value, int min, int max)
 {
-  if (velocity > MAX_VEL_MOTOR) {
-      velocity = MAX_VEL_MOTOR;
-  }
-  else if (velocity < -MAX_VEL_MOTOR) {
-      velocity = -MAX_VEL_MOTOR;
-  }
+  int trunc_value = value;
 
-  last_left_vel = velocity;
+  if (value < min)
+    trunc_value = min;
+  else if (value > max)
+    trunc_value = max;
 
-  if (velocity >= 0) {
-      /* move left motor forward */
-      move_forward(LEFT_MOTOR_IN1_PORT,
+  return trunc_value;
+}
+
+void left_motor_forward(int velocity)
+{
+  /* move left motor forward */
+  move_forward(LEFT_MOTOR_IN1_PORT,
                    LEFT_MOTOR_IN1_PIN,
                    LEFT_MOTOR_IN2_PORT,
                    LEFT_MOTOR_IN2_PIN);
-  } else {
+  set_left_motor_pwm(velocity);
+}
+
+void left_motor_backward(int velocity)
+{
       /* move left motor backward */
-      move_backward(LEFT_MOTOR_IN1_PORT,
+  move_backward(LEFT_MOTOR_IN1_PORT,
                     LEFT_MOTOR_IN1_PIN,
                     LEFT_MOTOR_IN2_PORT,
                     LEFT_MOTOR_IN2_PIN);
 
-      velocity = -velocity;
-  }
-
-  set_left_motor_pwm(velocity);
+  set_left_motor_pwm(-velocity);
 }
 
-void right_motor_velocity(int velocity)
+void right_motor_forward(int velocity)
 {
-  if (velocity > MAX_VEL_MOTOR)
-    {
-      velocity = MAX_VEL_MOTOR;
-    }
-  else if (velocity < -MAX_VEL_MOTOR)
-    {
-      velocity = -MAX_VEL_MOTOR;
-    }
-  
-  last_right_vel = velocity;
-
-  if (velocity >= 0)
-    {
-      /* move right motor forward */
-      move_forward(RIGHT_MOTOR_IN1_PORT,
+  /* move left motor forward */
+  move_forward(RIGHT_MOTOR_IN1_PORT,
                    RIGHT_MOTOR_IN1_PIN,
                    RIGHT_MOTOR_IN2_PORT,
                    RIGHT_MOTOR_IN2_PIN);
-    }
-  else
-    {
-      /* move right motor backward */
-      move_backward(RIGHT_MOTOR_IN1_PORT,
+  set_right_motor_pwm(velocity);
+}
+
+void right_motor_backward(int velocity)
+{
+  /* move left motor backward */
+  move_backward(RIGHT_MOTOR_IN1_PORT,
                     RIGHT_MOTOR_IN1_PIN,
                     RIGHT_MOTOR_IN2_PORT,
                     RIGHT_MOTOR_IN2_PIN);
 
-      velocity = -velocity;
-    }
-  
-  set_right_motor_pwm(velocity);
+  set_right_motor_pwm(-velocity);
+}
 
+
+void left_motor_velocity(int velocity)
+{
+  velocity = trunc_to_range(velocity, -MAX_VEL_MOTOR, MAX_VEL_MOTOR);
+  last_left_vel = velocity;
+
+  if (velocity >= 0) {
+    left_motor_forward(velocity);
+  } else {
+    left_motor_backward(velocity);
+  }
+}
+
+void right_motor_velocity(int velocity)
+{
+  velocity = trunc_to_range(velocity, -MAX_VEL_MOTOR, MAX_VEL_MOTOR);
+  last_right_vel = velocity;
+
+  if (velocity >= 0) {
+    right_motor_forward(velocity);
+  } else {
+    right_motor_backward(velocity);
+  }
 }
 
 /*
@@ -167,23 +179,16 @@ void right_motor_velocity(int velocity)
  */
 void motor_control(int control)
 {
-  int left_vel = 0;
-  int right_vel = 0;
+  int left_velocity = 0;
+  int right_velocity = 0;
 
-  if (control > MAX_PID_ERROR)
-    {
-      control = MAX_PID_ERROR;
-    }
-  else if (control < -MAX_PID_ERROR)
-    {
-      control = -MAX_PID_ERROR;
-    }
+  control = trunc_to_range(control, -MAX_PID_ERROR, MAX_PID_ERROR);
 
-  left_vel = target_velocity - control;
-  right_vel = target_velocity + control;
+  left_velocity = target_velocity - control;
+  right_velocity = target_velocity + control;
 
-  left_motor_velocity(left_vel);
-  right_motor_velocity(right_vel);
+  left_motor_velocity(left_velocity);
+  right_motor_velocity(right_velocity);
   
 }
 
