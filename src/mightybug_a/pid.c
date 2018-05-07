@@ -20,6 +20,17 @@ void reset_pid()
   integral = 0;
 }
 
+
+int32_t trunc_to_range(int32_t value, int32_t min, int32_t max) {
+  int32_t trunc_value = value;
+  if (value > max) {
+    trunc_value = max;
+  } else if (value < min) {
+    trunc_value = min;
+  }
+  return trunc_value;
+}
+
 /*
  * @brief pid calculation
  *
@@ -28,27 +39,19 @@ void reset_pid()
 int32_t pid(int32_t error)
 {
   int32_t control;
-  integral = integral + error;
-  if (integral > 0 && integral > MAX_INTEGRAL)
-    {
-      integral = MAX_INTEGRAL;
-    }
-  else if (integral < 0 && integral < -MAX_INTEGRAL)
-    {
-      integral = -MAX_INTEGRAL;
-    }
-
-  derivative = error - last_error;
-  last_error = error;
 
   proportional = error;
+  integral += error;
+  integral = trunc_to_range(integral, -MAX_INTEGRAL, MAX_INTEGRAL);
+  derivative = error - last_error;
 
+  last_error = error;
+  
   control = proportional * k_p + integral * k_i + derivative * k_d;
   control = control/PID_CONTROL_DIVISOR;
   
   return control;
 }
-
 
 void set_kp(int kp) {
   k_p = (uint32_t)kp;
