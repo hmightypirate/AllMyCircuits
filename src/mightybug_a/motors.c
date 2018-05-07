@@ -123,7 +123,7 @@ void left_motor_backward(int velocity)
                     LEFT_MOTOR_IN2_PORT,
                     LEFT_MOTOR_IN2_PIN);
 
-  set_left_motor_pwm(-velocity);
+  set_left_motor_pwm(velocity);
 }
 
 void right_motor_forward(int velocity)
@@ -144,7 +144,7 @@ void right_motor_backward(int velocity)
                     RIGHT_MOTOR_IN2_PORT,
                     RIGHT_MOTOR_IN2_PIN);
 
-  set_right_motor_pwm(-velocity);
+  set_right_motor_pwm(velocity);
 }
 
 
@@ -156,7 +156,7 @@ void left_motor_velocity(int velocity)
   if (velocity >= 0) {
     left_motor_forward(velocity);
   } else {
-    left_motor_backward(velocity);
+    left_motor_backward(-velocity);
   }
 }
 
@@ -168,7 +168,7 @@ void right_motor_velocity(int velocity)
   if (velocity >= 0) {
     right_motor_forward(velocity);
   } else {
-    right_motor_backward(velocity);
+    right_motor_backward(-velocity);
   }
 }
 
