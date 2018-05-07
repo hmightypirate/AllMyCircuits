@@ -1,12 +1,5 @@
 #include "pid.h"
 
-/*
-  PID values
-  k_p = (0.3 * 100)
-  k_i = 0
-  k_d = 10 (* 100)
-
- */
 static uint32_t k_p = 100;  /* 0.3 * 100 */
 static uint32_t k_i = 0; /* integral part */
 static uint32_t k_d = 0; /* derivative term */ 
