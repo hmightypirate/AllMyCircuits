@@ -9,6 +9,7 @@
 #include "cron.h"
 #include "libmusic.h"
 #include "vbatt.h"
+#include "commons.h"
 
 /*
  * @brief Initial setup and main loop
@@ -68,13 +69,19 @@ int main(void)
   */
   
   //FIXME: do some state machine here (callibration, running, etc)
+
+  uint32_t last_loop_execution_ms = 0;
+  
   while(1)
     {
       if (is_command_received()) {
         execute_command();
       }
 
-      /* should read battery? */
+      /* should read battery? 
+         battery measurement could have a different period than sensor/pid reads
+         
+       */
       if (get_millisecs_since_start() % SYS_BETWEEN_READS == 0)
         {
           // Check if battery drained
@@ -83,84 +90,91 @@ int main(void)
               update_state(OUT_OF_BATTERY_EVENT);
             }
         }
+
+      // loop is executed at a fixed period of time
+      if ((get_millisecs_since_start() - last_loop_execution_ms) >
+          TIME_BETWEEN_LOOP_ITS)
+        {
+          last_loop_execution_ms = get_millisecs_since_start();
       
-      /* read data from sensors */
-      uint16_t sensor_value[NUM_SENSORS];
-      read_line_sensors(sensor_value);
+          /* read data from sensors */
+          uint16_t sensor_value[NUM_SENSORS];
+          read_line_sensors(sensor_value);
  
-      state_e current_state = get_state();
-      
-      if (current_state == CALLIBRATION_STATE)
-        {
+          state_e current_state = get_state();
           
-          calibrate_sensors(sensor_value);
-          
-          // /* FIXME: forcing running if all sensors are callibrated 
-          //    better do it after some event is detected or some time
-          //    has passed, or some command has been received
-          //  */
-          // if (get_callibrated_sensors() == NUM_SENSORS)
-          //   {
-          //     update_state(GO_TO_RUN_EVENT);
-          //   }
-      
-          /* stop motors during callibration */
-          stop_motors();
-
-          /* led is off during callibration */
-          
-          set_led();
-          /* set song and play in loop */
-          jukebox_setcurrent_song(CALLIBRATION_SONG);
-          jukebox_play_in_loop(get_millisecs_since_start());
-        }
-      else if (current_state == NO_BATTERY_STATE)
-        {
-          /* Disable sensors */
-          disable_sensors();
-          
-          /* Stop motors */
-          stop_motors();
-
-          /* Clear led */
-          clear_led();
-
-          /* set song */
-          jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
-          jukebox_play_in_loop(get_millisecs_since_start());
-        }
-      else
-        {
-          // Running 
-          int proportional = get_line_position(sensor_value);
-      
-          /* pid control */
-          int error = 0;
-          error = pid(proportional);
-  
-          /* motor control */
-          if (is_out_of_line())
+          if (current_state == CALLIBRATION_STATE)
             {
-              // stop the motors if out of line
+          
+              calibrate_sensors(sensor_value);
+          
+              // /* FIXME: forcing running if all sensors are callibrated 
+              //    better do it after some event is detected or some time
+              //    has passed, or some command has been received
+              //  */
+              // if (get_callibrated_sensors() == NUM_SENSORS)
+              //   {
+              //     update_state(GO_TO_RUN_EVENT);
+              //   }
+              
+              /* stop motors during callibration */
               stop_motors();
 
-              // sets the led
+              /* led is off during callibration */
+          
+              set_led();
+              /* set song and play in loop */
+              jukebox_setcurrent_song(CALLIBRATION_SONG);
+              jukebox_play_in_loop(get_millisecs_since_start());
+            }
+          else if (current_state == NO_BATTERY_STATE)
+            {
+              /* Disable sensors */
+              disable_sensors();
+              
+              /* Stop motors */
+              stop_motors();
+              
+              /* Clear led */
               clear_led();
 
-              /* set song and play in loop */
-              jukebox_setcurrent_song(OUT_OF_LINE_SONG);
+              /* set song */
+              jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
               jukebox_play_in_loop(get_millisecs_since_start());
-              
             }
           else
             {
-              motor_control(error);
+              // Running 
+              int proportional = get_line_position(sensor_value);
+      
+              /* pid control */
+              int error = 0;
+              error = pid(proportional);
               
-              // blinking: normal behaviour
-              async_blink();
+              /* motor control */
+              if (is_out_of_line())
+                {
+                  // stop the motors if out of line
+                  stop_motors();
+                  
+                  // sets the led
+                  clear_led();
+                  
+                  /* set song and play in loop */
+                  jukebox_setcurrent_song(OUT_OF_LINE_SONG);
+                  jukebox_play_in_loop(get_millisecs_since_start());
+              
+                }
+              else
+                {
+                  motor_control(error);
+                  
+                  // blinking: normal behaviour
+                  async_blink();
 
-              /* stop the music */
-              stop_music_play();
+                  /* stop the music */
+                  stop_music_play();
+                }
             }
         }
     }
