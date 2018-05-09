@@ -72,8 +72,8 @@ int main(void)
 
   uint32_t last_loop_execution_ms = 0;
   
-  while(1)
-    {
+  while(1) {
+      int current_loop_millisecs = get_millisecs_since_start();
       if (is_command_received()) {
         execute_command();
       }
@@ -82,7 +82,7 @@ int main(void)
          battery measurement could have a different period than sensor/pid reads
          
        */
-      if (get_millisecs_since_start() % SYS_BETWEEN_READS == 0)
+      if (current_loop_millisecs % SYS_BETWEEN_READS == 0)
         {
           // Check if battery drained
           if (has_batt_drained())
@@ -92,10 +92,10 @@ int main(void)
         }
 
       // loop is executed at a fixed period of time
-      if ((get_millisecs_since_start() - last_loop_execution_ms) >
+      if ((current_loop_millisecs - last_loop_execution_ms) >=
           TIME_BETWEEN_LOOP_ITS)
         {
-          last_loop_execution_ms = get_millisecs_since_start();
+          last_loop_execution_ms = current_loop_millisecs;
       
           /* read data from sensors */
           uint16_t sensor_value[NUM_SENSORS];
@@ -125,7 +125,7 @@ int main(void)
               set_led();
               /* set song and play in loop */
               jukebox_setcurrent_song(CALLIBRATION_SONG);
-              jukebox_play_in_loop(get_millisecs_since_start());
+              jukebox_play_in_loop(current_loop_millisecs);
             }
           else if (current_state == NO_BATTERY_STATE)
             {
@@ -140,7 +140,7 @@ int main(void)
 
               /* set song */
               jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
-              jukebox_play_in_loop(get_millisecs_since_start());
+              jukebox_play_in_loop(current_loop_millisecs);
             }
           else
             {
@@ -162,7 +162,7 @@ int main(void)
                   
                   /* set song and play in loop */
                   jukebox_setcurrent_song(OUT_OF_LINE_SONG);
-                  jukebox_play_in_loop(get_millisecs_since_start());
+                  jukebox_play_in_loop(current_loop_millisecs);
               
                 }
               else
