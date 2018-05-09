@@ -72,11 +72,14 @@ int main(void)
 
   uint32_t last_loop_execution_ms = 0;
   
-  while(1) {
+  while(1)
+  {
       int current_loop_millisecs = get_millisecs_since_start();
       if (is_command_received()) {
         execute_command();
       }
+
+      jukebox_play_in_loop(current_loop_millisecs);
 
       /* should read battery? 
          battery measurement could have a different period than sensor/pid reads
@@ -125,7 +128,6 @@ int main(void)
               set_led();
               /* set song and play in loop */
               jukebox_setcurrent_song(CALLIBRATION_SONG);
-              jukebox_play_in_loop(current_loop_millisecs);
             }
           else if (current_state == NO_BATTERY_STATE)
             {
@@ -140,7 +142,6 @@ int main(void)
 
               /* set song */
               jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
-              jukebox_play_in_loop(current_loop_millisecs);
             }
           else
             {
@@ -162,8 +163,6 @@ int main(void)
                   
                   /* set song and play in loop */
                   jukebox_setcurrent_song(OUT_OF_LINE_SONG);
-                  jukebox_play_in_loop(current_loop_millisecs);
-              
                 }
               else
                 {
