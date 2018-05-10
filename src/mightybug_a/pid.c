@@ -1,13 +1,13 @@
 #include "pid.h"
 
-static uint32_t k_p = 100; // Proportional constant
-static uint32_t k_i = 0;   // Integral constant
-static uint32_t k_d = 0;   // Derivative constant
+static uint16_t k_p = 100; // Proportional constant
+static uint16_t k_i = 0;   // Integral constant
+static uint16_t k_d = 0;   // Derivative constant
 
-static int64_t integral = 0;
-static int32_t derivative = 0;
-static int32_t proportional = 0;
-static int32_t last_error = 0;
+static int32_t integral = 0;
+static int16_t derivative = 0;
+static int16_t proportional = 0;
+static int16_t last_error = 0;
 
 /*
  * @brief resets pid variables
@@ -39,9 +39,9 @@ int32_t trunc_to_range(int32_t value, int32_t min, int32_t max)
  *
  * @param[in] proportional current measure of sensors
  */
-int32_t pid(int32_t error)
+int16_t pid(int16_t error)
 {
-  int32_t control;
+  int16_t control;
 
   proportional = error;
   integral += error;
@@ -58,17 +58,17 @@ int32_t pid(int32_t error)
 
 void set_kp(int kp)
 {
-  k_p = (uint32_t)kp;
+  k_p = (uint16_t)kp;
 }
 
 void set_ki(int ki)
 {
-  k_i = (uint32_t)ki;
+  k_i = (uint16_t)ki;
 }
 
 void set_kd(int kd)
 {
-  k_d = (uint32_t)kd;
+  k_d = (uint16_t)kd;
 }
 
 int get_kp(void)
