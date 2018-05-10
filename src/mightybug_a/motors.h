@@ -8,6 +8,9 @@
 #define RIGHT_INVERTED 1
 #define LEFT_INVERTED 0
 
+#define FORWARD 0
+#define BACKWARD 1
+
 void reset_target_velocity(int target_vel);
 int get_target_velocity(void);
 void motor_control(int error);
