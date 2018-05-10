@@ -9,7 +9,7 @@ uint8_t last_drift = LEFT_DRIFT;
 static int out_of_line = 0;
 
 /* This var stores the number of sensors correctly callibrated */
-static uint8_t sensors_callibrated = 0;
+static uint8_t sensors_callibrated_count = 0;
 
 static int started_callibration = 0;
 
@@ -198,7 +198,7 @@ void calibrate_sensors(uint16_t* values)
       reset_callibration_values();
     }
   
-  sensors_callibrated = 0;
+  sensors_callibrated_count = 0;
   
   for (int i=0; i<NUM_SENSORS; i++)
     {
@@ -217,7 +217,7 @@ void calibrate_sensors(uint16_t* values)
 
       if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALLIBRATION)
         {
-          sensors_callibrated++;
+          sensors_callibrated_count++;
           callibrated_sensors[i] = 1;
         }
       else
@@ -247,9 +247,9 @@ void disable_sensors()
 /*
  * @brief get the number of callibrated sensors
  */
-uint8_t get_callibrated_sensors()
+uint8_t get_callibrated_sensors_count()
 {
-  return sensors_callibrated;
+  return sensors_callibrated_count;
 }
 
 
