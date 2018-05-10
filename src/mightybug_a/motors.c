@@ -71,7 +71,7 @@ int trunc_to_range(int value, int min, int max)
 }
 
 
-void left_motor_velocity(int velocity)
+void set_left_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, -MAX_VEL_MOTOR, MAX_VEL_MOTOR);
   last_left_vel = velocity;
@@ -85,7 +85,7 @@ void left_motor_velocity(int velocity)
   }
 }
 
-void right_motor_velocity(int velocity)
+void set_right_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, -MAX_VEL_MOTOR, MAX_VEL_MOTOR);
   last_right_vel = velocity;
@@ -108,8 +108,8 @@ void motor_control(int control)
 {
   control = trunc_to_range(control, -MAX_PID_ERROR, MAX_PID_ERROR);
 
-  left_motor_velocity(target_velocity - control);
-  right_motor_velocity(target_velocity + control); 
+  set_left_motor_velocity(target_velocity - control);
+  set_right_motor_velocity(target_velocity + control); 
 }
 
 /*
@@ -120,7 +120,7 @@ void motor_control(int control)
  */
 void stop_motors()
 {
-  left_motor_velocity(0);
-  right_motor_velocity(0);
+  set_left_motor_velocity(0);
+  set_right_motor_velocity(0);
 }
 
