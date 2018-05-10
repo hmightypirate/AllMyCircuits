@@ -29,29 +29,6 @@ void set_right_motor_state(char state)
   }
 }
 
-/*
- * @brief sets pwm for motor velocity
- *
- * @param[in] left_vel velocity of left motor
- * @param[in] right_vel velocity of right motor
- */
-void set_motor_velocity(int left_vel, int right_vel)
-{
-  if (LEFT_INVERTED)
-    {
-      left_vel = MAX_VEL_MOTOR - left_vel;
-    }
-
-  if (RIGHT_INVERTED)
-    {
-      right_vel = MAX_VEL_MOTOR - right_vel;
-    }
-
-  timer_set_oc_value(TIM4, TIM_OC3, left_vel);
-  timer_set_oc_value(TIM4, TIM_OC4, right_vel);
- 
-}
-
 void set_left_motor_pwm(int value)
 {
   if (LEFT_INVERTED) value = MAX_VEL_MOTOR - value;
