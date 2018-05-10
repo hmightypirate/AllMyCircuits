@@ -42,7 +42,7 @@ int main(void)
   set_async_period(LED_ASYNC_PERIOD);
 
   /* enable sensors */
-  enable_sensors();
+  enable_line_sensors();
 
   /* setup jukebox */
   jukebox_setup();
@@ -128,7 +128,7 @@ int main(void)
           else if (current_state == NO_BATTERY_STATE)
             {
               /* Disable sensors */
-              disable_sensors();
+              disable_line_sensors();
               
               /* Stop motors */
               stop_motors();

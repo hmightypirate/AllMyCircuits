@@ -230,7 +230,7 @@ void calibrate_sensors(uint16_t* values)
 /*
  * @brief enable sensors
  */
-void enable_sensors()
+void enable_line_sensors()
 {
   gpio_set(SENSOR_ON_PORT, SENSOR_ON_PIN);
 }
@@ -238,7 +238,7 @@ void enable_sensors()
 /*
  * @brief disable sensors
  */
-void disable_sensors()
+void disable_line_sensors()
 {
   gpio_clear(SENSOR_ON_PORT, SENSOR_ON_PIN);
 }
