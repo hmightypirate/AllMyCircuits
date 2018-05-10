@@ -183,6 +183,22 @@ int is_out_of_line()
   return out_of_line;
 }
 
+void check_callibrated_sensors(void)
+{
+
+  sensors_callibrated_count = 0;
+
+  for (char i=0; i<NUM_SENSORS; i++) {
+    if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALLIBRATION) {
+      sensors_callibrated_count++;
+      callibrated_sensors[i] = 1;
+    } else {
+      callibrated_sensors[i] = 0;
+    }
+  }
+
+}
+
 /*
  * @brief callibrate sensors (one step)
  *
@@ -198,8 +214,6 @@ void calibrate_sensors(uint16_t* values)
       reset_callibration_values();
     }
   
-  sensors_callibrated_count = 0;
-  
   for (int i=0; i<NUM_SENSORS; i++)
     {
       /* check if current value is higher than previous max value */
@@ -213,18 +227,9 @@ void calibrate_sensors(uint16_t* values)
            white_sensors[i] = values[i];
         }
       
-      threshold[i] = (black_sensors[i] + white_sensors[i])/2;
-
-      if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALLIBRATION)
-        {
-          sensors_callibrated_count++;
-          callibrated_sensors[i] = 1;
-        }
-      else
-        {
-          callibrated_sensors[i] = 0;
-        }
-    }     
+      threshold[i] = (black_sensors[i] + white_sensors[i])/2;   
+    }
+  check_callibrated_sensors();     
 }
 
 /*
