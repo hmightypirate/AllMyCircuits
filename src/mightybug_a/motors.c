@@ -70,30 +70,6 @@ int trunc_to_range(int value, int min, int max)
   return trunc_value;
 }
 
-void left_motor_forward(int velocity)
-{
-  set_left_motor_state(FORWARD);
-  set_left_motor_pwm(velocity);
-}
-
-void left_motor_backward(int velocity)
-{
-  set_left_motor_state(BACKWARD);
-  set_left_motor_pwm(velocity);
-}
-
-void right_motor_forward(int velocity)
-{
-  set_right_motor_state(FORWARD);
-  set_right_motor_pwm(velocity);
-}
-
-void right_motor_backward(int velocity)
-{
-  set_right_motor_state(BACKWARD);
-  set_right_motor_pwm(velocity);
-}
-
 
 void left_motor_velocity(int velocity)
 {
@@ -101,9 +77,11 @@ void left_motor_velocity(int velocity)
   last_left_vel = velocity;
 
   if (velocity >= 0) {
-    left_motor_forward(velocity);
+    set_left_motor_state(FORWARD);
+    set_left_motor_pwm(velocity);
   } else {
-    left_motor_backward(-velocity);
+    set_left_motor_state(BACKWARD);
+    set_left_motor_pwm(-velocity);
   }
 }
 
@@ -113,9 +91,11 @@ void right_motor_velocity(int velocity)
   last_right_vel = velocity;
 
   if (velocity >= 0) {
-    right_motor_forward(velocity);
+    set_right_motor_state(FORWARD);
+    set_right_motor_pwm(velocity);
   } else {
-    right_motor_backward(-velocity);
+    set_right_motor_state(BACKWARD);
+    set_right_motor_pwm(-velocity);
   }
 }
 
