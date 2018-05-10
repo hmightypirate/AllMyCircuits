@@ -2,16 +2,16 @@
 
 uint16_t black_sensors[NUM_SENSORS];
 uint16_t white_sensors[NUM_SENSORS];
-uint16_t callibrated_sensors[NUM_SENSORS];
+uint16_t calibrated_sensors[NUM_SENSORS];
 uint16_t threshold[NUM_SENSORS];
 uint8_t last_drift = LEFT_DRIFT;
 
 static int out_of_line = 0;
 
-/* This var stores the number of sensors correctly callibrated */
-static uint8_t sensors_callibrated_count = 0;
+/* This var stores the number of sensors correctly calibrated */
+static uint8_t sensors_calibrated_count = 0;
 
-static int started_callibration = 0;
+static int started_calibration = 0;
 
 /*
  * @brief reads a line sensor 
@@ -33,7 +33,7 @@ static uint16_t read_adc_naiive(uint8_t channel)
 /*
  * @brief set manually black and white thresholds to sensors
  * 
- * @note it is more advisable to callibrate the sensors rathen 
+ * @note it is more advisable to calibrate the sensors rathen 
  *        that using this function
  */
 void hard_reset_sensors()
@@ -47,19 +47,19 @@ void hard_reset_sensors()
 }
 
 /*
- * @resets callibration values
+ * @resets calibration values
  *
- * @note called automatically only once during callibration
+ * @note called automatically only once during calibration
  */
 
-void reset_callibration_values()
+void reset_calibration_values()
 {
   for (int i=0; i< NUM_SENSORS; i++)
     {
       black_sensors[i] = WHITE_MEASURE;
       white_sensors[i] = BLACK_MEASURE;
     }
-  started_callibration = 1;
+  started_calibration = 1;
 }
 
 /*
@@ -183,24 +183,24 @@ int is_out_of_line()
   return out_of_line;
 }
 
-void check_callibrated_sensors(void)
+void check_calibrated_sensors(void)
 {
 
-  sensors_callibrated_count = 0;
+  sensors_calibrated_count = 0;
 
   for (char i=0; i<NUM_SENSORS; i++) {
-    if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALLIBRATION) {
-      sensors_callibrated_count++;
-      callibrated_sensors[i] = 1;
+    if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALIBRATION) {
+      sensors_calibrated_count++;
+      calibrated_sensors[i] = 1;
     } else {
-      callibrated_sensors[i] = 0;
+      calibrated_sensors[i] = 0;
     }
   }
 
 }
 
 /*
- * @brief callibrate sensors (one step)
+ * @brief calibrate sensors (one step)
  *
  * @param[in] values a variable that holds current measurements
  *
@@ -208,10 +208,10 @@ void check_callibrated_sensors(void)
 void calibrate_sensors(uint16_t* values)
 {
 
-  /* reset callibration first time */
-  if (!started_callibration)
+  /* reset calibration first time */
+  if (!started_calibration)
     {
-      reset_callibration_values();
+      reset_calibration_values();
     }
   
   for (int i=0; i<NUM_SENSORS; i++)
@@ -229,7 +229,7 @@ void calibrate_sensors(uint16_t* values)
       
       threshold[i] = (black_sensors[i] + white_sensors[i])/2;   
     }
-  check_callibrated_sensors();     
+  check_calibrated_sensors();     
 }
 
 /*
@@ -250,11 +250,11 @@ void disable_line_sensors()
 
 
 /*
- * @brief get the number of callibrated sensors
+ * @brief get the number of calibrated sensors
  */
-uint8_t get_callibrated_sensors_count()
+uint8_t get_calibrated_sensors_count()
 {
-  return sensors_callibrated_count;
+  return sensors_calibrated_count;
 }
 
 
