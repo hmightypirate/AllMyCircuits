@@ -173,23 +173,16 @@ void right_motor_velocity(int velocity)
 }
 
 /*
- * given an error, obtain the velocity for the left and right motors 
+ * given a control signal, obtain the velocity for the left and right motors 
  *
- * @param[in] error pid error (typically line position error) 
+ * @param[in] control from pid
  */
 void motor_control(int control)
 {
-  int left_velocity = 0;
-  int right_velocity = 0;
-
   control = trunc_to_range(control, -MAX_PID_ERROR, MAX_PID_ERROR);
 
-  left_velocity = target_velocity - control;
-  right_velocity = target_velocity + control;
-
-  left_motor_velocity(left_velocity);
-  right_motor_velocity(right_velocity);
-  
+  left_motor_velocity(target_velocity - control);
+  right_motor_velocity(target_velocity + control); 
 }
 
 /*
