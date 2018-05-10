@@ -13,6 +13,8 @@ static uint8_t sensors_calibrated_count = 0;
 
 static int started_calibration = 0;
 
+int position = 0;
+
 /*
  * @brief reads a line sensor 
  * 
@@ -96,7 +98,7 @@ uint16_t rescale_in_range(uint16_t value, uint16_t min, uint16_t max, uint16_t s
   return ((value - min) * (scale / (max - min)));
 }
 
-int get_last_known_position()
+int get_position_before_drift()
 {
   int pos;
 
@@ -109,7 +111,7 @@ int get_last_known_position()
   return pos;
 }
 
-void set_last_known_position(int pos)
+void set_drift_side(int pos)
 {
   if (pos < ((NUM_SENSORS + 1) * 100/2)) 
     last_drift = LEFT_DRIFT;
@@ -127,51 +129,49 @@ void set_last_known_position(int pos)
  */
 int get_line_position(uint16_t* value)
 {
-  uint32_t line_value[NUM_SENSORS];
   uint8_t whites_detected = 0;
   uint8_t blacks_detected = 0;
-  int pos = 0;
-  int avg_sensors = 0;
-  int sum_sensors = 0;
+
+  uint32_t avg_sensors = 0;
+  uint16_t sum_sensors = 0;
 
   out_of_line = 0;
   
   for (int i = 0; i < NUM_SENSORS; i++) {
-    value[i] = trunc_to_range(value[i], white_sensors[i], black_sensors[i]);
-    line_value[i] = rescale_in_range(value[i], white_sensors[i], black_sensors[i], K_SENSOR);
-    
-    avg_sensors += (uint32_t)line_value[i]*(i+1)*100;
-    sum_sensors += line_value[i];
-
     //Check whites/blacks detected
-    if (value[i] > threshold[i]) blacks_detected += 1;
-    if (value[i] < threshold[i]) whites_detected += 1;
+    if (value[i] > threshold[i]) blacks_detected++;
+    if (value[i] < threshold[i]) whites_detected++;
+
+    value[i] = trunc_to_range(value[i], white_sensors[i], black_sensors[i]);
+    value[i] = rescale_in_range(value[i], white_sensors[i], black_sensors[i], K_SENSOR);
+    
+    avg_sensors += ((uint32_t)value[i])*(i+1)*100;
+    sum_sensors += value[i];
   }
 
   if ((blacks_detected == 0 && FOLLOW_BLACK_LINE) ||
-      (whites_detected == 0 && !FOLLOW_BLACK_LINE)) {
+      (whites_detected == 0 && FOLLOW_WHITE_LINE)) {
       
       /* Out of line */
       out_of_line = 1;
-      
-      pos = get_last_known_position();
+      position = get_position_before_drift();
 
   } else {
       
-    pos = avg_sensors/sum_sensors;
-
-    if (!FOLLOW_BLACK_LINE) {
-        pos = (NUM_SENSORS + 1) * 100 - pos;
-    }
-
-    set_last_known_position(pos);
+    position = avg_sensors/sum_sensors;
 
   }
 
-  /* Zero-center position */
-  pos = pos - (NUM_SENSORS + 1) * 100/2;
+  if (FOLLOW_WHITE_LINE) {
+      position = (NUM_SENSORS + 1) * 100 - position;
+  }
 
-  return pos;
+  set_drift_side(position);
+
+  /* Zero-center position */
+  position = position - (NUM_SENSORS + 1) * 100/2;
+
+  return position;
 }
 
 /*
