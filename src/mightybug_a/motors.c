@@ -6,7 +6,11 @@ static int target_velocity = 0;
 static int last_left_vel = 0;
 static int last_right_vel = 0;
 
-
+/*
+ * @brief set the state of left motor
+ * 
+ * @param[in] may be FORWARD or BACKWARD
+ */
 void set_left_motor_state(char state)
 {
   if (state == FORWARD) {
@@ -18,6 +22,11 @@ void set_left_motor_state(char state)
   }
 }
 
+/*
+ * @brief set the state of right motor
+ * 
+ * @param[in] may be FORWARD or BACKWARD
+ */
 void set_right_motor_state(char state)
 {
   if (state == FORWARD) {
@@ -29,12 +38,22 @@ void set_right_motor_state(char state)
   }
 }
 
+/*
+ * @brief set the value of the PWM of the left motor to control velocity
+ * 
+ * @param[in] an integer between 0 and 1023
+ */
 void set_left_motor_pwm(int value)
 {
   if (LEFT_INVERTED) value = MAX_VEL_MOTOR - value;
   timer_set_oc_value(TIM4, TIM_OC3, value);
 }
 
+/*
+ * @brief set the value of the PWM of the right motor to control velocity
+ * 
+ * @param[in] an integer between 0 and 1023
+ */
 void set_right_motor_pwm(int value)
 {
   if (RIGHT_INVERTED) value = MAX_VEL_MOTOR - value;
@@ -58,6 +77,9 @@ int get_target_velocity(void) {
   return target_velocity;
 }
 
+/*
+ * @brief helper function to truncate a value between min and max
+ */
 int trunc_to_range(int value, int min, int max)
 {
   int trunc_value = value;
@@ -70,7 +92,9 @@ int trunc_to_range(int value, int min, int max)
   return trunc_value;
 }
 
-
+/*
+ * @brief set left motor velocity
+ */
 void set_left_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, -MAX_VEL_MOTOR, MAX_VEL_MOTOR);
@@ -85,6 +109,9 @@ void set_left_motor_velocity(int velocity)
   }
 }
 
+/*
+ * @brief set right motor velocity
+ */
 void set_right_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, -MAX_VEL_MOTOR, MAX_VEL_MOTOR);
