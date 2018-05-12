@@ -80,7 +80,7 @@ int get_target_velocity(void) {
 /*
  * @brief helper function to truncate a value between min and max
  */
-int trunc_to_range(int value, int min, int max)
+static int trunc_to_range(int value, int min, int max)
 {
   int trunc_value = value;
 

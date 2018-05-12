@@ -77,7 +77,7 @@ void read_line_sensors(uint16_t* sensor_value)
     }
 }
 
-uint16_t trunc_to_range(uint16_t value, uint16_t min, uint16_t max)
+static uint16_t trunc_to_range(uint16_t value, uint16_t min, uint16_t max)
 {
   uint16_t trunc_value = value;
 
@@ -188,7 +188,7 @@ void check_calibrated_sensors(void)
 
   sensors_calibrated_count = 0;
 
-  for (char i=0; i<NUM_SENSORS; i++) {
+  for (int i=0; i<NUM_SENSORS; i++) {
     if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALIBRATION) {
       sensors_calibrated_count++;
       calibrated_sensors[i] = 1;

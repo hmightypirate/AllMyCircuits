@@ -31,7 +31,7 @@ int main(void)
   else
     {
       /* reset callibration values (needed for callibration) */
-     reset_callibration_values();
+     reset_calibration_values();
     }
   
   
@@ -68,7 +68,7 @@ int main(void)
   
   */
   
-  //FIXME: do some state machine here (callibration, running, etc)
+  //FIXME: do some state machine here (calibration, running, etc)
 
   uint32_t last_loop_execution_ms = 0;
   
@@ -118,7 +118,7 @@ int main(void)
               //     update_state(GO_TO_RUN_EVENT);
               //   }
               
-              /* stop motors during callibration */
+              /* stop motors during calibration */
               stop_motors();
 
               /* led is off during callibration */

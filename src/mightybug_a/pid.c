@@ -21,7 +21,7 @@ void reset_pid()
 }
 
 
-int32_t trunc_to_range(int32_t value, int32_t min, int32_t max)
+static int32_t trunc_to_range(int32_t value, int32_t min, int32_t max)
 {
   int32_t trunc_value = value;
   

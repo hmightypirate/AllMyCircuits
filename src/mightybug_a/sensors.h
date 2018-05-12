@@ -32,8 +32,8 @@ void reset_calibration_values(void);
 void calibrate_sensors(uint16_t* values);
 void hard_reset_sensors(void);
 
-void enable_sensors(void);
-void disable_sensors(void);
+void enable_line_sensors(void);
+void disable_line_sensors(void);
 
 void read_line_sensors(uint16_t* sensor_value);
 int get_line_position(uint16_t* value);
