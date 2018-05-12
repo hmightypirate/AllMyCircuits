@@ -1,6 +1,7 @@
 #ifndef __ENCODER_H
 #define __ENCODER_H
 
+#include <inttypes.h>
 #include <stdio.h>
 #include "commons.h"
 #include "setup.h"
@@ -17,5 +18,10 @@
 
 void update_encoder_ticks(void);
 void update_velocities_encoders(void);
+
+uint32_t get_left_encoder_ticks(void);
+uint32_t get_right_encoder_ticks(void);
+uint32_t get_left_velocity(void);
+uint32_t get_right_velocity(void);
 
 #endif /* __ENCODER_H */

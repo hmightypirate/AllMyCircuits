@@ -89,6 +89,54 @@ void command_unknown(char *command) {
     printf("Unknown command: %s\n", command);
 };
 
+void check_command_encoder() {
+  set_head_tail(tail);
+
+  if (is_head("LEFT")) {
+    uint32_t left_enc_ticks = get_left_encoder_ticks();
+    
+    printf("Ticks (left): %zu\n", (unsigned int) left_enc_ticks);
+  }
+  else if (is_head("RIGHT")) {
+    uint32_t right_enc_ticks = get_right_encoder_ticks();
+    printf("Ticks (right): %zu\n", (unsigned int) right_enc_ticks);
+  }
+  else if (is_head("ALL")) {
+    uint32_t left_enc_ticks = get_left_encoder_ticks();
+    uint32_t right_enc_ticks = get_right_encoder_ticks();
+    printf("Ticks %zu left, %zu right\n", (unsigned int) left_enc_ticks,
+           (unsigned int) right_enc_ticks);
+  }
+  else {
+    printf("Syntax: ENC LEFT|RIGHT|ALL\n");
+  }
+};    
+
+void check_command_velocity() {
+  set_head_tail(tail);
+
+  if (is_head("LEFT")) {
+    uint32_t left_vel = get_left_velocity();
+
+    printf("Vel (left): %zu\n", (unsigned int) left_vel);
+  }
+  else if (is_head("RIGHT")) {
+    uint32_t right_vel = get_right_velocity();
+
+    printf("Vel (right): %zu\n", (unsigned int) right_vel);
+  }
+  else if (is_head("ALL")) {
+    uint32_t left_vel = get_left_velocity();
+    uint32_t right_vel = get_right_velocity();
+
+    printf("Vel %zu left, %zu right\n", (unsigned int) left_vel,
+           (unsigned int) right_vel);
+    
+  } else {
+    printf("Syntax: VEL LEFT|RIGHT|ALL\n");
+  }
+};
+
 void check_command_car() {
     set_head_tail(tail);
     if (is_head("PLAY")) {
@@ -132,6 +180,8 @@ void check_module() {
     else if (is_head("CLK")) check_command_clock();
     else if (is_head("VER")) welcome_message();
     else if (is_head("BAT")) check_command_battery();
+    else if (is_head("ENC")) check_command_encoder();
+    else if (is_head("VEL")) check_command_velocity();
     else command_unknown(head);
     clear_head_tail();
 };
@@ -302,6 +352,9 @@ void check_command_buzzer() {
         printf("Syntax: BUZ ON|OFF\n");
     }
 }
+
+
+
 
 void check_command_battery() {
     printf("%u mV", read_vbatt());

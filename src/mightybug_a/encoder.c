@@ -15,6 +15,43 @@ static uint32_t right_velocity = 0;
 uint16_t systick_between_meas = SYSTICK_MEAS;
 static uint16_t current_ticks = 0;
 
+
+/*
+ * @brief get current encoder ticks (left engine)
+ *
+ * @note actually it is the difference between two measures
+ */
+uint32_t get_left_encoder_ticks(void)
+{
+  return left_encoder_ticks;
+}
+
+/*
+ * @brief get current encoder ticks (right engine)
+ *
+ */
+uint32_t get_right_encoder_ticks(void)
+{
+  return right_encoder_ticks;
+}
+
+
+/*
+ * @brief get current velocity of left encoder
+ */
+uint32_t get_left_velocity(void)
+{
+  return left_velocity;
+}
+
+/*
+ * @brief get current velocity of right encoder
+ */
+uint32_t get_right_velocity(void)
+{
+  return right_velocity;
+}
+
 /*
  * @brief perform encoder measurements
  */
