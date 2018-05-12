@@ -79,8 +79,6 @@ int main(void)
         execute_command();
       }
 
-      jukebox_play_in_loop(current_loop_millisecs);
-
       /* should read battery? 
          battery measurement could have a different period than sensor/pid reads
          
@@ -94,6 +92,8 @@ int main(void)
             }
         }
 
+      state_e current_state = get_state();
+      
       // loop is executed at a fixed period of time
       if ((current_loop_millisecs - last_loop_execution_ms) >=
           TIME_BETWEEN_LOOP_ITS)
@@ -103,8 +103,6 @@ int main(void)
           /* read data from sensors */
           uint16_t sensor_value[NUM_SENSORS];
           read_line_sensors(sensor_value);
- 
-          state_e current_state = get_state();
           
           if (current_state == CALLIBRATION_STATE)
             {
@@ -126,8 +124,6 @@ int main(void)
               /* led is off during callibration */
           
               set_led();
-              /* set song and play in loop */
-              jukebox_setcurrent_song(CALLIBRATION_SONG);
             }
           else if (current_state == NO_BATTERY_STATE)
             {
@@ -140,8 +136,6 @@ int main(void)
               /* Clear led */
               clear_led();
 
-              /* set song */
-              jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
             }
           else
             {
@@ -161,8 +155,6 @@ int main(void)
                   // sets the led
                   clear_led();
                   
-                  /* set song and play in loop */
-                  jukebox_setcurrent_song(OUT_OF_LINE_SONG);
                 }
               else
                 {
@@ -171,12 +163,41 @@ int main(void)
                   // blinking: normal behaviour
                   async_blink();
 
-                  /* stop the music */
-                  stop_music_play();
                 }
             }
         }
-    }
+
+
+      // execute always in the loop
+      if (current_state == CALLIBRATION_STATE)
+        {
+          
+          jukebox_setcurrent_song(CALLIBRATION_SONG);
+          jukebox_play_in_loop(current_loop_millisecs);
+        }
+      else if (current_state == NO_BATTERY_STATE)
+        {
+          /* set song */
+          jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
+          jukebox_play_in_loop(current_loop_millisecs);
+        }
+      else
+        {
+          /* motor control */
+          if (is_out_of_line())
+            {
+              /* set song and play in loop */
+              jukebox_setcurrent_song(OUT_OF_LINE_SONG);
+              jukebox_play_in_loop(current_loop_millisecs);
+            }
+          else
+            {
+              /* stop the music */
+              stop_music_play();
+            }
+        }
+  }
+  
   
   return 0;
 }
