@@ -1,7 +1,7 @@
 #include "ping_pong_example.h"
 #include "example_commons.h"
 
-bool send_if_possible(char tx_char){
+static bool send_if_possible(char tx_char){
 	if (usart_get_flag(MY_USART, USART_SR_TXE)){ //TXE: Transmit data buffer empty
 		usart_send(MY_USART, tx_char);
 		return true;
@@ -9,7 +9,7 @@ bool send_if_possible(char tx_char){
 	return false;
 }
 
-void send_one_and_fill_the_other(const char * send_buffer, char * fill_buffer
+static void send_one_and_fill_the_other(const char * send_buffer, char * fill_buffer
 		, const char fill_with_this){
 	int sending_index = 0;
 	int filling_index = 0;

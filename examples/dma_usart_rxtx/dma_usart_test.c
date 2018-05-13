@@ -1,37 +1,38 @@
 #include "fill_and_send_example.h"
 #include "ping_pong_example.h"
+#include "dma_example.h"
 #include "setup.h"
 #include "utils.h"
 #include "systick.h"
 
 #define EXAMPLE_LOOPS 10
 
+struct choice_entry_st{
+	char choice;
+	void (*functionPtr)(int);
+};
+
+#define CHOICES_LEN 3
+struct choice_entry_st choices[] = {
+		{.choice = '1', .functionPtr = fill_and_send_example},
+		{.choice = '2', .functionPtr = ping_pong_example},
+		{.choice = '3', .functionPtr = dma_example}
+};
+
 int main(void) {
 	setup();
 
-	uint32_t c = get_millisecs_since_start();
-	for (int i = 0 ; i < 800000; i++){
-		__asm__("nop");
-	}
-	c = get_millisecs_since_start() - c;
-	printf("\nTest has used %lu ms\n", c);
-
 	while(1){
 
-		char choice = prompt();
+		char user_choice = prompt();
 
-		if (choice == '1'){
-			uint32_t c = get_millisecs_since_start();
-			fill_and_send_example(EXAMPLE_LOOPS);
-			c = get_millisecs_since_start() - c;
-			printf("\nTest has used %lu ms\n", c);
-		}
-
-		if (choice == '2'){
-			uint32_t c = get_millisecs_since_start();
-			ping_pong_example(EXAMPLE_LOOPS);
-			c = get_millisecs_since_start() - c;
-			printf("\nTest has used %lu ms\n", c);
+		for (int i = 0; i < CHOICES_LEN; i++){
+			if (choices[i].choice == user_choice){
+				uint32_t c = get_millisecs_since_start();
+				choices[i].functionPtr(EXAMPLE_LOOPS);
+				c = get_millisecs_since_start() - c;
+				printf("\nTest has used %lu ms\n", c);
+			}
 		}
 	}
 }

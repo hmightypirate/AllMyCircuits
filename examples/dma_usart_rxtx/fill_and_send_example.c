@@ -1,7 +1,7 @@
 #include "fill_and_send_example.h"
 #include "example_commons.h"
 
-void send_buffer_1(){
+static void send_buffer_1(){
 	for(int i = 0; i < USART_TX_DMA_BUFFER_SIZE; i++){
 		usart_send_blocking(MY_USART, buffer_1[i]);
 	}

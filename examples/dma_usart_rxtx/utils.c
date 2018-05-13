@@ -12,7 +12,7 @@ int stringlen(char *string) {
 }
 
 char welcome[] =
-		"\nPress\n 1 for fill buffer, send buffer test. \n 2 for ping pong buffer test\n";
+		"\nPress\n 1 for fill buffer, send buffer test.\n 2 for ping pong buffer test.\n 3 for DMA buffer test\n";
 
 char prompt() {
 	for (int i = 0; i < stringlen(welcome); i++) {

@@ -10,6 +10,8 @@ void clock_setup(void) {
 
 	/* Enable clocks for GPIO port B (for GPIO_USART3_TX) and USART3. */
 	rcc_periph_clock_enable(RCC_USART1);
+
+	rcc_periph_clock_enable(RCC_DMA1);
 }
 
 void usart_setup(void) {
@@ -36,6 +38,12 @@ void gpio_setup(void) {
 			GPIO_CNF_OUTPUT_PUSHPULL, INTERNAL_LED);
 }
 
+void dma_setup(){
+	// UART TX on DMA1 Channel 4
+	nvic_set_priority(NVIC_DMA1_CHANNEL4_IRQ, 0);
+	nvic_enable_irq(NVIC_DMA1_CHANNEL4_IRQ);
+}
+
 void setup() {
 	/* Change interrupt vector table location to avoid conflict with */
 	/* serial bootloader interrupt vectors */
@@ -44,4 +52,5 @@ void setup() {
 	gpio_setup();
 	usart_setup();
 	systick_setup();
+	dma_setup();
 }
