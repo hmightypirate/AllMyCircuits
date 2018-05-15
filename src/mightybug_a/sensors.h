@@ -15,24 +15,25 @@
 /* 1 for black line
    0 for white line */
 #define FOLLOW_BLACK_LINE 1
+#define FOLLOW_WHITE_LINE !FOLLOW_BLACK_LINE
 
 #define BLACK_MEASURE 2000
 #define WHITE_MEASURE 0
 
 #define SOFT_CALLIBRATION 1
-#define THRESHOLD_CALLIBRATION 500
+#define THRESHOLD_CALIBRATION 500
 
 /* extra delay between callibration calls in NOP operations */
-#define DELAY_CALLIBRATION_CALLS 300
+#define DELAY_CALIBRATION_CALLS 300
 
 /* Callibration functions */
-uint8_t get_callibrated_sensors(void);
-void reset_callibration_values(void);
+uint8_t get_calibrated_sensors(void);
+void reset_calibration_values(void);
 void calibrate_sensors(uint16_t* values);
 void hard_reset_sensors(void);
 
-void enable_sensors(void);
-void disable_sensors(void);
+void enable_line_sensors(void);
+void disable_line_sensors(void);
 
 void read_line_sensors(uint16_t* sensor_value);
 int get_line_position(uint16_t* value);

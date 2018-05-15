@@ -5,8 +5,11 @@
 #include "setup.h"
 #include "pid.h"
 
-#define RIGHT_INVERTED 1
-#define LEFT_INVERTED 0
+#define RIGHT_MOTOR_PWM_ANTIPHASE 1
+#define LEFT_MOTOR_PWM_ANTIPHASE 0
+
+#define FORWARD 0
+#define BACKWARD 1
 
 void reset_target_velocity(int target_vel);
 int get_target_velocity(void);

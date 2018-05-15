@@ -2,16 +2,18 @@
 
 uint16_t black_sensors[NUM_SENSORS];
 uint16_t white_sensors[NUM_SENSORS];
-uint16_t callibrated_sensors[NUM_SENSORS];
+uint16_t calibrated_sensors[NUM_SENSORS];
 uint16_t threshold[NUM_SENSORS];
 uint8_t last_drift = LEFT_DRIFT;
 
 static int out_of_line = 0;
 
-/* This var stores the number of sensors correctly callibrated */
-static uint8_t sensors_callibrated = 0;
+/* This var stores the number of sensors correctly calibrated */
+static uint8_t sensors_calibrated_count = 0;
 
-static int started_callibration = 0;
+static int started_calibration = 0;
+
+int position = 0;
 
 /*
  * @brief reads a line sensor 
@@ -33,7 +35,7 @@ static uint16_t read_adc_naiive(uint8_t channel)
 /*
  * @brief set manually black and white thresholds to sensors
  * 
- * @note it is more advisable to callibrate the sensors rathen 
+ * @note it is more advisable to calibrate the sensors rathen 
  *        that using this function
  */
 void hard_reset_sensors()
@@ -47,19 +49,19 @@ void hard_reset_sensors()
 }
 
 /*
- * @resets callibration values
+ * @resets calibration values
  *
- * @note called automatically only once during callibration
+ * @note called automatically only once during calibration
  */
 
-void reset_callibration_values()
+void reset_calibration_values()
 {
   for (int i=0; i< NUM_SENSORS; i++)
     {
       black_sensors[i] = WHITE_MEASURE;
       white_sensors[i] = BLACK_MEASURE;
     }
-  started_callibration = 1;
+  started_calibration = 1;
 }
 
 /*
@@ -75,6 +77,48 @@ void read_line_sensors(uint16_t* sensor_value)
     }
 }
 
+static uint16_t trunc_to_range(uint16_t value, uint16_t min, uint16_t max)
+{
+  uint16_t trunc_value = value;
+
+  if (value < min) {
+    trunc_value = min;
+  } else if (value > max) {
+    trunc_value = max;
+  }
+
+  return trunc_value;
+}
+
+/*
+ * @brief rescale vale between min and max using scale steps
+ */
+uint16_t rescale_in_range(uint16_t value, uint16_t min, uint16_t max, uint16_t scale)
+{
+  return ((value - min) * (scale / (max - min)));
+}
+
+int get_position_before_drift()
+{
+  int pos;
+
+  if (last_drift == LEFT_DRIFT) {
+    pos = 1*100;
+  } else {
+    pos = NUM_SENSORS * 100;
+  }
+
+  return pos;
+}
+
+void set_drift_side(int pos)
+{
+  if (pos < ((NUM_SENSORS + 1) * 100/2)) 
+    last_drift = LEFT_DRIFT;
+  else 
+    last_drift = RIGHT_DRIFT;
+}
+
 /*
  * @brief transform sensor measures in line position
  *
@@ -85,83 +129,49 @@ void read_line_sensors(uint16_t* sensor_value)
  */
 int get_line_position(uint16_t* value)
 {
-  uint32_t line_value[NUM_SENSORS];
   uint8_t whites_detected = 0;
   uint8_t blacks_detected = 0;
-  int pos = 0;
-  int avg_sensors = 0;
-  int sum_sensors = 0;
+
+  uint32_t avg_sensors = 0;
+  uint16_t sum_sensors = 0;
 
   out_of_line = 0;
   
-  for (int i = 0; i < NUM_SENSORS; i++)
-    {
-      if (value[i] < white_sensors[i])
-        {
-          line_value[i] = white_sensors[i];
-        }
-      else if (value[i] > black_sensors[i])
-        {
-          line_value[i] = black_sensors[i];
-        }
-      else
-        {
-          line_value[i] = ((value[i] - white_sensors[i]) *
-                           (K_SENSOR / (black_sensors[i] - white_sensors[i])));      
-        }
+  for (int i = 0; i < NUM_SENSORS; i++) {
+    //Check whites/blacks detected
+    if (value[i] > threshold[i]) blacks_detected++;
+    if (value[i] < threshold[i]) whites_detected++;
 
-      //Check whites/blacks detected
-      if (value[i] > threshold[i])
-        {
-          blacks_detected += 1;
-        }
-      else if (value[i] < threshold[i])
-        {
-          whites_detected += 1;
-        }
-
-      avg_sensors += (uint32_t)line_value[i]*(i+1)*100;
-      sum_sensors += line_value[i];
-    }
+    value[i] = trunc_to_range(value[i], white_sensors[i], black_sensors[i]);
+    value[i] = rescale_in_range(value[i], white_sensors[i], black_sensors[i], K_SENSOR);
+    
+    avg_sensors += ((uint32_t)value[i])*(i+1)*100;
+    sum_sensors += value[i];
+  }
 
   if ((blacks_detected == 0 && FOLLOW_BLACK_LINE) ||
-      (whites_detected == 0 && !FOLLOW_BLACK_LINE))
-    {
+      (whites_detected == 0 && FOLLOW_WHITE_LINE)) {
+      
       /* Out of line */
       out_of_line = 1;
+      position = get_position_before_drift();
+
+  } else {
       
-      if (last_drift == LEFT_DRIFT)
-        {
-          pos = 1*100;
-        }
-      else
-        {
-          pos = NUM_SENSORS * 100;
-        }
-    }
-  else
-    {
-      pos = avg_sensors/sum_sensors;
+    position = avg_sensors/sum_sensors;
 
-      if (!FOLLOW_BLACK_LINE)
-        {
-          pos = (NUM_SENSORS + 1) * 100 - pos;
-        }
+  }
 
-      if (pos < ((NUM_SENSORS + 1) * 100/2))
-        {
-          last_drift = LEFT_DRIFT;
-        }
-      else if (pos > ((NUM_SENSORS + 1) * 100/2))
-        {
-          last_drift = RIGHT_DRIFT;
-        }
-    }
+  if (FOLLOW_WHITE_LINE) {
+      position = (NUM_SENSORS + 1) * 100 - position;
+  }
 
-  /* Updating pos */
-  pos = pos - (NUM_SENSORS + 1) * 100/2;
+  set_drift_side(position);
 
-  return pos;
+  /* Zero-center position */
+  position = position - (NUM_SENSORS + 1) * 100/2;
+
+  return position;
 }
 
 /*
@@ -173,8 +183,24 @@ int is_out_of_line()
   return out_of_line;
 }
 
+void check_calibrated_sensors(void)
+{
+
+  sensors_calibrated_count = 0;
+
+  for (int i=0; i<NUM_SENSORS; i++) {
+    if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALIBRATION) {
+      sensors_calibrated_count++;
+      calibrated_sensors[i] = 1;
+    } else {
+      calibrated_sensors[i] = 0;
+    }
+  }
+
+}
+
 /*
- * @brief callibrate sensors (one step)
+ * @brief calibrate sensors (one step)
  *
  * @param[in] values a variable that holds current measurements
  *
@@ -182,15 +208,11 @@ int is_out_of_line()
 void calibrate_sensors(uint16_t* values)
 {
 
-  /* reset callibration first time */
-  if (!started_callibration)
+  /* reset calibration first time */
+  if (!started_calibration)
     {
-      reset_callibration_values();
+      reset_calibration_values();
     }
-  
-  read_line_sensors(values);
-
-  sensors_callibrated = 0;
   
   for (int i=0; i<NUM_SENSORS; i++)
     {
@@ -205,32 +227,15 @@ void calibrate_sensors(uint16_t* values)
            white_sensors[i] = values[i];
         }
       
-      threshold[i] = (black_sensors[i] + white_sensors[i])/2;
-
-      if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALLIBRATION)
-        {
-          sensors_callibrated++;
-          callibrated_sensors[i] = 1;
-        }
-      else
-        {
-          callibrated_sensors[i] = 0;
-        }
+      threshold[i] = (black_sensors[i] + white_sensors[i])/2;   
     }
-
-  /* Add extra delay (in nop operations) after every callibration call */
-  /*for (int i=0; i < x; i++)
-    {
-    __asm__("nop");
-    }*/
-  //DELAY(DELAY_CALLIBRATION_CALLS);
-     
+  check_calibrated_sensors();     
 }
 
 /*
  * @brief enable sensors
  */
-void enable_sensors()
+void enable_line_sensors()
 {
   gpio_set(SENSOR_ON_PORT, SENSOR_ON_PIN);
 }
@@ -238,18 +243,18 @@ void enable_sensors()
 /*
  * @brief disable sensors
  */
-void disable_sensors()
+void disable_line_sensors()
 {
   gpio_clear(SENSOR_ON_PORT, SENSOR_ON_PIN);
 }
 
 
 /*
- * @brief get the number of callibrated sensors
+ * @brief get the number of calibrated sensors
  */
-uint8_t get_callibrated_sensors()
+uint8_t get_calibrated_sensors_count()
 {
-  return sensors_callibrated;
+  return sensors_calibrated_count;
 }
 
 
