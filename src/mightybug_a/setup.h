@@ -102,6 +102,7 @@
 #define AVG_BATTERY_SAMPLES 20
 
 /* Keypad */
+#define NUM_BUTTONS 3
 #define BUTTON0_PORT GPIOC
 #define BUTTON0_PIN GPIO14
 #define BUTTON1_PORT GPIOC

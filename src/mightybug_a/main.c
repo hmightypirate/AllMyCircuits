@@ -10,7 +10,7 @@
 #include "libmusic.h"
 #include "vbatt.h"
 #include "commons.h"
-
+#include "keypad.h"
 
 void music_update(int millis)
 {
@@ -63,6 +63,9 @@ int main(void)
   /* setup jukebox */
   jukebox_setup();
 
+  /* Setup keypad */
+  keypad_setup(get_millisecs_since_start());
+  
   clear_led();
 
   uint32_t last_loop_execution_ms = 0;
