@@ -64,7 +64,13 @@ int main(void)
   jukebox_setup();
 
   /* Setup keypad */
-  keypad_setup(get_millisecs_since_start());
+
+  uint16_t button_port_array[NUM_BUTTONS] = {BUTTON0_PORT, BUTTON1_PORT, BUTTON2_PORT};
+  uint16_t button_pin_array[NUM_BUTTONS] = {BUTTON0_PIN, BUTTON1_PIN, BUTTON2_PIN};
+  
+  keypad_setup(get_millisecs_since_start(),
+               button_port_array,
+               button_pin_array);
   
   clear_led();
 

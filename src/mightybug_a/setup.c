@@ -304,7 +304,6 @@ void gpio_setup(void)
 
   gpio_set_mode(BUTTON2_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                 BUTTON2_PIN);
-
 }
 
 
