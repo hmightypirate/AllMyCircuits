@@ -123,6 +123,14 @@ int main(void)
             
         /* Led off */
         clear_led();
+
+      } else if (current_state == DELAYED_RUN_START_STATE)
+        {
+
+          //FIXME delay time
+          //FIXME do something with the led
+          
+        
       } else {
             
         // Running 

@@ -21,6 +21,10 @@ void update_state(event_e new_event)
         {
           current_state = NO_BATTERY_STATE;
         }
+      else if (new_event == DELAYED_RUN_START_EVENT)
+        {
+          current_state = DELAYED_RUN_START_STATE;
+        }
     }
 }
 
