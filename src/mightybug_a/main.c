@@ -26,6 +26,7 @@ void music_update(int millis)
       jukebox_setcurrent_song(OUT_OF_LINE_SONG);
       jukebox_play_in_loop(millis);
     } else {
+      // Running or delayed run states
       stop_music_play();
     }
   }
@@ -124,12 +125,18 @@ int main(void)
         /* Led off */
         clear_led();
 
-      } else if (current_state == DELAYED_RUN_START_STATE)
+      } else if (current_state == DELAYED_START_STATE)
         {
-
-          //FIXME delay time
-          //FIXME do something with the led
+          /* Stop motors */
+          stop_motors();
           
+          if (current_loop_millisecs - get_delay_start_time() >
+              DELAYED_START_MS)
+            {
+              update_state(GO_TO_RUN_EVENT);
+            }
+
+          //FIXME do something with the led
         
       } else {
             

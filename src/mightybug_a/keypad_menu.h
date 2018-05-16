@@ -1,6 +1,7 @@
 #ifndef __KEYPAD_H
 #define __KEYPAD_H
 
+#include <inttypes.h>
 #include "setup.h"
 #include "keypad.h"
 #include "fsm.h"
