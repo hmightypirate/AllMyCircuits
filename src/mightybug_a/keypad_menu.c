@@ -22,6 +22,7 @@ void menu_functions(uint32_t current_millis)
   if (get_button(BUTTON_PID_MAPPING) &&
       get_edge_detection(BUTTON_PID_MAPPING))
     {
+      set_pid_map_time(current_millis);
       update_state(NEXT_PIDMAP_EVENT);
     }
 
@@ -29,6 +30,7 @@ void menu_functions(uint32_t current_millis)
   if (get_button(BUTTON_VEL_MAPPING) &&
       get_edge_detection(BUTTON_VEL_MAPPING))
     {
+      set_vel_map_time(current_millis);
       update_state(NEXT_VELMAP_EVENT);
     }
 

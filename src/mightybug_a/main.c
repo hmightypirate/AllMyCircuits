@@ -136,6 +136,52 @@ int main(void)
             }
 
           //FIXME do something with the led
+
+        }
+      else if (current_state == PID_MAPPING_STATE)
+        {
+          /* stop motors */
+          stop_motors();
+          if (current_loop_millisecs - get_pid_map_time() >
+              DELAYED_PID_CHANGE_MS)
+            {
+              // Return to callibration if 
+              update_state(FORCE_CALLIBRATION_EVENT);
+            }
+
+          //TODO do something with the led to show the mapping
+
+        }
+      else if (current_state == PID_CHANGE_STATE)
+        {
+
+          //TODO: change the mapping
+
+          /* sets the ms in mapping state to the current time */
+          set_pid_map_time(current_loop_millisecs);
+          update_state(FORCE_PIDMAP_EVENT);
+        }
+      else if (current_state == VEL_MAPPING_STATE)
+        {
+          stop_motors();
+          if (current_loop_millisecs - get_vel_map_time() >
+              DELAYED_VEL_CHANGE_MS)
+            {
+              // Return to callibration if 
+              update_state(FORCE_CALLIBRATION_EVENT);
+            }
+
+          //TODO do something with the led to show the mapping
+        }
+      else if (current_state == VEL_CHANGE_STATE)
+        {
+
+          //TODO: change the mapping
+
+          /* sets the ms in mapping state to the current time */
+          set_vel_map_time(current_loop_millisecs);
+          update_state(FORCE_VELMAP_EVENT);
+        
         
       } else {
             

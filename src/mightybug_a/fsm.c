@@ -3,6 +3,9 @@
 static state_e current_state = CALLIBRATION_STATE;
 
 uint32_t delay_start_ms = 0;
+uint32_t pid_map_ms = 0;
+uint32_t vel_map_ms = 0;
+
 uint8_t current_pid_mapping = 0;
 uint8_t current_vel_mapping = 0;
 
@@ -49,7 +52,48 @@ void update_state(event_e new_event)
         {
           current_state = VEL_CHANGE_STATE;
         }
+      else if (new_event == FORCE_PIDMAP_EVENT)
+        {
+          current_state = PID_MAPPING_STATE;
+        }
+      else if (new_event == FORCE_VELMAP_EVENT)
+        {
+          current_state = VEL_MAPPING_STATE;
+        }
     }
+}
+
+
+/*
+ * @brief sets the time entering a pid mapping state
+ */ 
+void set_pid_map_time(uint32_t current_time)
+{
+  pid_map_ms = current_time;
+}
+
+/*
+ * @brief obtain the time entering a pid mapping state
+ */
+uint32_t get_pid_map_time(void)
+{
+  return pid_map_ms;
+}
+
+/*
+ * @brief sets the time entering a vel mapping state
+ */
+void set_vel_map_time(uint32_t current_time)
+{
+  vel_map_ms = current_time;
+}
+
+/*
+ * @brief gets the time entering a vel mapping state
+ */
+uint32_t get_vel_map_time(void)
+{
+  return vel_map_ms;
 }
 
 /*
