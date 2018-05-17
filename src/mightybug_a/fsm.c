@@ -3,6 +3,8 @@
 static state_e current_state = CALLIBRATION_STATE;
 
 uint32_t delay_start_ms = 0;
+uint8_t current_pid_mapping = 0;
+uint8_t current_vel_mapping = 0;
 
 /*
  * @brief extremely simple finite state machine
@@ -26,6 +28,26 @@ void update_state(event_e new_event)
       else if (new_event == GO_TO_DELAYED_START_EVENT)
         {
           current_state = DELAYED_START_STATE;
+        }
+      else if ((new_event == NEXT_PIDMAP_EVENT) &&
+               (current_state == CALLIBRATION_STATE))       
+        {
+          current_state = PID_MAPPING_STATE;
+        }
+      else if ((new_event == NEXT_PIDMAP_EVENT) &&
+               (current_state == PID_MAPPING_STATE))
+        {
+          current_state = PID_CHANGE_STATE;
+        }
+      else if ((new_event == NEXT_VELMAP_EVENT) &&
+               (current_state == CALLIBRATION_STATE))
+        {
+          current_state = VEL_MAPPING_STATE;
+        }
+      else if ((new_event == NEXT_VELMAP_EVENT) &&
+               (current_state == VEL_MAPPING_STATE))
+        {
+          current_state = VEL_CHANGE_STATE;
         }
     }
 }

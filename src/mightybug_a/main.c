@@ -65,7 +65,6 @@ int main(void)
   jukebox_setup();
 
   /* Setup keypad */
-
   uint16_t button_port_array[NUM_BUTTONS] = {BUTTON0_PORT, BUTTON1_PORT, BUTTON2_PORT};
   uint16_t button_pin_array[NUM_BUTTONS] = {BUTTON0_PIN, BUTTON1_PIN, BUTTON2_PIN};
   
