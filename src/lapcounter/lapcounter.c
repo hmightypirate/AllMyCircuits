@@ -12,6 +12,8 @@
 #include <libopencm3/cm3/systick.h>
 #include <libopencm3/stm32/exti.h>
 
+#include "vbatt.h"
+
 #define FALLING 0
 #define RISING 1
 
@@ -62,6 +64,10 @@ static void gpio_setup(void) {
     /* Setup GPIO pin GPIO_USART1_TX. */
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
               GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
+
+    /* Battery level measure */
+    gpio_set_mode(BATTERY_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG,
+                  BATTERY_PIN);
 
     /* Setup UART parameters. */
     usart_set_baudrate(USART1, 115200);
@@ -182,6 +188,17 @@ void systick_setup(){
     systick_counter_enable();
 }
 
+void battery_alarm(){
+    while(true){
+        send_usart("BATTERY DRAINED!!\n");
+        for (int a = 0; a < 40; a++){
+            for (int i = 0; i < 8000; i++){
+                gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
+            }
+        }
+    }
+}
+
 int main(void) {
     /* Change interrupt vector table location to avoid conflict with */
     /* serial bootloader interrupt vectors */
@@ -201,6 +218,12 @@ int main(void) {
     exti_setup();
 
     while(1) {
+        if (millis % SYS_BETWEEN_READS == 0) {
+          // Check if battery drained
+          if (has_batt_drained()) {
+              battery_alarm();
+          }
+        }
         if(laptime != 0) {
           //usart_send_blocking(USART1, '0');
           print_int(laptime);
