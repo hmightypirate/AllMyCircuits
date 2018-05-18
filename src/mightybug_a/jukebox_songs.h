@@ -13,7 +13,7 @@ struct Song {
 
 
 
-#define JUKEBOX_SONGS_TOTAL_SONGS 3
+#define JUKEBOX_SONGS_TOTAL_SONGS 6
 
 struct Song jukebox_song_list[JUKEBOX_SONGS_TOTAL_SONGS];
 
@@ -30,6 +30,19 @@ struct Song jukebox_song_list[JUKEBOX_SONGS_TOTAL_SONGS];
 #define SONG_SUPERMAN_ORDER 2
 #define SONG_LEN_SUPERMAN 50
 #define SONG_VEL_SUPERMAN 200
+
+#define SONG_ONE_BEAT_ORDER 3
+#define SONG_LEN_ONE_BEAT 2
+#define SONG_VEL_ONE_BEAT 50
+
+#define SONG_TWO_BEAT_ORDER 4
+#define SONG_LEN_TWO_BEAT 4
+#define SONG_VEL_TWO_BEAT 50
+
+#define SONG_THREE_BEAT_ORDER 5
+#define SONG_LEN_THREE_BEAT 6
+#define SONG_VEL_THREE_BEAT 50
+
 
 uint8_t init_jukebox_songs(void);
 uint8_t get_total_songs_number(void);
