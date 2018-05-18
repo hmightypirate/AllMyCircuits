@@ -2,6 +2,19 @@
 
 static state_e current_state = CALLIBRATION_STATE;
 
+
+/* FIXME this should be moved to a *.h */
+/* pid maps: k_p, k_i, k_d */
+const int16_t pid_maps[NUMBER_PID_MAPPINGS * 3] = {
+  120, 0, 1200,
+  100, 0, 900,
+  150, 0, 1500
+};
+
+const int16_t vel_maps[NUMBER_VEL_MAPPINGS] = {
+  200, 300, 400
+};
+
 uint32_t delay_start_ms = 0;
 uint32_t pid_map_ms = 0;
 uint32_t vel_map_ms = 0;
@@ -117,4 +130,45 @@ state_e get_state()
   return current_state;
 }
 
+/* 
+ * @brief obtain next pid mapping
+ */
+void select_next_pid_map()
+{
+  current_pid_mapping = (current_pid_mapping + 1) % NUMBER_PID_MAPPINGS;
 
+  /* change the pid consts */
+  set_kp(pid_maps[current_pid_mapping * 3]);
+  set_ki(pid_maps[current_pid_mapping * 3 + 1]);
+  set_kd(pid_maps[current_pid_mapping * 3 + 2]);
+}
+
+/* 
+ * @brief obtain next vel mapping
+ */
+void select_next_vel_map()
+{
+  current_vel_mapping = (current_vel_mapping + 1) % NUMBER_VEL_MAPPINGS;
+
+  /* change the vel consts */
+  reset_target_velocity(vel_maps[current_vel_mapping]);
+}
+
+
+/*
+ * @brief return the current pid mapping
+ */
+uint8_t get_current_pid_map()
+{
+  return current_pid_mapping;
+}
+
+
+/*
+ * @brief return the current vel mapping
+ */
+uint8_t get_current_vel_map()
+{
+  return current_vel_mapping;
+
+}

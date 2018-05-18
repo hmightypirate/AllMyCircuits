@@ -2,6 +2,8 @@
 #define __FSM_H
 
 #include <inttypes.h>
+#include "pid.h"
+#include "motors.h"
 
 /* delay before the car starts running in DELAYED_START_STATE */
 #define DELAYED_START_MS  5000
@@ -9,6 +11,11 @@
 /* delays applied when trying to change a pid mapping */
 #define DELAYED_PID_CHANGE_MS 3000
 #define DELAYED_VEL_CHANGE_MS 3000
+
+/* Number of mappings for pid and vel */
+#define NUMBER_PID_MAPPINGS 3
+#define NUMBER_VEL_MAPPINGS 3
+
 
 typedef enum {
   CALLIBRATION_STATE,
@@ -36,6 +43,8 @@ typedef enum {
   MAX_EVENTS
 } event_e;
 
+
+
 state_e get_state(void);
 void update_state(event_e new_event);
 void set_delay_start_time(uint32_t delay);
@@ -44,6 +53,10 @@ void set_pid_map_time(uint32_t current_time);
 uint32_t get_pid_map_time(void);
 void set_vel_map_time(uint32_t current_time);
 uint32_t get_vel_map_time(void);
-  
+void select_next_vel_map(void);
+void select_next_pid_map(void);
+uint8_t get_current_pid_map(void);
+uint8_t get_current_vel_map(void);
+
 
 #endif /* __FSM_H */

@@ -178,6 +178,9 @@ int main(void)
 
           //TODO: change the mapping
 
+          
+          
+
           /* sets the ms in mapping state to the current time */
           set_vel_map_time(current_loop_millisecs);
           update_state(FORCE_VELMAP_EVENT);
