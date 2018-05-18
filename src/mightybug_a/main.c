@@ -21,6 +21,13 @@ void music_update(int millis)
   } else if (current_state == NO_BATTERY_STATE) {
     jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
     jukebox_play_in_loop(millis);
+  }
+  else if (current_state == PID_MAPPING_STATE) {
+    jukebox_setcurrent_song(get_map_song(get_current_pid_map()));
+    jukebox_play_in_loop(millis);
+  } else if (current_state == VEL_MAPPING_STATE) {
+    jukebox_setcurrent_song(get_map_song(get_current_vel_map()));
+    jukebox_play_in_loop(millis);
   } else {
     if (is_out_of_line()) {
       jukebox_setcurrent_song(OUT_OF_LINE_SONG);

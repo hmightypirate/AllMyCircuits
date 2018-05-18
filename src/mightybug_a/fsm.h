@@ -58,6 +58,6 @@ void select_next_vel_map(void);
 void select_next_pid_map(void);
 uint8_t get_current_pid_map(void);
 uint8_t get_current_vel_map(void);
-
+uint8_t get_map_song(uint8_t id_map);
 
 #endif /* __FSM_H */
