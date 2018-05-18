@@ -13,6 +13,7 @@
 #define DELAYED_VEL_CHANGE_MS 3000
 
 /* Number of mappings for pid and vel */
+#define MAX_MAPPINGS 3
 #define NUMBER_PID_MAPPINGS 3
 #define NUMBER_VEL_MAPPINGS 3
 

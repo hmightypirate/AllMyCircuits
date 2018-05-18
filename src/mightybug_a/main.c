@@ -155,7 +155,8 @@ int main(void)
       else if (current_state == PID_CHANGE_STATE)
         {
 
-          //TODO: change the mapping
+          //change the mapping
+          select_next_pid_map();
 
           /* sets the ms in mapping state to the current time */
           set_pid_map_time(current_loop_millisecs);
@@ -176,11 +177,9 @@ int main(void)
       else if (current_state == VEL_CHANGE_STATE)
         {
 
-          //TODO: change the mapping
-
+          //change the mapping
+          select_next_vel_map();
           
-          
-
           /* sets the ms in mapping state to the current time */
           set_vel_map_time(current_loop_millisecs);
           update_state(FORCE_VELMAP_EVENT);

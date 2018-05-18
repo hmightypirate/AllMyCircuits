@@ -15,6 +15,10 @@ const int16_t vel_maps[NUMBER_VEL_MAPPINGS] = {
   200, 300, 400
 };
 
+const uint8_t map_songs[MAX_MAPPINGS] = {
+  SONG_ONE_BEAT_ORDER, SONG_TWO_BEAT_ORDER, SONG_THREE_BEAT_ORDER
+};
+
 uint32_t delay_start_ms = 0;
 uint32_t pid_map_ms = 0;
 uint32_t vel_map_ms = 0;
@@ -172,3 +176,15 @@ uint8_t get_current_vel_map()
   return current_vel_mapping;
 
 }
+
+
+/*
+ * @brief get current map song
+ * 
+ * @note at least must be id map songs + 1
+ */
+uint8_t get_map_song(uint8_t id_map)
+{
+  return map_songs[id_map];
+}
+  
