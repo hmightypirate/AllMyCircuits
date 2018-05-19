@@ -39,9 +39,9 @@ static int32_t trunc_to_range(int32_t value, int32_t min, int32_t max)
  *
  * @param[in] proportional current measure of sensors
  */
-int16_t pid(int16_t error)
+int32_t pid(int32_t error)
 {
-  int16_t control;
+  int32_t control;
 
   proportional = error;
   integral += error;
