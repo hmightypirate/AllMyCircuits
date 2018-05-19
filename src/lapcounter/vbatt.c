@@ -5,6 +5,7 @@ static uint16_t last_batt_meas = 0;
 static uint8_t out_of_battery_flag = 0;
 
 static uint16_t read_adc_naiive(uint8_t channel) {
+
 	uint8_t channel_array[1];
 	channel_array[0] = channel;
 	adc_set_regular_sequence(ADC1, 1, channel_array);
@@ -29,13 +30,13 @@ static uint16_t read_adc_mean(uint8_t channel, int samples) {
 
 // returns battery in milivolts
 uint16_t read_vbatt() {
-
-	return read_adc_mean(BATTERY_CHANNEL,
-	AVG_BATTERY_SAMPLES) * 100 / RESISTOR_DIVISOR;
+	last_batt_meas = read_adc_mean(BATTERY_CHANNEL,
+			AVG_BATTERY_SAMPLES) * 100 / RESISTOR_DIVISOR;
+	return last_batt_meas;
 }
 
 uint8_t has_batt_drained(void) {
-	last_batt_meas = read_vbatt();
+	read_vbatt();
 	if (last_batt_meas < BATTERY_LIMIT_MV) {
 		out_of_battery_flag = 1;
 	}

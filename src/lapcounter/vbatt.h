@@ -6,7 +6,7 @@
 
 /* Battery limit in millivolts (2 cells) */
 #define BATTERY_LIMIT_MV 6400
-#define RESISTOR_DIVISOR 37
+#define RESISTOR_DIVISOR 36
 
 /* Battery */
 #define BATTERY_PORT GPIOB
