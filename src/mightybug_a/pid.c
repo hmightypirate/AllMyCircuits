@@ -85,3 +85,19 @@ int get_kd(void)
 {
   return k_d;
 }
+
+
+int get_proportional(void)
+{
+  return proportional;
+}
+
+int get_integral(void)
+{
+  return integral;
+}
+
+int get_derivative(void)
+{
+  return derivative;
+}

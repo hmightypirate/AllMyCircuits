@@ -18,4 +18,8 @@ int get_kp(void);
 int get_ki(void);
 int get_kd(void);
 
+int get_proportional(void);
+int get_integral(void);
+int get_derivative(void);
+
 #endif /* __PID_H */
