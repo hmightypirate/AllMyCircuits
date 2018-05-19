@@ -12,11 +12,13 @@ void menu_functions(uint32_t current_millis)
     }
 
   // Button delayed start: Resetting state (rising edge)
+  /*
   if (get_button(BUTTON_START) &&
       get_edge_detection(BUTTON_START))
     {
       update_state(FORCE_CALLIBRATION_EVENT);
     }
+  */
 
   // Pid mapping (rising edge)
   if (get_button(BUTTON_PID_MAPPING) &&

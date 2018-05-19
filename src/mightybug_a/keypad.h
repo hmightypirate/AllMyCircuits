@@ -8,7 +8,7 @@
 
 void keypad_loop(uint32_t current_millis);
 void keypad_setup(uint32_t current_millis,
-                  uint16_t *port_array,
+                  uint32_t *port_array,
                   uint16_t *pin_array);
 
 

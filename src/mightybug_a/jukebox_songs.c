@@ -16,24 +16,24 @@ static uint8_t notes_duration_INDIANAJONES[SONG_LEN_INDIANAJONES] = {
         32, 16, 16, 16, 16, 64, 16, 32, 16, 16, 128, 32, 32, 16, 16, 16, 16, 64, 32, 32, 16, 16, 64, 64, 64, 32, 16, 16, 16, 16, 128, 32, 32, 16, 16, 128, 32, 16, 16, 32, 16, 32, 16, 16, 32, 16, 32, 16, 16, 32, 16, 32, 16, 16, 128};
 
 static uint8_t notes_pitch_ONE_BEAT[SONG_LEN_ONE_BEAT] = {
-  D5, R
+  A6, R
 };
 
 static uint8_t notes_duration_ONE_BEAT[SONG_LEN_ONE_BEAT] = {
-    50, 255};
+    30, 255};
 
 static uint8_t notes_pitch_TWO_BEAT[SONG_LEN_TWO_BEAT] = {
-  D5, R, D5, R
+  A6, R, A6, R
 };
 
 static uint8_t notes_duration_TWO_BEAT[SONG_LEN_TWO_BEAT] = {
-    50, 50, 50, 255};
+    30, 15, 30, 255};
 
 static uint8_t notes_pitch_THREE_BEAT[SONG_LEN_THREE_BEAT] = {
-  D5, R, D5, R, D5, R};
+  A6, R, A6, R, A6, R};
 
 static uint8_t notes_duration_THREE_BEAT[SONG_LEN_THREE_BEAT] = {
-  50, 50, 50, 50, 50, 255};
+  30, 15, 30, 15, 30, 255};
 
   
 // Returns the number of songs in the jukebox

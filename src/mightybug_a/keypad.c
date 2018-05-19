@@ -11,8 +11,8 @@ bool is_new_edge[NUM_BUTTONS];
 /* Timestamps of the last measured edges (rising or falling) for each button */
 uint32_t button_edge_ts[NUM_BUTTONS];
 
-uint8_t button_port_array[NUM_BUTTONS];
-uint8_t button_pin_array[NUM_BUTTONS];
+uint32_t button_port_array[NUM_BUTTONS];
+uint16_t button_pin_array[NUM_BUTTONS];
 
 /*
  * @brief update keypad status in main loop
@@ -31,8 +31,9 @@ void keypad_loop(uint32_t current_millis)
       reading = gpio_get(button_port_array[i],
                          button_pin_array[i]);
       elapsed_time = current_millis - button_edge_ts[i];
+
       if ((elapsed_time > DEBOUNCE_PERIOD) && (reading != is_button[i]))
-        {
+        { 
           button_edge_ts[i] = current_millis;
           is_button[i] = reading;
           is_new_edge[i] = true;
@@ -52,7 +53,7 @@ void unset_edge(uint8_t id_button)
  * @brief initial state of the buttons
  */
 void keypad_setup(uint32_t current_millis,
-                  uint16_t *port_array,
+                  uint32_t *port_array,
                   uint16_t *pin_array)
 {
 

@@ -33,15 +33,15 @@ struct Song jukebox_song_list[JUKEBOX_SONGS_TOTAL_SONGS];
 
 #define SONG_ONE_BEAT_ORDER 3
 #define SONG_LEN_ONE_BEAT 2
-#define SONG_VEL_ONE_BEAT 50
+#define SONG_VEL_ONE_BEAT 150
 
 #define SONG_TWO_BEAT_ORDER 4
 #define SONG_LEN_TWO_BEAT 4
-#define SONG_VEL_TWO_BEAT 50
+#define SONG_VEL_TWO_BEAT 250
 
 #define SONG_THREE_BEAT_ORDER 5
 #define SONG_LEN_THREE_BEAT 6
-#define SONG_VEL_THREE_BEAT 50
+#define SONG_VEL_THREE_BEAT 250
 
 
 uint8_t init_jukebox_songs(void);

@@ -11,6 +11,7 @@
 #include "vbatt.h"
 #include "commons.h"
 #include "keypad.h"
+#include "keypad_menu.h"
 
 void music_update(int millis)
 {
@@ -21,8 +22,7 @@ void music_update(int millis)
   } else if (current_state == NO_BATTERY_STATE) {
     jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
     jukebox_play_in_loop(millis);
-  }
-  else if (current_state == PID_MAPPING_STATE) {
+  } else if (current_state == PID_MAPPING_STATE) {
     jukebox_setcurrent_song(get_map_song(get_current_pid_map()));
     jukebox_play_in_loop(millis);
   } else if (current_state == VEL_MAPPING_STATE) {
@@ -72,8 +72,12 @@ int main(void)
   jukebox_setup();
 
   /* Setup keypad */
-  uint16_t button_port_array[NUM_BUTTONS] = {BUTTON0_PORT, BUTTON1_PORT, BUTTON2_PORT};
-  uint16_t button_pin_array[NUM_BUTTONS] = {BUTTON0_PIN, BUTTON1_PIN, BUTTON2_PIN};
+  uint32_t button_port_array[NUM_BUTTONS] = {(uint32_t) BUTTON0_PORT,
+                                             (uint32_t) BUTTON1_PORT,
+                                             (uint32_t) BUTTON2_PORT};
+  uint16_t button_pin_array[NUM_BUTTONS] = {(uint16_t) BUTTON0_PIN,
+                                            (uint16_t) BUTTON1_PIN,
+                                            (uint16_t) BUTTON2_PIN};
   
   keypad_setup(get_millisecs_since_start(),
                button_port_array,
@@ -105,6 +109,8 @@ int main(void)
     state_e current_state = get_state();
 
     music_update(current_loop_millisecs);
+    keypad_loop(current_loop_millisecs);
+    menu_functions(current_loop_millisecs);
     
     // loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS) {
@@ -115,8 +121,7 @@ int main(void)
       uint16_t sensor_value[NUM_SENSORS];
       read_line_sensors(sensor_value);
         
-      if (current_state == CALLIBRATION_STATE) {
-        
+      if (current_state == CALLIBRATION_STATE) {        
         calibrate_sensors(sensor_value);
                      
         /* stop motors during calibration */
@@ -145,7 +150,8 @@ int main(void)
               update_state(GO_TO_RUN_EVENT);
             }
 
-          //FIXME do something with the led
+          /* Led on */
+          set_led();
 
         }
       else if (current_state == PID_MAPPING_STATE)
@@ -157,9 +163,10 @@ int main(void)
             {
               // Return to callibration if 
               update_state(FORCE_CALLIBRATION_EVENT);
+              pull_enable_jukebox();
             }
 
-          //TODO do something with the led to show the mapping
+          set_led();
 
         }
       else if (current_state == PID_CHANGE_STATE)
@@ -180,9 +187,10 @@ int main(void)
             {
               // Return to callibration if 
               update_state(FORCE_CALLIBRATION_EVENT);
+              pull_enable_jukebox();
             }
 
-          //TODO do something with the led to show the mapping
+          set_led();
         }
       else if (current_state == VEL_CHANGE_STATE)
         {
@@ -193,8 +201,7 @@ int main(void)
           /* sets the ms in mapping state to the current time */
           set_vel_map_time(current_loop_millisecs);
           update_state(FORCE_VELMAP_EVENT);
-        
-        
+               
       } else {
             
         // Running 

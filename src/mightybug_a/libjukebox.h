@@ -14,5 +14,8 @@ int is_jukebox_playing(void);
 void jukebox_play_in_loop(uint32_t current_millisecs);
 void enable_jukebox();
 void disable_jukebox();
+void push_enable_jukebox();
+void pull_enable_jukebox();
+  
 
 #endif /* __LIBJUKEBOX_H */

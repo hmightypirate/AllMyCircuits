@@ -4,13 +4,14 @@
 #include <inttypes.h>
 #include "pid.h"
 #include "motors.h"
+#include "libjukebox.h"
 
 /* delay before the car starts running in DELAYED_START_STATE */
 #define DELAYED_START_MS  5000
 
 /* delays applied when trying to change a pid mapping */
-#define DELAYED_PID_CHANGE_MS 3000
-#define DELAYED_VEL_CHANGE_MS 3000
+#define DELAYED_PID_CHANGE_MS 5000
+#define DELAYED_VEL_CHANGE_MS 5000
 
 /* Number of mappings for pid and vel */
 #define MAX_MAPPINGS 3
