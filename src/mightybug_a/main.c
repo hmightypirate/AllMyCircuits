@@ -161,10 +161,10 @@ int main(void)
           if (current_loop_millisecs - get_pid_map_time() >
               DELAYED_PID_CHANGE_MS)
             {
-              // Return to callibration if 
+              // Return to callibration if
+              stop_music_play();
               update_state(FORCE_CALLIBRATION_EVENT);
               pull_enable_jukebox();
-              stop_music_play();
             }
 
           set_led();
@@ -186,10 +186,10 @@ int main(void)
           if (current_loop_millisecs - get_vel_map_time() >
               DELAYED_VEL_CHANGE_MS)
             {
-              // Return to callibration if 
+              // Return to callibration if
+              stop_music_play();
               update_state(FORCE_CALLIBRATION_EVENT);
               pull_enable_jukebox();
-              stop_music_play();
             }
 
           set_led();
