@@ -164,6 +164,7 @@ int main(void)
               // Return to callibration if 
               update_state(FORCE_CALLIBRATION_EVENT);
               pull_enable_jukebox();
+              stop_music_play();
             }
 
           set_led();
@@ -188,6 +189,7 @@ int main(void)
               // Return to callibration if 
               update_state(FORCE_CALLIBRATION_EVENT);
               pull_enable_jukebox();
+              stop_music_play();
             }
 
           set_led();
