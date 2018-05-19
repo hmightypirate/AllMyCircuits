@@ -12,7 +12,7 @@ void print_telemetry()
     if (SHOW_D_VALUE) printf("%d,", get_derivative());
     if (SHOW_LEFT_PWM) printf("%d,", get_last_left_vel());
     if (SHOW_RIGHT_PWM) printf("%d,", get_last_right_vel());
-    if (SHOW_LEFT_ENCODER) printf("%u,", (unsigned int)get_left_velocity());
-    if (SHOW_RIGHT_ENCODER) printf("%u,", (unsigned int)get_right_velocity());
+    if (SHOW_LEFT_ENCODER) printf("%u,", (unsigned int)get_left_encoder_ticks());
+    if (SHOW_RIGHT_ENCODER) printf("%u,", (unsigned int)get_right_encoder_ticks());
     printf("0\n");
 }
