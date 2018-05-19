@@ -10,7 +10,8 @@
 #include "libmusic.h"
 #include "vbatt.h"
 #include "commons.h"
-
+#include "keypad.h"
+#include "keypad_menu.h"
 
 void music_update(int millis)
 {
@@ -21,11 +22,18 @@ void music_update(int millis)
   } else if (current_state == NO_BATTERY_STATE) {
     jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
     jukebox_play_in_loop(millis);
+  } else if (current_state == PID_MAPPING_STATE) {
+    jukebox_setcurrent_song(get_map_song(get_current_pid_map()));
+    jukebox_play_in_loop(millis);
+  } else if (current_state == VEL_MAPPING_STATE) {
+    jukebox_setcurrent_song(get_map_song(get_current_vel_map()));
+    jukebox_play_in_loop(millis);
   } else {
     if (is_out_of_line()) {
       jukebox_setcurrent_song(OUT_OF_LINE_SONG);
       jukebox_play_in_loop(millis);
     } else {
+      // Running or delayed run states
       stop_music_play();
     }
   }
@@ -63,6 +71,21 @@ int main(void)
   /* setup jukebox */
   jukebox_setup();
 
+  /* Setup keypad */
+  uint32_t button_port_array[NUM_BUTTONS] = {(uint32_t) BUTTON0_PORT,
+                                             (uint32_t) BUTTON1_PORT,
+                                             (uint32_t) BUTTON2_PORT};
+  uint16_t button_pin_array[NUM_BUTTONS] = {(uint16_t) BUTTON0_PIN,
+                                            (uint16_t) BUTTON1_PIN,
+                                            (uint16_t) BUTTON2_PIN};
+  
+  keypad_setup(get_millisecs_since_start(),
+               button_port_array,
+               button_pin_array);
+
+  /* reset mappings */
+  reset_mappings();
+  
   clear_led();
 
   uint32_t last_loop_execution_ms = 0;
@@ -86,6 +109,8 @@ int main(void)
     state_e current_state = get_state();
 
     music_update(current_loop_millisecs);
+    keypad_loop(current_loop_millisecs);
+    menu_functions(current_loop_millisecs);
     
     // loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS) {
@@ -96,8 +121,7 @@ int main(void)
       uint16_t sensor_value[NUM_SENSORS];
       read_line_sensors(sensor_value);
         
-      if (current_state == CALLIBRATION_STATE) {
-        
+      if (current_state == CALLIBRATION_STATE) {        
         calibrate_sensors(sensor_value);
                      
         /* stop motors during calibration */
@@ -114,6 +138,72 @@ int main(void)
             
         /* Led off */
         clear_led();
+
+      } else if (current_state == DELAYED_START_STATE)
+        {
+          /* Stop motors */
+          stop_motors();
+          
+          if (current_loop_millisecs - get_delay_start_time() >
+              DELAYED_START_MS)
+            {
+              update_state(GO_TO_RUN_EVENT);
+            }
+
+          /* Led on */
+          set_led();
+
+        }
+      else if (current_state == PID_MAPPING_STATE)
+        {
+          /* stop motors */
+          stop_motors();
+          if (current_loop_millisecs - get_pid_map_time() >
+              DELAYED_PID_CHANGE_MS)
+            {
+              // Return to callibration if
+              stop_music_play();
+              update_state(FORCE_CALLIBRATION_EVENT);
+              pull_enable_jukebox();
+            }
+
+          set_led();
+
+        }
+      else if (current_state == PID_CHANGE_STATE)
+        {
+
+          //change the mapping
+          select_next_pid_map();
+
+          /* sets the ms in mapping state to the current time */
+          set_pid_map_time(current_loop_millisecs);
+          update_state(FORCE_PIDMAP_EVENT);
+        }
+      else if (current_state == VEL_MAPPING_STATE)
+        {
+          stop_motors();
+          if (current_loop_millisecs - get_vel_map_time() >
+              DELAYED_VEL_CHANGE_MS)
+            {
+              // Return to callibration if
+              stop_music_play();
+              update_state(FORCE_CALLIBRATION_EVENT);
+              pull_enable_jukebox();
+            }
+
+          set_led();
+        }
+      else if (current_state == VEL_CHANGE_STATE)
+        {
+
+          //change the mapping
+          select_next_vel_map();
+          
+          /* sets the ms in mapping state to the current time */
+          set_vel_map_time(current_loop_millisecs);
+          update_state(FORCE_VELMAP_EVENT);
+               
       } else {
             
         // Running 

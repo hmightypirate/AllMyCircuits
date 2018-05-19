@@ -15,7 +15,27 @@ static uint8_t notes_pitch_INDIANAJONES[SONG_LEN_INDIANAJONES] = {
 static uint8_t notes_duration_INDIANAJONES[SONG_LEN_INDIANAJONES] = {
         32, 16, 16, 16, 16, 64, 16, 32, 16, 16, 128, 32, 32, 16, 16, 16, 16, 64, 32, 32, 16, 16, 64, 64, 64, 32, 16, 16, 16, 16, 128, 32, 32, 16, 16, 128, 32, 16, 16, 32, 16, 32, 16, 16, 32, 16, 32, 16, 16, 32, 16, 32, 16, 16, 128};
 
+static uint8_t notes_pitch_ONE_BEAT[SONG_LEN_ONE_BEAT] = {
+  A6, R
+};
 
+static uint8_t notes_duration_ONE_BEAT[SONG_LEN_ONE_BEAT] = {
+    30, 255};
+
+static uint8_t notes_pitch_TWO_BEAT[SONG_LEN_TWO_BEAT] = {
+  A6, R, A6, R
+};
+
+static uint8_t notes_duration_TWO_BEAT[SONG_LEN_TWO_BEAT] = {
+    30, 15, 30, 255};
+
+static uint8_t notes_pitch_THREE_BEAT[SONG_LEN_THREE_BEAT] = {
+  A6, R, A6, R, A6, R};
+
+static uint8_t notes_duration_THREE_BEAT[SONG_LEN_THREE_BEAT] = {
+  30, 15, 30, 15, 30, 255};
+
+  
 // Returns the number of songs in the jukebox
 uint8_t init_jukebox_songs() {
 
@@ -33,6 +53,24 @@ uint8_t init_jukebox_songs() {
   jukebox_song_list[SONG_EUROPE_ORDER].bpm = SONG_VEL_EUROPE;
   jukebox_song_list[SONG_EUROPE_ORDER].notes_pitch = notes_pitch_EUROPE;
   jukebox_song_list[SONG_EUROPE_ORDER].notes_duration = notes_duration_EUROPE;
+
+
+  /* Beat songs */
+  jukebox_song_list[SONG_ONE_BEAT_ORDER].length = SONG_LEN_ONE_BEAT;
+  jukebox_song_list[SONG_ONE_BEAT_ORDER].bpm = SONG_VEL_ONE_BEAT;
+  jukebox_song_list[SONG_ONE_BEAT_ORDER].notes_pitch = notes_pitch_ONE_BEAT;
+  jukebox_song_list[SONG_ONE_BEAT_ORDER].notes_duration = notes_duration_ONE_BEAT;
+
+  jukebox_song_list[SONG_TWO_BEAT_ORDER].length = SONG_LEN_TWO_BEAT;
+  jukebox_song_list[SONG_TWO_BEAT_ORDER].bpm = SONG_VEL_TWO_BEAT;
+  jukebox_song_list[SONG_TWO_BEAT_ORDER].notes_pitch = notes_pitch_TWO_BEAT;
+  jukebox_song_list[SONG_TWO_BEAT_ORDER].notes_duration = notes_duration_TWO_BEAT;
+
+  jukebox_song_list[SONG_THREE_BEAT_ORDER].length = SONG_LEN_THREE_BEAT;
+  jukebox_song_list[SONG_THREE_BEAT_ORDER].bpm = SONG_VEL_THREE_BEAT;
+  jukebox_song_list[SONG_THREE_BEAT_ORDER].notes_pitch = notes_pitch_THREE_BEAT;
+  jukebox_song_list[SONG_THREE_BEAT_ORDER].notes_duration = notes_duration_THREE_BEAT;
+  
   
   return JUKEBOX_SONGS_TOTAL_SONGS;
 }
