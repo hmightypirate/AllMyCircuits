@@ -278,3 +278,11 @@ uint16_t* get_blacks() {
 uint16_t* get_thresholds() {
   return threshold;
 }
+
+/*
+ * @bried get last position calcualted
+ */
+int get_position()
+{
+  return position;
+}
