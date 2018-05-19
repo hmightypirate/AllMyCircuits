@@ -10,13 +10,10 @@
 #include "libmusic.h"
 #include "vbatt.h"
 #include "commons.h"
-<<<<<<< 70ac657f7dffbfbabb967589bda1aec4802a3450
 #include "keypad.h"
 #include "keypad_menu.h"
-=======
 #include "telemetry.h"
 
->>>>>>> Added function to show telemetry to main
 
 void music_update(int millis)
 {
