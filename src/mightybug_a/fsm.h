@@ -16,9 +16,12 @@
 #define MAX_MAPPINGS 3
 #define NUMBER_PID_MAPPINGS 3
 #define NUMBER_VEL_MAPPINGS 3
+#define INITIAL_PID_MAPPING 0
+#define INITIAL_VEL_MAPPING 0
 
 
 typedef enum {
+  INITIAL_STATE,
   CALLIBRATION_STATE,
   RUNNING_STATE,
   NO_BATTERY_STATE,
@@ -59,5 +62,6 @@ void select_next_pid_map(void);
 uint8_t get_current_pid_map(void);
 uint8_t get_current_vel_map(void);
 uint8_t get_map_song(uint8_t id_map);
+void reset_mappings(void);
 
 #endif /* __FSM_H */

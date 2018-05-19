@@ -23,8 +23,19 @@ uint32_t delay_start_ms = 0;
 uint32_t pid_map_ms = 0;
 uint32_t vel_map_ms = 0;
 
-uint8_t current_pid_mapping = 0;
-uint8_t current_vel_mapping = 0;
+uint8_t current_pid_mapping = INITIAL_PID_MAPPING;
+uint8_t current_vel_mapping = INITIAL_VEL_MAPPING;
+
+void reset_mappings(void)
+{
+  /* change the pid consts */
+  set_kp(pid_maps[current_pid_mapping * 3]);
+  set_ki(pid_maps[current_pid_mapping * 3 + 1]);
+  set_kd(pid_maps[current_pid_mapping * 3 + 2]);
+  
+  /* change the vel consts */
+  reset_target_velocity(vel_maps[current_vel_mapping]);
+}
 
 /*
  * @brief extremely simple finite state machine
