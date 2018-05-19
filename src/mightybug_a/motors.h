@@ -16,4 +16,7 @@ int get_target_velocity(void);
 void motor_control(int error);
 void stop_motors();
 
+int get_last_left_vel(void);
+int get_last_right_vel(void);
+
 #endif /* __MOTORS_H */
