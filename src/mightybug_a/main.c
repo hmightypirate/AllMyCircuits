@@ -230,7 +230,7 @@ int main(void)
          }
       }
     
-      print_telemetry();
+      print_telemetry(current_loop_millisecs);
 
     }
   }
