@@ -266,12 +266,12 @@ int main(void) {
   gpio_clear(GPIOB, GPIO10);
 
   /* Configure left motor for forward */
-  gpio_set(GPIOA, GPIO12);
-  gpio_clear(GPIOB, GPIO5);
+  gpio_set(GPIOB, GPIO5);
+  gpio_clear(GPIOA, GPIO12);
   
   /* this value is the time each engine is active : max value is 1024 */
-  timer_set_oc_value(TIM4, TIM_OC3, 100); // 10% duty for left motor
-  timer_set_oc_value(TIM4, TIM_OC4, 924); // 0% duty for right motor (because it is not wired yet)
+  timer_set_oc_value(TIM4, TIM_OC3, 0); // 10% duty for left motor
+  timer_set_oc_value(TIM4, TIM_OC4, 1024); // 0% duty for right motor (because it is not wired yet)
 
   systick_setup();
 
@@ -307,7 +307,8 @@ int main(void) {
             right_count += former_right_encoder;
           }
 
-        sprintf(diff_encoder_count, "%u-%u\n", left_count, right_count);
+        sprintf(diff_encoder_count, "%u-%u-%u-%u\n", left_count, right_count,
+                new_left_encoder, new_right_encoder);
         
         /* Send difference through the USART */
         for (int i = 0; i < strlen(diff_encoder_count); i++)
