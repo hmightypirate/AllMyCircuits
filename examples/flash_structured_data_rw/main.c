@@ -39,13 +39,19 @@ void write_example(){
 		usart_send_string(str_send, SEND_BUFFER_SIZE);
 		break;
 	}
-	/*send end_of_line*/
 	usart_send_string((uint8_t*)"\n", 2);
 }
 
 
 void read_example(){
+	uint8_t str_send[SEND_BUFFER_SIZE], str_verify[SEND_BUFFER_SIZE];
 
+	usart_send_string((uint8_t*)"Verification of written data: "
+			, SEND_BUFFER_SIZE);
+	flash_read_data(FLASH_OPERATION_ADDRESS, SEND_BUFFER_SIZE, str_verify);
+	usart_send_string(str_verify, SEND_BUFFER_SIZE);
+
+	usart_send_string((uint8_t*)"\n", 2);
 }
 
 #define CHOICES_LEN 2

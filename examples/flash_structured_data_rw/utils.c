@@ -45,15 +45,14 @@ void usart_get_string(uint8_t *out_string, uint16_t str_max_size){
 	uint8_t sign = 0;
 	uint16_t iter = 0;
 
-	while(iter < str_max_size)
-	{
+	while(iter < str_max_size){
 		sign = usart_recv_blocking(MY_USART);
 
 		if(sign != '\n' && sign != '\r')
 			out_string[iter++] = sign;
 		else {
 			out_string[iter] = 0;
-			usart_send_string((uint8_t*)"\r\n", 3);
+			usart_send_string((uint8_t*)"\n", 2);
 			break;
 		}
 	}
