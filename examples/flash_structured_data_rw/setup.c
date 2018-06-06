@@ -1,6 +1,7 @@
 #include "setup.h"
+
+#include "flash_non_structured_data.h"
 #include "systick.h"
-#include "flash_structured_data.h"
 
 void clock_setup(void) {
 	rcc_clock_setup_in_hse_8mhz_out_72mhz();

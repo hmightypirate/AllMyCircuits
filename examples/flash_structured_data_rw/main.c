@@ -1,8 +1,8 @@
-#include "flash_structured_data.h"
 #include "setup.h"
 #include "utils.h"
 #include "systick.h"
 #include <stdint.h>
+#include "flash_non_structured_data.h"
 
 
 struct choice_entry_st{
@@ -11,7 +11,7 @@ struct choice_entry_st{
 };
 
 
-void write_example(){
+void write_raw_data_example(){
 
 	uint8_t str_send[SEND_BUFFER_SIZE], str_verify[SEND_BUFFER_SIZE];
 
@@ -43,10 +43,10 @@ void write_example(){
 }
 
 
-void read_example(){
-	uint8_t str_send[SEND_BUFFER_SIZE], str_verify[SEND_BUFFER_SIZE];
+void read_raw_data_example(){
+	uint8_t str_verify[SEND_BUFFER_SIZE];
 
-	usart_send_string((uint8_t*)"Verification of written data: "
+	usart_send_string((uint8_t*)"Written data: "
 			, SEND_BUFFER_SIZE);
 	flash_read_data(FLASH_OPERATION_ADDRESS, SEND_BUFFER_SIZE, str_verify);
 	usart_send_string(str_verify, SEND_BUFFER_SIZE);
@@ -56,8 +56,8 @@ void read_example(){
 
 #define CHOICES_LEN 2
 struct choice_entry_st choices[] = {
-		{.choice = '1', .functionPtr = write_example},
-		{.choice = '2', .functionPtr = read_example}
+		{.choice = '1', .functionPtr = write_raw_data_example},
+		{.choice = '2', .functionPtr = read_raw_data_example}
 };
 
 int main(void) {
