@@ -228,10 +228,11 @@ int main(void)
           // blinking: normal behaviour
           async_blink();
          }
-      }
-    
-      print_telemetry(current_loop_millisecs);
 
+    
+        print_telemetry(current_loop_millisecs);
+
+      }
     }
   }
 
