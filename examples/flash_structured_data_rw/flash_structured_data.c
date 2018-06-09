@@ -1,71 +1,177 @@
+#include "flash_non_structured_data.h"
 #include "flash_structured_data.h"
-#include <libopencm3/stm32/flash.h>
 
-#define FLASH_OPERATION_ADDRESS ((uint32_t)0x0800f000)
-#define FLASH_PAGE_NUM_MAX 127
-#define FLASH_PAGE_SIZE 0x800
-#define FLASH_WRONG_DATA_WRITTEN 0x80
-#define RESULT_OK 0
+#define K_BANKS_NUMBER 4
 
+struct packed_pid_entry {
+	int32_t kp;
+	int32_t ki;
+	int32_t kd;
+	int32_t speed;
+};
 
-void flash_setup(){
+struct structured_data_storage_struct {
+	uint32_t myuint32;
+	char mystring[10];
+	char mychar;
+	uint16_t myuint16;
+	struct packed_pid_entry pid_constants[K_BANKS_NUMBER];
+};
 
+static struct structured_data_storage_struct structured_data_storage;
+static uint8_t *structured_data_storage_raw;
+
+inline uint8_t * get_raw_data_pointer(){
+
+	return structured_data_storage_raw;
+}
+
+inline int32_t get_raw_data_length(){
+
+	return sizeof(struct structured_data_storage_struct);
+}
+
+void flash_structured_setup() {
+	sizeof(char[FLASH_STORAGE_SIZE
+			- sizeof(struct structured_data_storage_struct)]);
+
+	flash_non_structured_setup();
+	structured_data_storage_raw = (uint8_t *) &structured_data_storage;
+}
+
+static void str_copy(const char * src, char * dst, uint32_t size){
+
+	for (uint32_t i = 0; i < size; i++){
+		dst[i] = src[i];
+	}
+}
+
+void fill_persistent_structured_data() {
+
+	structured_data_storage.myuint32 = 66;
+	str_copy("abcdefghi", structured_data_storage.mystring, 10);
+	structured_data_storage.mychar = 'K';
+	structured_data_storage.myuint16 = 55;
+	for (uint32_t i = 0; i < K_BANKS_NUMBER; i++) {
+		structured_data_storage.pid_constants[i].kp = 100 + i;
+		structured_data_storage.pid_constants[i].ki = 100 + i;
+		structured_data_storage.pid_constants[i].kd = 100 + i;
+		structured_data_storage.pid_constants[i].speed = 100 + i;
+	}
+}
+
+void clean_persistent_structured_data() {
+
+	structured_data_storage.myuint32 = 0;
+	str_copy(".........", structured_data_storage.mystring, 10);
+	structured_data_storage.mychar = 0;
+	structured_data_storage.myuint16 = 0;
+	for (uint32_t i = 0; i < K_BANKS_NUMBER; i++) {
+		structured_data_storage.pid_constants[i].kp = 0;
+		structured_data_storage.pid_constants[i].ki = 0;
+		structured_data_storage.pid_constants[i].kd = 0;
+		structured_data_storage.pid_constants[i].speed = 0;
+	}
+}
+
+void put_persistant_myuint32(uint32_t x) {
+
+	structured_data_storage.myuint32 = x;
+}
+
+void put_persistant_mystring(char * s, uint32_t size) {
+
+	uint32_t mysize = size;
+	if (size > sizeof(structured_data_storage.mystring)) {
+		mysize = sizeof(structured_data_storage.mystring);
+	}
+
+	for (uint32_t i = 0; i < mysize; i++) {
+		structured_data_storage.mystring[i] = s[i];
+	}
+}
+
+void put_persistant_mychar(char x) {
+
+	structured_data_storage.mychar = x;
+}
+
+void put_persistant_myuint16(uint16_t x) {
+
+	structured_data_storage.myuint16 = x;
+}
+
+void put_persistant_pid_kp_bank(uint32_t x, uint32_t bank) {
+
+	structured_data_storage.pid_constants[bank].kp = x;
+}
+
+void put_persistant_pid_ki_bank(uint32_t x, uint32_t bank) {
+
+	structured_data_storage.pid_constants[bank].ki = x;
+}
+
+void put_persistant_pid_kd_bank(uint32_t x, uint32_t bank) {
+
+	structured_data_storage.pid_constants[bank].kd = x;
+}
+
+void put_persistant_pid_speed_bank(uint32_t x, uint32_t bank) {
+
+	structured_data_storage.pid_constants[bank].speed = x;
 }
 
 
-uint32_t flash_program_data(uint32_t start_address, uint8_t *input_data
-		, uint16_t num_elements)
-{
-	uint16_t iter;
-	uint32_t current_address = start_address;
-	uint32_t page_address = start_address;
-	uint32_t flash_status = 0;
+uint32_t get_persistant_myuint32() {
 
-	/*check if start_address is in proper range*/
-	if((start_address - FLASH_BASE)
-			>= (FLASH_PAGE_SIZE * (FLASH_PAGE_NUM_MAX+1)))
-		return 1;
-
-	/*calculate current page address*/
-	if(start_address % FLASH_PAGE_SIZE)
-		page_address -= (start_address % FLASH_PAGE_SIZE);
-
-	flash_unlock();
-
-	/*Erasing page*/
-	flash_erase_page(page_address);
-	flash_status = flash_get_status_flags();
-	if(flash_status != FLASH_SR_EOP)
-		return flash_status;
-
-	/*programming flash memory*/
-	for(iter=0; iter<num_elements; iter += 4)
-	{
-		/*programming word data*/
-		flash_program_word(current_address+iter
-				, *((uint32_t*)(input_data + iter)));
-		flash_status = flash_get_status_flags();
-		if(flash_status != FLASH_SR_EOP)
-			return flash_status;
-
-		/*verify if correct data is programmed*/
-		if(*((uint32_t*)(current_address+iter))
-				!= *((uint32_t*)(input_data + iter)))
-			return FLASH_WRONG_DATA_WRITTEN;
-	}
-
-	return 0;
+	return structured_data_storage.myuint32;
 }
 
-void flash_read_data(uint32_t start_address, uint16_t num_elements
-		, uint8_t *output_data)
-{
-	uint16_t iter;
-	uint32_t *memory_ptr= (uint32_t*)start_address;
+char * get_persistant_mystring() {
 
-	for(iter=0; iter<num_elements/4; iter++)
-	{
-		*(uint32_t*)output_data = *(memory_ptr + iter);
-		output_data += 4;
-	}
+	return structured_data_storage.mystring;
+}
+
+char get_persistant_mychar() {
+
+	return structured_data_storage.mychar;
+}
+
+uint16_t get_persistant_myuint16() {
+
+	return structured_data_storage.myuint16;
+}
+
+uint32_t get_persistant_pid_kp_bank(uint32_t bank) {
+
+	return structured_data_storage.pid_constants[bank].kp;
+}
+
+uint32_t get_persistant_pid_ki_bank(uint32_t bank) {
+
+	return structured_data_storage.pid_constants[bank].ki;
+}
+
+uint32_t get_persistant_pid_kd_bank(uint32_t bank) {
+
+	return structured_data_storage.pid_constants[bank].kd;
+}
+
+uint32_t get_persistant_pid_speed_bank(uint32_t bank) {
+
+	return structured_data_storage.pid_constants[bank].speed;
+}
+
+void load_data_from_flash() {
+
+	flash_read_data(FLASH_OPERATION_ADDRESS,
+			get_raw_data_length(),
+			get_raw_data_pointer());
+}
+
+uint32_t save_data_to_flash() {
+
+	return flash_program_data(FLASH_OPERATION_ADDRESS,
+			get_raw_data_pointer(),
+			get_raw_data_length());
 }

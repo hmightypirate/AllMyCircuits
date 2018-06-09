@@ -10,6 +10,7 @@
 #include <libopencm3/cm3/nvic.h>
 
 
+// Calls all the hardware setup commands
 void setup();
 
 #endif

@@ -7,7 +7,7 @@
 #define FLASH_WRONG_DATA_WRITTEN 0x80
 #define RESULT_OK 0
 
-void flash_setup() {
+void flash_non_structured_setup() {
 
 }
 

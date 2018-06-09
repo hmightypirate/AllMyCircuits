@@ -1,6 +1,6 @@
 #include "setup.h"
 
-#include "flash_non_structured_data.h"
+#include "flash_structured_data.h"
 #include "systick.h"
 
 void clock_setup(void) {
@@ -12,8 +12,6 @@ void clock_setup(void) {
 
 	/* Enable clocks for GPIO port B (for GPIO_USART3_TX) and USART3. */
 	rcc_periph_clock_enable(RCC_USART1);
-
-	rcc_periph_clock_enable(RCC_DMA1);
 }
 
 void usart_setup(void) {
@@ -40,7 +38,6 @@ void gpio_setup(void) {
 			GPIO_CNF_OUTPUT_PUSHPULL, INTERNAL_LED);
 }
 
-
 void setup() {
 	/* Change interrupt vector table location to avoid conflict with */
 	/* serial bootloader interrupt vectors */
@@ -49,5 +46,5 @@ void setup() {
 	gpio_setup();
 	usart_setup();
 	systick_setup();
-	flash_setup();
+	flash_structured_setup(); // calls flash_non_structured_setup();
 }

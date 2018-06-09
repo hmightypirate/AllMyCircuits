@@ -11,19 +11,35 @@ int stringlen(char *string) {
 	return 0;
 }
 
+static int is_a_number(char c){
+
+	if ((c >= '0') && (c <= '9')){
+		return true;
+	}
+
+	return false;
+}
+
 char welcome[] =
-		"\nPress\n 1 for write test.\n 2 read test.\n";
+		"\nPress\n"
+		" 1 for write test.\n"
+		" 2 read test.\n"
+		" 3 write structured test.\n"
+		" 4 read structured test.\n";
 
 char prompt() {
-	for (int i = 0; i < stringlen(welcome); i++) {
-		usart_send_blocking(MY_USART, welcome[i]);
-	}
-	return usart_recv_blocking(MY_USART);
+
+	uint16_t res;
+	printf("%s", welcome);
+	do {
+		res = usart_recv_blocking(MY_USART);
+	} while (!is_a_number(res));
+	return res;
 }
 
 int _write(int file, char *ptr, int len) {
-	int i;
 
+	int i;
 	if (file == 1) {
 		for (i = 0; i < len; i++)
 			usart_send_blocking(MY_USART, ptr[i]);
@@ -34,11 +50,17 @@ int _write(int file, char *ptr, int len) {
 	return -1;
 }
 
-void usart_send_string(uint8_t *string, uint16_t str_size){
+void usart_send_string_stop_on_zero(uint8_t *string, uint16_t str_size){
 	uint16_t iter = 0;
 	do{
 		usart_send_blocking(MY_USART, string[iter++]);
 	}while(string[iter] != 0 && iter < str_size);
+}
+
+void usart_send_string(uint8_t *string, uint16_t str_size){
+
+	for (uint32_t i = 0; i < str_size; i++)
+		usart_send_blocking(MY_USART, string[i++]);
 }
 
 void usart_get_string(uint8_t *out_string, uint16_t str_max_size){
@@ -52,7 +74,7 @@ void usart_get_string(uint8_t *out_string, uint16_t str_max_size){
 			out_string[iter++] = sign;
 		else {
 			out_string[iter] = 0;
-			usart_send_string((uint8_t*)"\n", 2);
+			usart_send_string_stop_on_zero((uint8_t*)"\n", 2);
 			break;
 		}
 	}
