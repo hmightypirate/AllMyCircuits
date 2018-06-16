@@ -50,7 +50,7 @@ void update_state(event_e new_event)
         }
       else if (new_event == GO_TO_RUN_EVENT)
         {
-          if (get_calibrated_sensors() >= NUM_SENSORS -
+          if (get_calibrated_sensors_count() >= NUM_SENSORS -
               MAX_NUM_NOT_CALLIBRATED_SENSORS)
             {
               current_state = RUNNING_STATE;
