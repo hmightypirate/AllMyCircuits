@@ -2,9 +2,9 @@
 #define __FSM_H
 
 #include <inttypes.h>
+#include "sensors.h"
 #include "pid.h"
 #include "motors.h"
-#include "sensors.h"
 #include "libjukebox.h"
 
 /* delay before the car starts running in DELAYED_START_STATE */
