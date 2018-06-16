@@ -22,6 +22,8 @@
 
 #define SOFT_CALLIBRATION 1
 #define THRESHOLD_CALIBRATION 500
+/* Number of sensors that could not be callibrated */
+#define MAX_NUM_NOT_CALLIBRATED_SENSORS 1
 
 /* extra delay between callibration calls in NOP operations */
 #define DELAY_CALIBRATION_CALLS 300

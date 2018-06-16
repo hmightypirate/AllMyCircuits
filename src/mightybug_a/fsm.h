@@ -2,6 +2,7 @@
 #define __FSM_H
 
 #include <inttypes.h>
+#include "sensors.h"
 #include "pid.h"
 #include "motors.h"
 #include "libjukebox.h"
