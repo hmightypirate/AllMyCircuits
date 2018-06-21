@@ -151,3 +151,20 @@ void stop_motors()
   set_right_motor_velocity(0);
 }
 
+
+/*
+ * @brief get last left velocity
+ */
+int get_last_left_vel()
+{
+  return last_left_vel;
+}
+
+
+/*
+ * @brief get last right velocity
+ */
+int get_last_right_vel()
+{
+  return last_right_vel;
+}

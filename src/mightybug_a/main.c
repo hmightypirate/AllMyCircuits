@@ -12,6 +12,8 @@
 #include "commons.h"
 #include "keypad.h"
 #include "keypad_menu.h"
+#include "telemetry.h"
+
 
 void music_update(int millis)
 {
@@ -226,6 +228,10 @@ int main(void)
           // blinking: normal behaviour
           async_blink();
          }
+
+    
+        print_telemetry(current_loop_millisecs);
+
       }
     }
   }

@@ -43,4 +43,6 @@ uint16_t* get_whites(void);
 uint16_t* get_blacks(void);
 uint16_t* get_thresholds(void);
 
+int get_position(void);
+
 #endif /* __SENSORS_H */
