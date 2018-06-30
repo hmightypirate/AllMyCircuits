@@ -229,8 +229,9 @@ int main(void)
           async_blink();
          }
 
-    
-        print_telemetry(current_loop_millisecs);
+        if (TELEMETRY) {
+          print_telemetry(current_loop_millisecs);
+        }
 
       }
     }
