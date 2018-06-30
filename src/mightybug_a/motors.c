@@ -97,7 +97,7 @@ static int trunc_to_range(int value, int min, int max)
  */
 void set_left_motor_velocity(int velocity)
 {
-  velocity = trunc_to_range(velocity, -MAX_VEL_MOTOR, MAX_VEL_MOTOR);
+  velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
   last_left_vel = velocity;
 
   if (velocity >= 0) {
@@ -114,7 +114,7 @@ void set_left_motor_velocity(int velocity)
  */
 void set_right_motor_velocity(int velocity)
 {
-  velocity = trunc_to_range(velocity, -MAX_VEL_MOTOR, MAX_VEL_MOTOR);
+  velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
   last_right_vel = velocity;
 
   if (velocity >= 0) {

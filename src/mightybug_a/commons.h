@@ -17,6 +17,7 @@
 */
 #define MAX_PWM_VALUE 1023
 #define MAX_VEL_MOTOR 999
+#define MIN_VEL_MOTOR 0
 #define INITIAL_TARGET_VELOCITY 200
 #define MAX_INT 65535
 
