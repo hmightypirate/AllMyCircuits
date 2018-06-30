@@ -354,8 +354,6 @@ void check_command_buzzer() {
 }
 
 
-
-
 void check_command_battery() {
     printf("%u mV", read_vbatt());
 }

@@ -6,13 +6,13 @@ static state_e current_state = CALLIBRATION_STATE;
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
 const int16_t pid_maps[NUMBER_PID_MAPPINGS * 3] = {
+  200, 0, 1800,
   120, 0, 1200,
-  100, 0, 900,
-  150, 0, 1500
+  100, 0, 0
 };
 
 const int16_t vel_maps[NUMBER_VEL_MAPPINGS] = {
-  200, 300, 400
+  400, 350, 200
 };
 
 const uint8_t map_songs[MAX_MAPPINGS] = {
