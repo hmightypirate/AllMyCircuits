@@ -64,40 +64,29 @@ void update_state(event_e new_event)
         {
           current_state = DELAYED_START_STATE;
         }
-      else if ((new_event == NEXT_PIDMAP_EVENT) &&
-               (current_state == CALLIBRATION_STATE))       
-        {
-          /* enable jukebox during mapping selection */
-          push_enable_jukebox();
-          enable_jukebox();
-          current_state = PID_MAPPING_STATE;
-        }
-      else if ((new_event == NEXT_PIDMAP_EVENT) &&
-               (current_state == PID_MAPPING_STATE))
-        {
-          current_state = PID_CHANGE_STATE;
-        }
-      else if ((new_event == NEXT_VELMAP_EVENT) &&
+      else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
                (current_state == CALLIBRATION_STATE))
         {
-          /* enable jukebox during mappling selection */
           push_enable_jukebox();
           enable_jukebox();
-          current_state = VEL_MAPPING_STATE;
+          current_state = PIDANDVEL_MAPPING_STATE;
         }
-      else if ((new_event == NEXT_VELMAP_EVENT) &&
-               (current_state == VEL_MAPPING_STATE))
+      else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
+               (current_state == PIDANDVEL_MAPPING_STATE))
         {
-          current_state = VEL_CHANGE_STATE;
-        }
-      else if (new_event == FORCE_PIDMAP_EVENT)
+          current_state = PIDANDVEL_MAPPING_STATE;
+        }      
+      else if (new_event == FORCE_PIDANDVELMAP_EVENT)
         {
-          current_state = PID_MAPPING_STATE;
+          current_state = PIDANDVEL_MAPPING_STATE;
         }
-      else if (new_event == FORCE_VELMAP_EVENT)
+      else if ((new_event == NEXT_BUZZER_EVENT) &&
+               (current_state == BUZZER_CHANGE_STATE))
         {
-          current_state = VEL_MAPPING_STATE;
+          current_state = BUZZER_CHANGE_STATE;
         }
+                
+                                             
     }
 }
 
