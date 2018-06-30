@@ -105,25 +105,32 @@ void motor_pwm_setup(void)
 
   
   /* Set timer 4 mode to no divisor (72MHz), Edge-aligned, up-counting */
-  timer_set_mode(TIM4, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+  timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
   /* Set divider to 3 */
-  timer_set_prescaler(TIM4, 3);
+  timer_set_prescaler(TIM1, 3);
   /* A timer update event is generated only after the specified number of
    * repeat count cycles have been completed. */
-  timer_set_repetition_counter(TIM4, 0);
+  timer_set_repetition_counter(TIM1, 0);
   /* Enable Auto-Reload Buffering. */
-  timer_enable_preload(TIM4);
+  timer_enable_preload(TIM1);
   /* Enable the Timer to Run Continuously. */
-  timer_continuous_mode(TIM4);
+  timer_continuous_mode(TIM1);
   /* Specify the timer period in the auto-reload register. */
-  timer_set_period(TIM4, MAX_VEL_MOTOR);
+  timer_set_period(TIM1, MAX_VEL_MOTOR);
+
+  /* Enable Main output bit as Timer 1 is and andvanced timer */
+  timer_enable_break_main_output(TIM1);
   
   /* The freq is 72 MHz / ((1+3)*(1+0)*(1+1024)) = 17560,975609756 Hz ->
    * period of 56.9 uS*/
   
   /* Enable output GPIOs */
-  gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-                GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM4_CH3 | GPIO_TIM4_CH4);
+  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+                GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM1_CH1);
+
+  gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
+                GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM1_CH4);
+
   
   /* Timer Set Output Compare Mode.
      
@@ -143,17 +150,17 @@ void motor_pwm_setup(void)
      register contents and inactive otherwise.
      PWM2 - The output is inactive when the counter is less than the compare
      register contents and active otherwise. */
-  timer_set_oc_mode(TIM4, TIM_OC3, TIM_OCM_PWM1);
-  timer_set_oc_mode(TIM4, TIM_OC4, TIM_OCM_PWM2); // so it is in contra phase
+  timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
+  timer_set_oc_mode(TIM1, TIM_OC4, TIM_OCM_PWM2); // so it is in contra phase
   /* This is a convenience function to set the OC preload register value for
    * loading to the compare register. */
-  timer_set_oc_value(TIM4, TIM_OC3, 0);
-  timer_set_oc_value(TIM4, TIM_OC4, 0);
+  timer_set_oc_value(TIM1, TIM_OC1, 0);
+  timer_set_oc_value(TIM1, TIM_OC4, 0);
 
-  timer_enable_oc_output(TIM4, TIM_OC3);
-  timer_enable_oc_output(TIM4, TIM_OC4);
+  timer_enable_oc_output(TIM1, TIM_OC1);
+  timer_enable_oc_output(TIM1, TIM_OC4);
   
-  timer_enable_counter(TIM4);
+  timer_enable_counter(TIM1);
 }
 
 void buzzer_pwm_setup(void)
