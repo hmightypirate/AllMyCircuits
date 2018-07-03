@@ -20,12 +20,11 @@ void menu_functions(uint32_t current_millis)
     }
   */
 
-  // Pid mapping (rising edge)
+  // Pid and vel mapping (rising edge)
   if (get_button(BUTTON_PIDANDVEL_MAPPING) &&
       get_edge_detection(BUTTON_PIDANDVEL_MAPPING))
     {
-      set_pid_map_time(current_millis);
-      set_vel_map_time(current_millis);
+      set_pidvel_map_time(current_millis);
       update_state(NEXT_PIDANDVELMAP_EVENT);
     }
 

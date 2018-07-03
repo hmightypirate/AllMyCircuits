@@ -25,7 +25,7 @@ void music_update(int millis)
     jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
     jukebox_play_in_loop(millis);
   } else if (current_state == PIDANDVEL_MAPPING_STATE) {
-    jukebox_setcurrent_song(get_map_song(get_current_pid_map()));
+    jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
     jukebox_play_in_loop(millis);
   } else {
     if (is_out_of_line()) {
@@ -157,10 +157,8 @@ int main(void)
         {
           /* stop motors */
           stop_motors();
-          if ((current_loop_millisecs - get_pid_map_time() >
-              DELAYED_PID_CHANGE_MS) ||
-              ((current_loop_millisecs - get_vel_map_time() >
-                DELAYED_VEL_CHANGE_MS)))
+          if (current_loop_millisecs - get_pidvel_map_time() >
+              DELAYED_PIDVEL_CHANGE_MS)
             {
               // Return to callibration if
               stop_music_play();
@@ -169,23 +167,16 @@ int main(void)
             }
 
           set_led();
-
         }
       else if (current_state == PIDANDVEL_CHANGE_STATE)
         {
           //change the mapping
-          select_next_pid_map();
+          select_next_pidvel_map();
 
           /* sets the ms in mapping state to the current time */
-          set_pid_map_time(current_loop_millisecs);
-          //change the mapping
-          select_next_vel_map();
+          set_pidvel_map_time(current_loop_millisecs);
 
-          /* sets the ms in mapping state to the current time */
-          set_vel_map_time(current_loop_millisecs);
-
-          update_state(FORCE_PIDANDVELMAP_EVENT);
-       
+          update_state(FORCE_PIDANDVELMAP_EVENT);       
  
       } else {
             
