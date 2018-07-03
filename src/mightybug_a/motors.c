@@ -46,7 +46,7 @@ void set_right_motor_state(char state)
 void set_left_motor_pwm(int value)
 {
   if (LEFT_MOTOR_PWM_ANTIPHASE) value = MAX_PWM_VALUE - value;
-  timer_set_oc_value(TIM1, TIM_OC1, value);
+  timer_set_oc_value(PWM_MOTOR_TIMER, LEFT_MOTOR_OUTPUT_CHANNEL, value);
 }
 
 /*
@@ -57,7 +57,7 @@ void set_left_motor_pwm(int value)
 void set_right_motor_pwm(int value)
 {
   if (RIGHT_MOTOR_PWM_ANTIPHASE) value = MAX_PWM_VALUE - value;
-  timer_set_oc_value(TIM1, TIM_OC4, value);
+  timer_set_oc_value(PWM_MOTOR_TIMER, RIGHT_MOTOR_OUTPUT_CHANNEL, value);
 }
 
 /*
