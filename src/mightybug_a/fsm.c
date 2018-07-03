@@ -78,12 +78,17 @@ void update_state(event_e new_event)
           current_state = PIDANDVEL_MAPPING_STATE;
         }
       else if ((new_event == NEXT_BUZZER_EVENT) &&
-               (current_state == BUZZER_CHANGE_STATE))
+               (current_state == CALLIBRATION_STATE))
         {
-          current_state = BUZZER_CHANGE_STATE;
-        }
-                
-                                             
+          if (is_jukebox_enabled())
+            {
+              disable_jukebox();
+            }
+          else
+            {
+              enable_jukebox();
+            }
+        }                                
     }
 }
 

@@ -86,6 +86,13 @@ void disable_jukebox()
  enable_jukebox_signal = 0;
 }
 
+/*
+ * @brief check if the jukebox is currently enabled
+ */
+uint8_t is_jukebox_enabled()
+{
+  return enable_jukebox_signal;
+}
 
 /*
  * @brief stack the enable jukebox signal
