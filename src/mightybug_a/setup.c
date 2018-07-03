@@ -120,7 +120,7 @@ void motor_pwm_setup(void)
   timer_set_period(PWM_MOTOR_TIMER, MAX_VEL_MOTOR);
 
   /* Enable Main output bit as Timer 1 is and andvanced timer */
-  if (PWM_MOTOR_TIMER == PWM_MOTOR_TIMER)
+  if (PWM_MOTOR_TIMER == TIM1)
     {
       timer_enable_break_main_output(PWM_MOTOR_TIMER);
     }
