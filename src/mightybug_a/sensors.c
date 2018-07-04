@@ -189,14 +189,21 @@ void check_calibrated_sensors(void)
   sensors_calibrated_count = 0;
 
   for (int i=0; i<NUM_SENSORS; i++) {
-    if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALIBRATION) {
-      sensors_calibrated_count++;
-      calibrated_sensors[i] = 1;
-    } else {
-      calibrated_sensors[i] = 0;
-    }
-  }
 
+    if (black_sensors[i] > white_sensors[i])
+      {
+        if ((black_sensors[i] - white_sensors[i]) > THRESHOLD_CALIBRATION) {
+          sensors_calibrated_count++;
+          calibrated_sensors[i] = 1;
+        } else {
+          calibrated_sensors[i] = 0;
+        }
+      }
+    else
+      {
+        calibrated_sensors[i] = 0;
+      }
+  }
 }
 
 /*
