@@ -71,7 +71,7 @@ void update_state(event_e new_event)
       else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
                (current_state == PIDANDVEL_MAPPING_STATE))
         {
-          current_state = PIDANDVEL_MAPPING_STATE;
+          current_state = PIDANDVEL_CHANGE_STATE;
         }      
       else if (new_event == FORCE_PIDANDVELMAP_EVENT)
         {
