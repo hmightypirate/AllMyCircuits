@@ -10,8 +10,8 @@
 
 
 #define BUTTON_START 0
-#define BUTTON_PID_MAPPING 1
-#define BUTTON_VEL_MAPPING 2
+#define BUTTON_PIDANDVEL_MAPPING 1
+#define BUTTON_BUZZER 2
 
 
 void menu_functions(uint32_t current_millis);

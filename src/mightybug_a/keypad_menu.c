@@ -20,24 +20,24 @@ void menu_functions(uint32_t current_millis)
     }
   */
 
-  // Pid mapping (rising edge)
-  if (get_button(BUTTON_PID_MAPPING) &&
-      get_edge_detection(BUTTON_PID_MAPPING))
+  // Pid and vel mapping (rising edge)
+  if (get_button(BUTTON_PIDANDVEL_MAPPING) &&
+      get_edge_detection(BUTTON_PIDANDVEL_MAPPING))
     {
-      set_pid_map_time(current_millis);
-      update_state(NEXT_PIDMAP_EVENT);
+      set_pidvel_map_time(current_millis);
+      update_state(NEXT_PIDANDVELMAP_EVENT);
     }
 
-  // Vel mapping (rising edge)
-  if (get_button(BUTTON_VEL_MAPPING) &&
-      get_edge_detection(BUTTON_VEL_MAPPING))
+  // Buzzer on/off mapping (rising edge)
+  if (get_button(BUTTON_BUZZER) &&
+      get_edge_detection(BUTTON_BUZZER))
     {
-      set_vel_map_time(current_millis);
-      update_state(NEXT_VELMAP_EVENT);
+      
+      update_state(NEXT_BUZZER_EVENT);
     }
 
   // setting all the edges to false
   unset_edge(BUTTON_START);
-  unset_edge(BUTTON_PID_MAPPING);
-  unset_edge(BUTTON_VEL_MAPPING);
+  unset_edge(BUTTON_PIDANDVEL_MAPPING);
+  unset_edge(BUTTON_BUZZER);
 }
