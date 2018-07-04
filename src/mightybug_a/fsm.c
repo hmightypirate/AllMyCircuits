@@ -5,13 +5,13 @@ static state_e current_state = CALLIBRATION_STATE;
 
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
-const int16_t pid_maps[NUMBER_PID_MAPPINGS * 3] = {
+const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
   200, 0, 1800,
   120, 0, 1200,
   100, 0, 0
 };
 
-const int16_t vel_maps[NUMBER_VEL_MAPPINGS] = {
+const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
   400, 350, 200
 };
 
@@ -20,21 +20,18 @@ const uint8_t map_songs[MAX_MAPPINGS] = {
 };
 
 uint32_t delay_start_ms = 0;
-uint32_t pid_map_ms = 0;
-uint32_t vel_map_ms = 0;
-
-uint8_t current_pid_mapping = INITIAL_PID_MAPPING;
-uint8_t current_vel_mapping = INITIAL_VEL_MAPPING;
+uint32_t pidvel_map_ms = 0;
+uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
 void reset_mappings(void)
 {
   /* change the pid consts */
-  set_kp(pid_maps[current_pid_mapping * 3]);
-  set_ki(pid_maps[current_pid_mapping * 3 + 1]);
-  set_kd(pid_maps[current_pid_mapping * 3 + 2]);
+  set_kp(pid_maps[current_pidvel_mapping * 3]);
+  set_ki(pid_maps[current_pidvel_mapping * 3 + 1]);
+  set_kd(pid_maps[current_pidvel_mapping * 3 + 2]);
   
   /* change the vel consts */
-  reset_target_velocity(vel_maps[current_vel_mapping]);
+  reset_target_velocity(vel_maps[current_pidvel_mapping]);
 }
 
 /*
@@ -64,74 +61,52 @@ void update_state(event_e new_event)
         {
           current_state = DELAYED_START_STATE;
         }
-      else if ((new_event == NEXT_PIDMAP_EVENT) &&
-               (current_state == CALLIBRATION_STATE))       
-        {
-          /* enable jukebox during mapping selection */
-          push_enable_jukebox();
-          enable_jukebox();
-          current_state = PID_MAPPING_STATE;
-        }
-      else if ((new_event == NEXT_PIDMAP_EVENT) &&
-               (current_state == PID_MAPPING_STATE))
-        {
-          current_state = PID_CHANGE_STATE;
-        }
-      else if ((new_event == NEXT_VELMAP_EVENT) &&
+      else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
                (current_state == CALLIBRATION_STATE))
         {
-          /* enable jukebox during mappling selection */
           push_enable_jukebox();
           enable_jukebox();
-          current_state = VEL_MAPPING_STATE;
+          current_state = PIDANDVEL_MAPPING_STATE;
         }
-      else if ((new_event == NEXT_VELMAP_EVENT) &&
-               (current_state == VEL_MAPPING_STATE))
+      else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
+               (current_state == PIDANDVEL_MAPPING_STATE))
         {
-          current_state = VEL_CHANGE_STATE;
-        }
-      else if (new_event == FORCE_PIDMAP_EVENT)
+          current_state = PIDANDVEL_CHANGE_STATE;
+        }      
+      else if (new_event == FORCE_PIDANDVELMAP_EVENT)
         {
-          current_state = PID_MAPPING_STATE;
+          current_state = PIDANDVEL_MAPPING_STATE;
         }
-      else if (new_event == FORCE_VELMAP_EVENT)
+      else if ((new_event == NEXT_BUZZER_EVENT) &&
+               (current_state == CALLIBRATION_STATE))
         {
-          current_state = VEL_MAPPING_STATE;
-        }
+          if (is_jukebox_enabled())
+            {
+              disable_jukebox();
+            }
+          else
+            {
+              enable_jukebox();
+            }
+        }                                
     }
 }
 
 
 /*
- * @brief sets the time entering a pid mapping state
+ * @brief sets the time entering a pid/vel mapping state
  */ 
-void set_pid_map_time(uint32_t current_time)
+void set_pidvel_map_time(uint32_t current_time)
 {
-  pid_map_ms = current_time;
+  pidvel_map_ms = current_time;
 }
 
 /*
- * @brief obtain the time entering a pid mapping state
+ * @brief obtain the time entering a pid/vel mapping state
  */
-uint32_t get_pid_map_time(void)
+uint32_t get_pidvel_map_time(void)
 {
-  return pid_map_ms;
-}
-
-/*
- * @brief sets the time entering a vel mapping state
- */
-void set_vel_map_time(uint32_t current_time)
-{
-  vel_map_ms = current_time;
-}
-
-/*
- * @brief gets the time entering a vel mapping state
- */
-uint32_t get_vel_map_time(void)
-{
-  return vel_map_ms;
+  return pidvel_map_ms;
 }
 
 /*
@@ -156,48 +131,29 @@ state_e get_state()
 }
 
 /* 
- * @brief obtain next pid mapping
+ * @brief obtain next pid/vel mapping
  */
-void select_next_pid_map()
+void select_next_pidvel_map()
 {
-  current_pid_mapping = (current_pid_mapping + 1) % NUMBER_PID_MAPPINGS;
+  current_pidvel_mapping = (current_pidvel_mapping + 1) % NUMBER_PIDVEL_MAPPINGS;
 
   /* change the pid consts */
-  set_kp(pid_maps[current_pid_mapping * 3]);
-  set_ki(pid_maps[current_pid_mapping * 3 + 1]);
-  set_kd(pid_maps[current_pid_mapping * 3 + 2]);
-}
+  set_kp(pid_maps[current_pidvel_mapping * 3]);
+  set_ki(pid_maps[current_pidvel_mapping * 3 + 1]);
+  set_kd(pid_maps[current_pidvel_mapping * 3 + 2]);
 
-/* 
- * @brief obtain next vel mapping
- */
-void select_next_vel_map()
-{
-  current_vel_mapping = (current_vel_mapping + 1) % NUMBER_VEL_MAPPINGS;
-
-  /* change the vel consts */
-  reset_target_velocity(vel_maps[current_vel_mapping]);
+  /* change vel cts */
+  reset_target_velocity(vel_maps[current_pidvel_mapping]);
 }
 
 
 /*
  * @brief return the current pid mapping
  */
-uint8_t get_current_pid_map()
+uint8_t get_current_pidvel_map()
 {
-  return current_pid_mapping;
+  return current_pidvel_mapping;
 }
-
-
-/*
- * @brief return the current vel mapping
- */
-uint8_t get_current_vel_map()
-{
-  return current_vel_mapping;
-
-}
-
 
 /*
  * @brief get current map song
