@@ -59,7 +59,7 @@ void reset_calibration_values()
   for (int i=0; i< NUM_SENSORS; i++)
     {
       black_sensors[i] = WHITE_MEASURE;
-      white_sensors[i] = BLACK_MEASURE;
+      white_sensors[i] = BLACK_MEASURE_HARDRESET;
     }
   started_calibration = 1;
 }
