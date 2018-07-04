@@ -59,7 +59,11 @@ void update_state(event_e new_event)
         }
       else if (new_event == GO_TO_DELAYED_START_EVENT)
         {
-          current_state = DELAYED_START_STATE;
+          if (get_calibrated_sensors_count() >= NUM_SENSORS -
+              MAX_NUM_NOT_CALLIBRATED_SENSORS)
+            {
+              current_state = DELAYED_START_STATE;
+            }
         }
       else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
                (current_state == CALLIBRATION_STATE))
