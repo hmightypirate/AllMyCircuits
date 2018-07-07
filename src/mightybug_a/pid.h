@@ -12,8 +12,8 @@
    # store line position every <it> * TIME_BETWEEN_STORE_POS
 */
 #define TIME_BETWEEN_STORE_POS 1
-#define NUMBER_POS_READINGS 10
-#define AVG_READINGS_POS 200
+#define NUMBER_POS_READINGS 5
+#define AVG_READINGS_POS 15 // 25 works
 
 
 int32_t pid(int32_t error);

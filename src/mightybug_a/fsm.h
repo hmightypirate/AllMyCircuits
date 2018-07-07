@@ -18,12 +18,6 @@
 #define NUMBER_PIDVEL_MAPPINGS 3
 #define INITIAL_PIDVEL_MAPPING 0
 
-/* STORE POSITION (in main loop iterations) 
-   # store line position every <it> * TIME_BETWEEN_STORE_POS
-*/
-#define TIME_BETWEEN_STORE_POS 1
-#define NUMBER_POS_READINGS 10
-
 
 typedef enum {
   IDLE_STATE,

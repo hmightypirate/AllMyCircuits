@@ -49,7 +49,8 @@ int main(void)
   
   /* reset motors */
   reset_target_velocity(INITIAL_TARGET_VELOCITY);
-
+  reset_target_velocity_turbo(TURBO_TARGET_VELOCITY);
+  
   /* reset sensors */
   //FIXME: better do some callibration
   if (!SOFT_CALLIBRATION) {
@@ -122,11 +123,12 @@ int main(void)
 
     if (current_state == SET_NORMAL_MODE_STATE)
       {
-        
+        set_target_as_normal();
         current_state = RUNNING_STATE;
       }
     else if (current_state == SET_TURBO_MODE_STATE)
       {
+        set_target_as_turbo();
         current_state = RUNNING_STATE;
       }
     
