@@ -1,5 +1,7 @@
 #include "motors.h"
 
+static int target_velocity_turbo = 0;
+static int target_velocity_normal = 0;
 static int target_velocity = 0;
 
 /* storing last velocities for debug */
@@ -61,13 +63,43 @@ void set_right_motor_pwm(int value)
 }
 
 /*
- * @brief resets target velocity to a given value
+ * @brief resets target velocity to a given value (also de normal velocity)
  *
  * @param[in] target_vel initial target velocity
  */
 void reset_target_velocity(int target_vel)
 {
+  target_velocity_normal = target_vel;
   target_velocity = target_vel;
+}
+
+/* 
+ * @brief resets target velocity in turbo
+ *
+ * @param[in] target_vel initial target velocity
+ */
+void reset_target_velocity_turbo(int target_vel)
+{
+  target_velocity_turbo = target_vel;
+}
+
+/* 
+ * @brief resets current target velocity with the turbo velocity
+ *
+ */
+void set_target_as_turbo(void)
+{
+  target_velocity = target_velocity_turbo;
+}
+
+
+/* 
+ * @brief resets current target velocity with the normal velocity
+ *
+ */
+void set_target_as_normal(void)
+{
+  target_velocity = target_velocity_normal;
 }
 
 /*
@@ -159,7 +191,6 @@ void stop_motors()
   set_left_motor_velocity(0);
   set_right_motor_velocity(0);
 }
-
 
 /*
  * @brief get last left velocity

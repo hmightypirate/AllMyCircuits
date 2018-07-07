@@ -111,6 +111,14 @@ void update_state(event_e new_event)
         {
           current_state = IDLE_STATE;
         }
+      else if (new_event == GO_TO_TURBO_EVENT)
+        {
+          current_state = SET_TURBO_MODE_STATE; 
+        }
+      else if (new_event == GO_TO_NORMAL_EVENT)
+        {
+          current_state = SET_NORMAL_MODE_STATE;
+        }
     }
 }
 

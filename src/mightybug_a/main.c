@@ -62,6 +62,9 @@ int main(void)
   /* reset pid */
   reset_pid();
 
+  /* reset readings for turbo calculation */
+  reset_prop_readings();
+
   /* led: setting async period */
   set_async_period(LED_ASYNC_PERIOD);
 
@@ -89,9 +92,12 @@ int main(void)
   clear_led();
 
   uint32_t last_loop_execution_ms = 0;
+  uint32_t sync_iterations = 0;
   
   while(1) {
     int current_loop_millisecs = get_millisecs_since_start();
+    sync_iterations += 1;
+    
     if (is_command_received()) {
       execute_command();
     }
@@ -111,6 +117,18 @@ int main(void)
     music_update(current_loop_millisecs);
     keypad_loop(current_loop_millisecs);
     menu_functions(current_loop_millisecs);
+
+    // loop out of period
+
+    if (current_state == SET_NORMAL_MODE_STATE)
+      {
+        
+        current_state = RUNNING_STATE;
+      }
+    else if (current_state == SET_TURBO_MODE_STATE)
+      {
+        current_state = RUNNING_STATE;
+      }
     
     // loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS) {
@@ -166,8 +184,6 @@ int main(void)
 
           /* Led on */
           set_led();
-
-
         }
       else if (current_state == PIDANDVEL_MAPPING_STATE)
         {
@@ -198,7 +214,28 @@ int main(void)
             
         // Running 
         int proportional = get_line_position(sensor_value);
-      
+
+        // Meas turbo mode
+        if (sync_iterations % TIME_BETWEEN_STORE_POS == 0)
+          {
+            set_new_reading(proportional);
+            if (is_enable_avg_readings())
+              {
+                int16_t avg_proportional = get_avg_readings();
+
+                if ((avg_proportional > AVG_READINGS_POS) ||
+                    (avg_proportional < -AVG_READINGS_POS))
+                  {
+                    update_state(GO_TO_NORMAL_EVENT);
+                   
+                  }
+                else
+                  {
+                    update_state(GO_TO_TURBO_EVENT);
+                  }
+              }
+          }
+        
         /* pid control */
         int error = 0;
         error = pid(proportional);
