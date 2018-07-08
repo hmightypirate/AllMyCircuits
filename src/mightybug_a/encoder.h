@@ -15,6 +15,8 @@
 /* systick measurements */
 #define SYSTICK_MEAS 1
 
+/* Weird encoder measures */
+#define WEIRD_ENCODER_MEAS UINT16_MAX/2
 
 void update_encoder_ticks(void);
 void update_velocities_encoders(void);
