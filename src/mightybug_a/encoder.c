@@ -58,7 +58,7 @@ static uint32_t encoder_measurement(uint32_t new_encoder)
 
   if (new_encoder > WEIRD_ENCODER_MEAS)
     {
-      new_encoder = WEIRD_ENCODER_MEAS - new_encoder;
+      new_encoder = new_encoder - UINT16_MAX;
     }
   
   return new_encoder;
