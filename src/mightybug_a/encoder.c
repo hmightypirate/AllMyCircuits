@@ -1,9 +1,7 @@
 #include "encoder.h"
 
-static uint16_t former_left_encoder = 0;
-static uint16_t former_right_encoder = 0;
-static uint16_t new_left_encoder = 0;
-static uint16_t new_right_encoder = 0;
+static uint32_t new_left_encoder = 0;
+static uint32_t new_right_encoder = 0;
 
 static uint8_t measures_done = 0;
 
@@ -55,21 +53,15 @@ uint32_t get_right_velocity(void)
 /*
  * @brief perform encoder measurements
  */
-static uint16_t encoder_measurement(uint16_t former_encoder, uint16_t new_encoder)
+static uint32_t encoder_measurement(uint32_t new_encoder)
 {
-  uint16_t encoder_ticks = 0;
-  
-  if (former_encoder >= new_encoder)
-    {
-      encoder_ticks = former_encoder - new_encoder;
-    }
-  else
-    {
-      encoder_ticks = MAX_INT - new_encoder;
-      encoder_ticks += former_encoder;
-    }
 
-  return encoder_ticks;
+  if (new_encoder > WEIRD_ENCODER_MEAS)
+    {
+      new_encoder = UINT16_MAX - new_encoder;
+    }
+  
+  return new_encoder;
 }
 
 /* 
@@ -82,11 +74,16 @@ void update_velocities_encoders(void)
   if (measures_done > 0)
     {
   
-      left_encoder_ticks = encoder_measurement(former_left_encoder,
-                                           new_left_encoder);
+      left_encoder_ticks = new_left_encoder;
 
-      right_encoder_ticks = encoder_measurement(former_right_encoder,
-                                                new_right_encoder);
+      /* reset the left encoder measures */
+      new_left_encoder = 0;
+
+      
+      right_encoder_ticks = new_right_encoder;
+
+      /* reset the left encoder measures */
+      new_right_encoder = 0;
       
       /* ticks per ms */
       left_encoder_ticks = left_encoder_ticks/measures_done;
@@ -95,6 +92,7 @@ void update_velocities_encoders(void)
       /* obtain velocity */
       left_velocity = (left_encoder_ticks * WHEEL_PERIMETER)/WHEEL_RATIO;
       right_velocity = (right_encoder_ticks * WHEEL_PERIMETER)/WHEEL_RATIO;
+
       
       measures_done = 0;
     }
@@ -108,8 +106,15 @@ void update_encoder_ticks()
   current_ticks += 1;
   if (current_ticks == systick_between_meas)
     {
-      new_left_encoder = (uint16_t)timer_get_counter(LEFT_ENCODER_TIMER);
-      new_right_encoder = (uint16_t)timer_get_counter(RIGHT_ENCODER_TIMER);
+      uint32_t timer_tmp = (uint32_t)timer_get_counter(LEFT_ENCODER_TIMER); 
+      
+      new_left_encoder += encoder_measurement(timer_tmp);
+      timer_tmp = (uint32_t)timer_get_counter(RIGHT_ENCODER_TIMER);
+      new_right_encoder += encoder_measurement(timer_tmp);
+
+      // Reset the timers
+      timer_set_counter(LEFT_ENCODER_TIMER, 0);
+      timer_set_counter(RIGHT_ENCODER_TIMER, 0);
       
       measures_done += 1;
       current_ticks = 0;

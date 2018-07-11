@@ -8,6 +8,7 @@
 #include "libjukebox.h"
 #include "cron.h"
 #include "libmusic.h"
+#include "encoder.h"
 #include "vbatt.h"
 #include "commons.h"
 #include "keypad.h"
@@ -200,6 +201,9 @@ int main(void)
           // blinking: normal behaviour
           async_blink();
          }
+
+        // update encoders velocity
+        update_velocities_encoders();
 
         if (TELEMETRY) {
           print_telemetry(current_loop_millisecs);

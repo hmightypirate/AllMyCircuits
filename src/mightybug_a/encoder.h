@@ -13,8 +13,10 @@
 #define WHEEL_RATIO 100
 
 /* systick measurements */
-#define SYSTICK_MEAS 1
+#define SYSTICK_MEAS 10
 
+/* Weird encoder measures */
+#define WEIRD_ENCODER_MEAS UINT16_MAX/2
 
 void update_encoder_ticks(void);
 void update_velocities_encoders(void);
