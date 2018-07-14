@@ -29,6 +29,8 @@
 /* extra delay between callibration calls in NOP operations */
 #define DELAY_CALIBRATION_CALLS 300
 
+#define FINISH_ALL_INLINE 1
+
 /* Callibration functions */
 uint8_t get_calibrated_sensors_count(void);
 void reset_calibration_values(void);
@@ -45,6 +47,8 @@ int is_out_of_line();
 uint16_t* get_whites(void);
 uint16_t* get_blacks(void);
 uint16_t* get_thresholds(void);
+uint8_t get_all_inline(void);
+void reset_all_inline(void);
 
 int get_position(void);
 

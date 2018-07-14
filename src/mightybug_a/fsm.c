@@ -7,12 +7,12 @@ static state_e current_state = CALLIBRATION_STATE;
 /* pid maps: k_p, k_i, k_d */
 const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
   200, 0, 1800,
-  120, 0, 1200,
-  100, 0, 0
+  200, 0, 1800,
+  200, 0, 1800
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  400, 350, 200
+  300, 500, 300
 };
 
 const uint8_t map_songs[MAX_MAPPINGS] = {

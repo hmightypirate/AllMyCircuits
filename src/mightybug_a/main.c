@@ -102,7 +102,7 @@ int main(void)
     if (current_loop_millisecs % SYS_BETWEEN_READS == 0) {
       // Check if battery drained
       if (has_batt_drained()) {
-        update_state(OUT_OF_BATTERY_EVENT);
+        //update_state(OUT_OF_BATTERY_EVENT);
       }
     }
 
@@ -128,6 +128,8 @@ int main(void)
         stop_motors();
          /* led is on during callibration */
         set_led();
+
+        
       } else if (current_state == NO_BATTERY_STATE) {
             
         /* Disable sensors */
@@ -147,11 +149,14 @@ int main(void)
           if (current_loop_millisecs - get_delay_start_time() >
               DELAYED_START_MS)
             {
+              
+              reset_encoder_ticks();
               update_state(GO_TO_RUN_EVENT);
             }
 
           /* Led on */
           set_led();
+
 
         }
       else if (current_state == PIDANDVEL_MAPPING_STATE)
@@ -195,6 +200,18 @@ int main(void)
                 
           // led off
           clear_led();
+
+          // Send car to callibration if reached the end of line
+          if (get_all_inline())
+            {
+              /* reset out of line measurements */
+              reset_all_inline();
+
+              hard_reset_sensors();
+              reset_calibration_values();
+              update_state(FORCE_CALLIBRATION_EVENT);
+            }
+                            
         } else {
           motor_control(error);
                 

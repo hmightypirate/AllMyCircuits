@@ -25,5 +25,6 @@ uint32_t get_left_encoder_ticks(void);
 uint32_t get_right_encoder_ticks(void);
 uint32_t get_left_velocity(void);
 uint32_t get_right_velocity(void);
+void reset_encoder_ticks(void);
 
 #endif /* __ENCODER_H */
