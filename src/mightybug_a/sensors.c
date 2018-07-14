@@ -45,7 +45,7 @@ void hard_reset_sensors()
     {
       black_sensors[i] = BLACK_MEASURE;
       white_sensors[i] = WHITE_MEASURE;
-      threshold[i] = (black_sensors[i] - white_sensors[i])/2;
+      threshold[i] = (black_sensors[i] + white_sensors[i])/2;
       calibrated_sensors[i] = 0;
     }
 

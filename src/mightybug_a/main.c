@@ -52,7 +52,7 @@ int main(void)
 
   /* reset sensors */
   //FIXME: better do some callibration
-  if (SOFT_CALLIBRATION) {
+  if (!SOFT_CALLIBRATION) {
       hard_reset_sensors();
   } else {
       /* reset callibration values (needed for callibration) */
@@ -206,8 +206,6 @@ int main(void)
             {
               /* reset out of line measurements */
               reset_all_inline();
-
-              hard_reset_sensors();
               reset_calibration_values();
               update_state(FORCE_CALLIBRATION_EVENT);
             }
