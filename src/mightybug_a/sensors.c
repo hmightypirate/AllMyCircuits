@@ -1,10 +1,10 @@
 #include "sensors.h"
 
-uint16_t black_sensors[NUM_SENSORS];
-uint16_t white_sensors[NUM_SENSORS];
-uint16_t calibrated_sensors[NUM_SENSORS];
-uint16_t threshold[NUM_SENSORS];
-uint8_t last_drift = LEFT_DRIFT;
+static uint16_t black_sensors[NUM_SENSORS];
+static uint16_t white_sensors[NUM_SENSORS];
+static uint16_t calibrated_sensors[NUM_SENSORS];
+static uint16_t threshold[NUM_SENSORS];
+static uint8_t last_drift = LEFT_DRIFT;
 static uint8_t detected_all_inline = 0;
 static int out_of_line = 0;
 
