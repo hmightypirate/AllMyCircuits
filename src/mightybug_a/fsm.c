@@ -59,10 +59,24 @@ void update_state(event_e new_event)
         }
       else if (new_event == GO_TO_DELAYED_START_EVENT)
         {
-          if (get_calibrated_sensors_count() >= NUM_SENSORS -
-              MAX_NUM_NOT_CALLIBRATED_SENSORS)
+          /* if in callibration -> go to delay start  */
+          if (current_state == CALLIBRATION_STATE)
             {
-              current_state = DELAYED_START_STATE;
+              if (get_calibrated_sensors_count() >= NUM_SENSORS -
+                  MAX_NUM_NOT_CALLIBRATED_SENSORS)
+                {
+                  current_state = DELAYED_START_STATE;
+                }
+            }
+          /* if running -> go to idle state */
+          else if (current_state == RUNNING_STATE)
+            {
+              current_state = IDLE_STATE;
+            }
+          /* if in any other state -> go to callibration state */
+          else
+            {
+              current_state = CALLIBRATION_STATE;
             }
         }
       else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
@@ -92,7 +106,11 @@ void update_state(event_e new_event)
             {
               enable_jukebox();
             }
-        }                                
+        }
+      else if (new_event == FORCE_IDLE_EVENT)
+        {
+          current_state = IDLE_STATE;
+        }
     }
 }
 

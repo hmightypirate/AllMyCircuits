@@ -132,6 +132,16 @@ int main(void)
          /* led is on during callibration */
         set_led();
 
+      } else if (current_state == IDLE_STATE) {
+
+        /* reset out of line measurements, resets callibration */
+        reset_all_inline();
+        reset_calibration_values();
+        stop_motors();
+
+        /* Clear led during idle state */
+        clear_led();
+
         
       } else if (current_state == NO_BATTERY_STATE) {
             
@@ -207,10 +217,7 @@ int main(void)
           // Send car to callibration if reached the end of line
           if (get_all_inline())
             {
-              /* reset out of line measurements */
-              reset_all_inline();
-              reset_calibration_values();
-              update_state(FORCE_CALLIBRATION_EVENT);
+              update_state(FORCE_IDLE_EVENT);
             }
                             
         } else {
