@@ -123,7 +123,7 @@
 #define B8 107
 
 #define R 108 // no note, or rest
-#define MAX_DUTY_BUZZER 1024
+#define MAX_DUTY_BUZZER 65503
 
 int play_note(int note_number);
 void play_music(int song_id,
