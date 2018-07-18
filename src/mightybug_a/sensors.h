@@ -29,7 +29,8 @@
 /* extra delay between callibration calls in NOP operations */
 #define DELAY_CALIBRATION_CALLS 300
 
-#define FINISH_ALL_INLINE 1
+/* if 1 the car stops after finding an horizontal line -> all sensors detect line */
+#define FINISH_ALL_INLINE 0
 
 /* Callibration functions */
 uint8_t get_calibrated_sensors_count(void);
