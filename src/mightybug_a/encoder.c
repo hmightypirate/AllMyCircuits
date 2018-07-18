@@ -58,10 +58,17 @@ static uint32_t encoder_measurement(uint32_t new_encoder)
 
   if (new_encoder > WEIRD_ENCODER_MEAS)
     {
-      new_encoder = UINT16_MAX - new_encoder;
+      /* summing 1 because the first tick is the max number of ticks */
+      new_encoder = UINT16_MAX + 1 - new_encoder;
     }
   
   return new_encoder;
+}
+
+void reset_encoder_ticks(void)
+{
+  new_left_encoder = 0;
+  new_right_encoder = 0;
 }
 
 /* 
@@ -73,14 +80,14 @@ void update_velocities_encoders(void)
 {
   if (measures_done > 0)
     {
-  
-      left_encoder_ticks = new_left_encoder;
+
+      left_encoder_ticks = new_left_encoder; // it is not +
 
       /* reset the left encoder measures */
       new_left_encoder = 0;
 
       
-      right_encoder_ticks = new_right_encoder;
+      right_encoder_ticks = new_right_encoder; // IT IS NOT +
 
       /* reset the left encoder measures */
       new_right_encoder = 0;

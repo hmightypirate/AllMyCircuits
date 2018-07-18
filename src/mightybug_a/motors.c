@@ -135,8 +135,17 @@ void motor_control(int control)
 {
   control = trunc_to_range(control, -MAX_PID_ERROR, MAX_PID_ERROR);
 
-  set_left_motor_velocity(target_velocity + control);
-  set_right_motor_velocity(target_velocity - control); 
+  if (DEBUG_INERTIA_TEST)
+    {
+      set_left_motor_velocity(target_velocity);  //FIXME delete
+      set_right_motor_velocity(target_velocity); //FIXME delete
+    }
+  else
+    {
+      set_left_motor_velocity(target_velocity + control);
+      set_right_motor_velocity(target_velocity - control); 
+    }
+  
 }
 
 /*

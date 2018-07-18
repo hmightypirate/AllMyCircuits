@@ -1,11 +1,11 @@
 #include "sensors.h"
 
-uint16_t black_sensors[NUM_SENSORS];
-uint16_t white_sensors[NUM_SENSORS];
-uint16_t calibrated_sensors[NUM_SENSORS];
-uint16_t threshold[NUM_SENSORS];
-uint8_t last_drift = LEFT_DRIFT;
-
+static uint16_t black_sensors[NUM_SENSORS];
+static uint16_t white_sensors[NUM_SENSORS];
+static uint16_t calibrated_sensors[NUM_SENSORS];
+static uint16_t threshold[NUM_SENSORS];
+static uint8_t last_drift = LEFT_DRIFT;
+static uint8_t detected_all_inline = 0;
 static int out_of_line = 0;
 
 /* This var stores the number of sensors correctly calibrated */
@@ -32,6 +32,7 @@ static uint16_t read_adc_naiive(uint8_t channel)
   return reg16;
 }
 
+
 /*
  * @brief set manually black and white thresholds to sensors
  * 
@@ -44,8 +45,11 @@ void hard_reset_sensors()
     {
       black_sensors[i] = BLACK_MEASURE;
       white_sensors[i] = WHITE_MEASURE;
-      threshold[i] = (black_sensors[i] - white_sensors[i])/2;
+      threshold[i] = (black_sensors[i] + white_sensors[i])/2;
+      calibrated_sensors[i] = 0;
     }
+
+  sensors_calibrated_count = 0;
 }
 
 /*
@@ -60,8 +64,11 @@ void reset_calibration_values()
     {
       black_sensors[i] = WHITE_MEASURE;
       white_sensors[i] = BLACK_MEASURE_HARDRESET;
+      threshold[i] = 0;
+      calibrated_sensors[i] = 0;
     }
   started_calibration = 1;
+  sensors_calibrated_count = 0;
 }
 
 /*
@@ -149,6 +156,16 @@ int get_line_position(uint16_t* value)
     sum_sensors += value[i];
   }
 
+
+  //all sensors are black
+  if ((whites_detected == 0 && FINISH_ALL_INLINE && FOLLOW_BLACK_LINE) ||
+      (blacks_detected == 0 && FINISH_ALL_INLINE && FOLLOW_WHITE_LINE))
+    {
+      out_of_line = 1;
+      detected_all_inline = 1;
+      position = 0;
+    }
+  
   if ((blacks_detected == 0 && FOLLOW_BLACK_LINE) ||
       (whites_detected == 0 && FOLLOW_WHITE_LINE)) {
       
@@ -234,7 +251,7 @@ void calibrate_sensors(uint16_t* values)
            white_sensors[i] = values[i];
         }
       
-      threshold[i] = (black_sensors[i] + white_sensors[i])/2;   
+      threshold[i] = (black_sensors[i] + white_sensors[i])/2;
     }
   check_calibrated_sensors();     
 }
@@ -293,4 +310,21 @@ uint16_t* get_thresholds() {
 int get_position()
 {
   return position;
+}
+
+/* 
+ * @brief Get the flag, all sensors in line
+ */
+uint8_t get_all_inline(void)
+{
+  return detected_all_inline;
+}
+
+/*  @brief rest_all_inline
+ *
+ */
+void reset_all_inline(void)
+{
+  started_calibration = 0;
+  detected_all_inline = 0;
 }

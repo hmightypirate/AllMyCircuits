@@ -52,7 +52,7 @@ int main(void)
 
   /* reset sensors */
   //FIXME: better do some callibration
-  if (SOFT_CALLIBRATION) {
+  if (!SOFT_CALLIBRATION) {
       hard_reset_sensors();
   } else {
       /* reset callibration values (needed for callibration) */
@@ -99,12 +99,15 @@ int main(void)
     /* should read battery? 
        battery measurement could have a different period than sensor/pid reads
      */
+
+    /* FIXME Disconnecting batt measurement till it is reliably enough to use it
     if (current_loop_millisecs % SYS_BETWEEN_READS == 0) {
       // Check if battery drained
       if (has_batt_drained()) {
-        update_state(OUT_OF_BATTERY_EVENT);
+        update_state(OUT_OF_BATTERY_EVENT); 
       }
     }
+    */
 
     state_e current_state = get_state();
 
@@ -128,6 +131,18 @@ int main(void)
         stop_motors();
          /* led is on during callibration */
         set_led();
+
+      } else if (current_state == IDLE_STATE) {
+
+        /* reset out of line measurements, resets callibration */
+        reset_all_inline();
+        reset_calibration_values();
+        stop_motors();
+
+        /* Clear led during idle state */
+        clear_led();
+
+        
       } else if (current_state == NO_BATTERY_STATE) {
             
         /* Disable sensors */
@@ -147,11 +162,14 @@ int main(void)
           if (current_loop_millisecs - get_delay_start_time() >
               DELAYED_START_MS)
             {
+              
+              reset_encoder_ticks();
               update_state(GO_TO_RUN_EVENT);
             }
 
           /* Led on */
           set_led();
+
 
         }
       else if (current_state == PIDANDVEL_MAPPING_STATE)
@@ -195,6 +213,13 @@ int main(void)
                 
           // led off
           clear_led();
+
+          // Send car to callibration if reached the end of line
+          if (get_all_inline())
+            {
+              update_state(FORCE_IDLE_EVENT);
+            }
+                            
         } else {
           motor_control(error);
                 
