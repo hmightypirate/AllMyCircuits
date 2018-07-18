@@ -1,9 +1,9 @@
 #include "jukebox_songs.h"
 
 static uint8_t notes_pitch_SUPERMAN[SONG_LEN_SUPERMAN] = {
-        D5, D5, D5, G5, R, G5, D6, R, D6, E6, D6, C6, D6, R, D5, D5, D5, G5, R, G5, D6, D6, D6, E6, C6, G5, E6, D6, R, G5, G5, G5, FX6, D6, G5, G5, G5, FX6, D6, G5, G5, G5, FX6, E6, FX6, G6, G5, G5, G5, G5};
+        D5, D5, D5, G5, R, G5, D6, R, D6, E6, D6, C6, D6, R, D5, D5, D5, G5, R, G5, D6, D6, D6, E6, C6, G5, E6, D6, R, G5, G5, G5, FX6, D6, R, G5, G5, G5, FX6, D6, R, G5, G5, G5, FX6, E6, FX6, G6, G5, G5, G5, G5, R};
 static uint8_t notes_duration_SUPERMAN[SONG_LEN_SUPERMAN] = {
-        16, 16, 16, 16, 8, 16, 64, 16, 16, 16, 16, 16, 128, 16, 16, 16, 16, 16, 8, 16, 64, 16, 16, 16, 16, 16, 16, 64, 32, 16, 16, 16, 64, 32, 16, 16, 16, 64, 32, 16, 16, 16, 16, 16, 16, 64, 16, 16, 16, 64};
+        16, 16, 16, 16, 8, 16, 64, 16, 16, 16, 16, 16,128,16, 16, 16, 16, 16,8, 16, 64, 16, 16, 16, 16, 16, 16, 64, 16, 16, 16, 16,  64, 32,16, 16, 16, 16,  64, 32,16, 16, 16, 16,  16, 16,  16, 64, 16, 16, 16, 64, 64};
 
 static uint8_t notes_pitch_EUROPE[SONG_LEN_EUROPE] = {
         CX6, B5, R, CX6, R, FX5, R, D6, R, CX6, R, D6, R, CX6, R, B5, R, D6, R, CX6, R, D6, FX5, R, B5, R, A5, R, B5, R, A5, R, GX5, R, B5, R, A5, CX6, R, B5, R, CX6, FX5, R, R, D6, R, CX6, R, D6, R, CX6, R, B5, R, D6, R, CX6, R, D6, FX5, R, B5, R, A5, R, B5, R, A5, R, GX5, R, B5, R, A5, R, GX5, R, A5, R, B5, A5, B5, CX6, B5, A5, GX5, FX5, D6, CX6, R, CX6, D6, CX6, B5, CX6, R};
