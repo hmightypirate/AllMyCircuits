@@ -15,5 +15,6 @@ void print_telemetry(int millis)
     if (SHOW_RIGHT_PWM) printf("%d,", get_last_right_vel());
     if (SHOW_LEFT_ENCODER) printf("%u,", (unsigned int)get_left_encoder_ticks());
     if (SHOW_RIGHT_ENCODER) printf("%u,", (unsigned int)get_right_encoder_ticks());
+    if (SHOW_TARGET_VEL) printf("%d,", get_target_velocity());
     printf("\n");
 }
