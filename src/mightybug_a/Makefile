@@ -4,7 +4,7 @@ sinclude ../../rules.mk
 CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-candid_car.elf: $(OBJ)
+disable_drive.elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -19,7 +19,7 @@ clean_all:
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: candid_car.bin
+bin: disable_drive.bin
 
-all: libopencm3 candid_car.bin
+all: libopencm3 disable_drive.bin
 
