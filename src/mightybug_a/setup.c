@@ -1,4 +1,5 @@
 #include "setup.h"
+#include "vbatt.h"
 
 
 /*
@@ -361,6 +362,7 @@ void setup_microcontroller(void)
   motor_pwm_setup();
   sensor_setup();
   buzzer_pwm_setup();
+  vbatt_setup();
   /* left encoder */ 
   encoder_setup(LEFT_ENCODER_TIMER,
                 LEFT_ENCODER_AFIO,

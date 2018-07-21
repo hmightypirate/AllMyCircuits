@@ -10,6 +10,7 @@
 /* Time between battery readings: 1000 ms => 1s */
 #define SYS_BETWEEN_READS 1000
 
+void vbatt_setup();
 uint16_t read_vbatt();
 uint8_t has_batt_drained(void);
 uint16_t get_last_batt_meas(void);
