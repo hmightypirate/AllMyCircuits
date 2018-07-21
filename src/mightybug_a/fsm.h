@@ -18,6 +18,8 @@
 #define NUMBER_PIDVEL_MAPPINGS 3
 #define INITIAL_PIDVEL_MAPPING 0
 
+/* Activate/deactivate special functions */
+#define ENABLE_TURBO_MODE 0
 
 typedef enum {
   IDLE_STATE,

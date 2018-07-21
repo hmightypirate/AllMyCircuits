@@ -111,7 +111,7 @@ void update_state(event_e new_event)
         {
           current_state = IDLE_STATE;
         }
-      else if (new_event == GO_TO_TURBO_EVENT)
+      else if (new_event == GO_TO_TURBO_EVENT && ENABLE_TURBO_MODE)
         {
           current_state = SET_TURBO_MODE_STATE; 
         }
