@@ -47,9 +47,8 @@ int main(void)
   /* setup microcontroller */
   setup_microcontroller();
   
-  /* reset motors */
-  reset_target_velocity(INITIAL_TARGET_VELOCITY);
-  reset_target_velocity_turbo(TURBO_TARGET_VELOCITY);
+  /* reset motors and pid to the current mapping */
+  force_mapping_to_current();
   
   /* reset sensors */
   //FIXME: better do some callibration
@@ -221,8 +220,11 @@ int main(void)
         if (sync_iterations % TIME_BETWEEN_STORE_POS == 0)
           {
             set_new_reading(proportional);
+
+            // Check that the minimum number of readings was performed
             if (is_enable_avg_readings())
               {
+                // Obtain the average number of readings
                 int16_t avg_proportional = get_avg_readings();
 
                 if ((avg_proportional > AVG_READINGS_POS) ||

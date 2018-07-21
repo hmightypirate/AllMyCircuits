@@ -7,12 +7,22 @@ static state_e current_state = CALLIBRATION_STATE;
 /* pid maps: k_p, k_i, k_d */
 const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
   400, 0, 1600,
-  450, 0, 1800,
-  400, 0, 1800
+  420, 0, 1800,
+  450, 0, 1800
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
   425, 425, 425
+};
+
+const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
+  400, 0, 1600,
+  500, 0, 1600,
+  600, 0, 1600
+};
+
+const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
+  550, 600, 650
 };
 
 const uint8_t map_songs[MAX_MAPPINGS] = {
@@ -167,6 +177,11 @@ void select_next_pidvel_map()
 {
   current_pidvel_mapping = (current_pidvel_mapping + 1) % NUMBER_PIDVEL_MAPPINGS;
 
+  force_mapping_to_current();
+}
+
+void force_mapping_to_current()
+{
   /* change the pid consts */
   set_kp(pid_maps[current_pidvel_mapping * 3]);
   set_ki(pid_maps[current_pidvel_mapping * 3 + 1]);
@@ -174,6 +189,9 @@ void select_next_pidvel_map()
 
   /* change vel cts */
   reset_target_velocity(vel_maps[current_pidvel_mapping]);
+
+  /* reset target turbo velocity */
+  reset_target_velocity_turbo(vel_turbo_maps[current_pidvel_mapping]);
 }
 
 
