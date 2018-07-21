@@ -21,6 +21,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Use the following tags: Added, Changed, Fixed and Removed
 
+## [Disable Drive 1.3.0] - Unreleased
+
+### Added
+TODO
+
+### Changed
+TODO
+
+### Fixed
+TODO
+
+### Removed
+TODO
+
 ## [Candid Car 1.2.0] - Unreleased
 
 ### Added
