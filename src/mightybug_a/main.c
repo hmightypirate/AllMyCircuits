@@ -99,7 +99,7 @@ int main(void)
     /* should read battery? 
        battery measurement could have a different period than sensor/pid reads
      */
-    if (current_loop_millisecs % SYS_BETWEEN_READS == 0) {
+    if (current_loop_millisecs % VBATT_SYS_BETWEEN_READS == 0) {
       // Check if battery drained
       if (has_batt_drained()) {
         update_state(OUT_OF_BATTERY_EVENT); 

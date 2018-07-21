@@ -4,7 +4,7 @@ static uint16_t last_batt_meas = 0;
 // For safety reasons battery flag should not be set to 0 in the code
 static uint8_t out_of_battery_flag = 0;
 
-#define VBATT_LAST_MEASUREMENTS_ARRAY_LEN 10
+#define VBATT_LAST_MEASUREMENTS_ARRAY_LEN 100
 static uint16_t last_measurements[VBATT_LAST_MEASUREMENTS_ARRAY_LEN];
 static uint32_t last_measurements_index = 0;
 
@@ -43,7 +43,7 @@ uint16_t read_vbatt() {
                              AVG_BATTERY_SAMPLES) * 100 / RESISTOR_DIVISOR;
 }
 
-static uint16_t read_vbatt_mean()
+uint16_t read_vbatt_mean()
 {
   last_measurements[last_measurements_index] = read_vbatt();
   last_measurements_index = (last_measurements_index + 1)
