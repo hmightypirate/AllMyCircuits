@@ -4,7 +4,7 @@ sinclude ../../rules.mk
 CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-candid_car.elf: $(OBJ)
+disable_drive.elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
