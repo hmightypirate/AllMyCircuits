@@ -120,11 +120,15 @@ int main(void)
     if (current_state == SET_NORMAL_MODE_STATE)
       {
         set_target_as_normal();
+        /* change pid normal */
+        reset_pids_normal();
         current_state = RUNNING_STATE;
       }
     else if (current_state == SET_TURBO_MODE_STATE)
       {
         set_target_as_turbo();
+        /* change pid consts */
+        reset_pids_turbo();
         current_state = RUNNING_STATE;
       }
     
