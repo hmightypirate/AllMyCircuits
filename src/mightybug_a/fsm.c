@@ -33,16 +33,6 @@ uint32_t delay_start_ms = 0;
 uint32_t pidvel_map_ms = 0;
 uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
-void reset_mappings(void)
-{
-  /* change the pid consts */
-  set_kp(pid_maps[current_pidvel_mapping * 3]);
-  set_ki(pid_maps[current_pidvel_mapping * 3 + 1]);
-  set_kd(pid_maps[current_pidvel_mapping * 3 + 2]);
-  
-  /* change the vel consts */
-  reset_target_velocity(vel_maps[current_pidvel_mapping]);
-}
 
 /*
  * @brief extremely simple finite state machine
@@ -182,10 +172,8 @@ void select_next_pidvel_map()
 
 void force_mapping_to_current()
 {
-  /* change the pid consts */
-  set_kp(pid_maps[current_pidvel_mapping * 3]);
-  set_ki(pid_maps[current_pidvel_mapping * 3 + 1]);
-  set_kd(pid_maps[current_pidvel_mapping * 3 + 2]);
+  /* reset pids normal */
+  reset_pids_normal();
 
   /* change vel cts */
   reset_target_velocity(vel_maps[current_pidvel_mapping]);
@@ -194,6 +182,27 @@ void force_mapping_to_current()
   reset_target_velocity_turbo(vel_turbo_maps[current_pidvel_mapping]);
 }
 
+/* 
+ * @brief change the pid consts to the normal mapping
+*/
+void reset_pids_normal()
+{
+  /* change the pid consts */
+  set_kp(pid_maps[current_pidvel_mapping * 3]);
+  set_ki(pid_maps[current_pidvel_mapping * 3 + 1]);
+  set_kd(pid_maps[current_pidvel_mapping * 3 + 2]);
+}
+
+/* 
+ * @brief change the pid consts to the turbo mapping
+*/
+void reset_pids_turbo()
+{
+  /* change the pid consts */
+  set_kp(pid_turbo_maps[current_pidvel_mapping * 3]);
+  set_ki(pid_turbo_maps[current_pidvel_mapping * 3 + 1]);
+  set_kd(pid_turbo_maps[current_pidvel_mapping * 3 + 2]);
+}
 
 /*
  * @brief return the current pid mapping

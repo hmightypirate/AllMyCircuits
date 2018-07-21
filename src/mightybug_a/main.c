@@ -85,9 +85,6 @@ int main(void)
   keypad_setup(get_millisecs_since_start(),
                button_port_array,
                button_pin_array);
-
-  /* reset mappings */
-  reset_mappings();
   
   clear_led();
 

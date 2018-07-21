@@ -60,7 +60,8 @@ uint32_t get_pidvel_map_time(void);
 void select_next_pidvel_map(void);
 uint8_t get_current_pidvel_map(void);
 uint8_t get_map_song(uint8_t id_map);
-void reset_mappings(void);
 void force_mapping_to_current(void);
+void reset_pids_normal(void);
+void reset_pids_turbo(void);
 
 #endif /* __FSM_H */
