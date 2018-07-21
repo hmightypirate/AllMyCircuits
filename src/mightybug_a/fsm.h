@@ -19,7 +19,8 @@
 #define INITIAL_PIDVEL_MAPPING 0
 
 /* Activate/deactivate special functions */
-#define ENABLE_TURBO_MODE 0
+#define ENABLE_TURBO_MODE 1
+#define MAX_ITS_CORNER 10
 
 typedef enum {
   IDLE_STATE,
@@ -27,6 +28,7 @@ typedef enum {
   RUNNING_STATE,
   SET_TURBO_MODE_STATE,
   SET_NORMAL_MODE_STATE,
+  SET_INCORNER_MODE_STATE,
   NO_BATTERY_STATE,
   STOP_STATE,
   DELAYED_START_STATE,
@@ -43,6 +45,7 @@ typedef enum {
   GO_TO_RUN_EVENT,
   GO_TO_TURBO_EVENT,
   GO_TO_NORMAL_EVENT,
+  GO_TO_INCORNER_EVENT,
   OUT_OF_BATTERY_EVENT,
   NEXT_PIDANDVELMAP_EVENT,
   FORCE_PIDANDVELMAP_EVENT,
@@ -63,5 +66,6 @@ uint8_t get_map_song(uint8_t id_map);
 void force_mapping_to_current(void);
 void reset_pids_normal(void);
 void reset_pids_turbo(void);
+void reset_pids_incorner(void);
 
 #endif /* __FSM_H */

@@ -131,6 +131,14 @@ int main(void)
         reset_pids_turbo();
         current_state = RUNNING_STATE;
       }
+    else if (current_state == SET_INCORNER_MODE_STATE)
+      {
+        set_target_as_incorner();
+
+        /* change pid consts */
+        reset_pids_incorner();
+        current_state = RUNNING_STATE;
+      }
     
     // loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS) {

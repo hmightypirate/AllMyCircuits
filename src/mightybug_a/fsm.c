@@ -7,12 +7,12 @@ static state_e current_state = CALLIBRATION_STATE;
 /* pid maps: k_p, k_i, k_d */
 const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
   400, 0, 1600,
-  420, 0, 1800,
-  450, 0, 1800
+  400, 0, 1600,
+  400, 0, 1600
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  425, 425, 425
+  450, 450, 450
 };
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
@@ -22,8 +22,20 @@ const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  550, 600, 650
+  600, 600, 600
 };
+
+const int16_t pid_incorner_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
+  700, 0, 800,
+  700, 0, 800,
+  700, 0, 800
+};
+
+const int16_t vel_incorner_maps[NUMBER_PIDVEL_MAPPINGS] = {
+  200, 100, 000
+};
+
+
 
 const uint8_t map_songs[MAX_MAPPINGS] = {
   SONG_ONE_BEAT_ORDER, SONG_TWO_BEAT_ORDER, SONG_THREE_BEAT_ORDER
@@ -32,7 +44,7 @@ const uint8_t map_songs[MAX_MAPPINGS] = {
 uint32_t delay_start_ms = 0;
 uint32_t pidvel_map_ms = 0;
 uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
-
+int32_t iterations_in_corner = MAX_ITS_CORNER;
 
 /*
  * @brief extremely simple finite state machine
@@ -113,11 +125,27 @@ void update_state(event_e new_event)
         }
       else if (new_event == GO_TO_TURBO_EVENT && ENABLE_TURBO_MODE)
         {
-          current_state = SET_TURBO_MODE_STATE; 
+          // resets the time in corner
+          iterations_in_corner = MAX_ITS_CORNER;
+
+          current_state = SET_TURBO_MODE_STATE;
         }
-      else if (new_event == GO_TO_NORMAL_EVENT)
+      else if (new_event == GO_TO_NORMAL_EVENT && ENABLE_TURBO_MODE)
         {
-          current_state = SET_NORMAL_MODE_STATE;
+          iterations_in_corner -= 1;
+
+          if (iterations_in_corner < 0)
+            {
+              current_state = SET_NORMAL_MODE_STATE;
+            }
+          else
+            {
+              current_state = SET_INCORNER_MODE_STATE;
+            }
+        }
+      else if (new_event == GO_TO_INCORNER_EVENT)
+        {
+          current_state = SET_INCORNER_MODE_STATE;
         }
     }
 }
@@ -180,6 +208,10 @@ void force_mapping_to_current()
 
   /* reset target turbo velocity */
   reset_target_velocity_turbo(vel_turbo_maps[current_pidvel_mapping]);
+
+  /* reset target velocity in corners */
+  reset_target_velocity_incorner(vel_incorner_maps[current_pidvel_mapping]);
+  
 }
 
 /* 
@@ -203,6 +235,18 @@ void reset_pids_turbo()
   set_ki(pid_turbo_maps[current_pidvel_mapping * 3 + 1]);
   set_kd(pid_turbo_maps[current_pidvel_mapping * 3 + 2]);
 }
+
+/* 
+ * @brief change the pid consts to the turbo mapping
+*/
+void reset_pids_incorner()
+{
+  /* change the pid consts */
+  set_kp(pid_incorner_maps[current_pidvel_mapping * 3]);
+  set_ki(pid_incorner_maps[current_pidvel_mapping * 3 + 1]);
+  set_kd(pid_incorner_maps[current_pidvel_mapping * 3 + 2]);
+}
+
 
 /*
  * @brief return the current pid mapping
