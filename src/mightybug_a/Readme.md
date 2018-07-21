@@ -21,7 +21,33 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Use the following tags: Added, Changed, Fixed and Removed
 
-## [Bat bolido: 1.1.0] - 05/05/2018
+## [Candid Car 1.2.0] - Unreleased
+
+### Added
+- Added example for storing data in flash
+- Added example of DMA usage
+- Basic telemetry using blocking messages
+- Keypad menu
+- Different mappings of buzzers
+- New optional functionality: stopping the car if all sensors detect a line
+- Idle state (sending car to ilde state from running state)
+- Resetting calibration from idle state
+
+### Changed
+- Pinout of encoders and motor PWMs
+- PID and vel mappings (now they are performed jointly)
+
+### Fixed
+- Battery consumption of buzzer in idle mode
+- PWM in timer1 of the STM32F1
+- Bugs in the readings of sensors and pid
+- Prints of cli messages
+
+### Removed
+- Disabling the option of moving backwards
+
+
+## [Bat Bolido: 1.1.0] - 05/05/2018
 
 ### Added
 - FSM for car state: callibration, running and out of line detection

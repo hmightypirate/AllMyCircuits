@@ -14,6 +14,7 @@
 #include "led.h"
 #include "libjukebox.h"
 #include "vbatt.h"
+#include "encoder.h"
 
 bool is_command_received(void);
 void execute_command(void);

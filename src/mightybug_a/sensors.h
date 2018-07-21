@@ -15,24 +15,31 @@
 /* 1 for black line
    0 for white line */
 #define FOLLOW_BLACK_LINE 1
+#define FOLLOW_WHITE_LINE !FOLLOW_BLACK_LINE
 
+#define BLACK_MEASURE_HARDRESET 4096
 #define BLACK_MEASURE 2000
 #define WHITE_MEASURE 0
 
 #define SOFT_CALLIBRATION 1
-#define THRESHOLD_CALLIBRATION 500
+#define THRESHOLD_CALIBRATION 500
+/* Number of sensors that could not be callibrated */
+#define MAX_NUM_NOT_CALLIBRATED_SENSORS 1
 
 /* extra delay between callibration calls in NOP operations */
-#define DELAY_CALLIBRATION_CALLS 300
+#define DELAY_CALIBRATION_CALLS 300
+
+/* if 1 the car stops after finding an horizontal line -> all sensors detect line */
+#define FINISH_ALL_INLINE 0
 
 /* Callibration functions */
-uint8_t get_callibrated_sensors(void);
-void reset_callibration_values(void);
+uint8_t get_calibrated_sensors_count(void);
+void reset_calibration_values(void);
 void calibrate_sensors(uint16_t* values);
 void hard_reset_sensors(void);
 
-void enable_sensors(void);
-void disable_sensors(void);
+void enable_line_sensors(void);
+void disable_line_sensors(void);
 
 void read_line_sensors(uint16_t* sensor_value);
 int get_line_position(uint16_t* value);
@@ -41,5 +48,9 @@ int is_out_of_line();
 uint16_t* get_whites(void);
 uint16_t* get_blacks(void);
 uint16_t* get_thresholds(void);
+uint8_t get_all_inline(void);
+void reset_all_inline(void);
+
+int get_position(void);
 
 #endif /* __SENSORS_H */

@@ -3,6 +3,7 @@
 static int current_song = 0; // The order in the jukebox array of the song currently loaded.
 static uint32_t last_millisec = 0;
 static uint8_t enable_jukebox_signal = ENABLE_JUKEBOX_AT_START;
+static uint8_t stacked_jukebox_signal = ENABLE_JUKEBOX_AT_START;
 
 /*
  * @brief jukebox setup
@@ -83,4 +84,28 @@ void disable_jukebox()
   stop_music_play();
   
  enable_jukebox_signal = 0;
+}
+
+/*
+ * @brief check if the jukebox is currently enabled
+ */
+uint8_t is_jukebox_enabled()
+{
+  return enable_jukebox_signal;
+}
+
+/*
+ * @brief stack the enable jukebox signal
+ */
+void push_enable_jukebox()
+{
+  stacked_jukebox_signal = enable_jukebox_signal;
+}
+
+/*
+ * @brief return the enable jukebox signal from stack
+ */
+void pull_enable_jukebox()
+{
+  enable_jukebox_signal = stacked_jukebox_signal;
 }

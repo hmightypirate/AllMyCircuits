@@ -12,6 +12,8 @@
 #include <libopencm3/cm3/systick.h>
 #include <libopencm3/stm32/exti.h>
 
+#include "vbatt.h"
+
 #define FALLING 0
 #define RISING 1
 
@@ -48,20 +50,27 @@ void print_int(uint32_t x) {
   usart_send_blocking(USART1, '\n');
 }
 
+void print_csv_time_voltaje(uint32_t time, uint32_t voltaje) {
+  send_usart(itoa(time, number));
+  usart_send_blocking(USART1, ',');
+  send_usart(itoa(voltaje, number));
+  usart_send_blocking(USART1, '\n');
+
+}
+
 // Enable internal LED
 static void gpio_setup(void) {
-    /* Enable GPIOB clock. */
-    rcc_periph_clock_enable(RCC_INTERNAL_LED);
 
     gpio_set_mode(INTERNAL_LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
             INTERNAL_LED);
 
-    /* Enable clocks for GPIO port B (for GPIO_USART3_TX) and USART3. */
-    rcc_periph_clock_enable(RCC_USART1);
-
     /* Setup GPIO pin GPIO_USART1_TX. */
     gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
               GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
+
+    /* Battery level measure */
+    gpio_set_mode(BATTERY_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG,
+                  BATTERY_PIN);
 
     /* Setup UART parameters. */
     usart_set_baudrate(USART1, 115200);
@@ -74,25 +83,43 @@ static void gpio_setup(void) {
     /* Finally enable the USART. */
     usart_enable(USART1);
 
-    /* Set B11 as digital input */
-    /* Enable AFIO clock. */
-	  rcc_periph_clock_enable(RCC_AFIO);
+}
 
-	  /* Enable EXTI0 interrupt. */
+#define SENSOR_ADC ADC1
+void sensor_setup() {
 
+    /* Make sure the ADC doesn't run during config. */
+    adc_power_off(SENSOR_ADC);
+
+    /* We configure everything for one single conversion. */
+    adc_disable_scan_mode(SENSOR_ADC);
+    adc_set_single_conversion_mode(SENSOR_ADC);
+    adc_disable_external_trigger_regular(SENSOR_ADC);
+    adc_set_right_aligned(SENSOR_ADC);
+    /* We want to read the temperature sensor, so we have to enable it. */
+
+    adc_set_sample_time_on_all_channels(SENSOR_ADC,
+                                        ADC_SMPR_SMP_28DOT5CYC);
+
+    adc_power_on(SENSOR_ADC);
+
+    /* Wait for ADC starting up. */
+    for (int i = 0; i < 800000; i++)    /* Wait a bit. */
+        __asm__("nop");
+
+    adc_reset_calibration(SENSOR_ADC);
+    adc_calibrate(SENSOR_ADC);
 }
 
 // Enable IR LED in pin B4
 void ir_setup() {
-    rcc_periph_clock_enable(RCC_AFIO);
     /* Enable the alternate GPIO for output*/
     gpio_primary_remap(AFIO_MAPR_SWJ_CFG_FULL_SWJ_NO_JNTRST
             , AFIO_MAPR_TIM3_REMAP_PARTIAL_REMAP);
     /* Enable the GPIO */
     gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
             GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO4);
-    /* Enable timer 3 */
-    rcc_periph_clock_enable(RCC_TIM3);
+
     /* Set timer 3 mode to no divisor (72MHz), Edge-aligned, up-counting */
     timer_set_mode(TIM3, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
     /* Set prescaler to 72 */
@@ -125,11 +152,6 @@ void sys_tick_handler(void) {
 
 // Setup external interruptions
 void exti_setup(void) {
-	/* Enable GPIOA clock. */
-	rcc_periph_clock_enable(RCC_GPIOA);
-
-	/* Enable AFIO clock. */
-	rcc_periph_clock_enable(RCC_AFIO);
 
 	/* Enable EXTI0 interrupt. */
 	nvic_enable_irq(NVIC_EXTI0_IRQ);
@@ -182,28 +204,42 @@ void systick_setup(){
     systick_counter_enable();
 }
 
+void battery_alarm(){
+    while(true){
+        send_usart("BATTERY DRAINED!!\n");
+        for (int a = 0; a < 40; a++){
+            for (int i = 0; i < 800000; i++){
+                gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
+            }
+        }
+    }
+}
+
 int main(void) {
     /* Change interrupt vector table location to avoid conflict with */
     /* serial bootloader interrupt vectors */
     SCB_VTOR = (uint32_t)0x08000000;
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
+	rcc_periph_clock_enable(RCC_INTERNAL_LED);
+	rcc_periph_clock_enable(RCC_GPIOB);	/* Enable GPIOA clock. */
+	rcc_periph_clock_enable(RCC_GPIOA);
+	rcc_periph_clock_enable(RCC_USART1);
+    rcc_periph_clock_enable(RCC_TIM3);
+	rcc_periph_clock_enable(RCC_ADC1);
+	rcc_periph_clock_enable(RCC_AFIO);
 
-    // Enable GPIO
     gpio_setup();
-
-    // Start 38kHz IR timer
     ir_setup();
-
-    // Start systick counter
+    sensor_setup();
     systick_setup();
-
-    // Start external interruptions
     exti_setup();
 
     while(1) {
+        if (millis % SYS_BETWEEN_READS == 0) {
+            print_csv_time_voltaje(0, read_vbatt());
+        }
         if(laptime != 0) {
-          //usart_send_blocking(USART1, '0');
-          print_int(laptime);
+          print_csv_time_voltaje(laptime, get_last_batt_meas());
           laptime = 0;
         }
     }

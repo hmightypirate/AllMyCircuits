@@ -7,61 +7,57 @@ static int last_left_vel = 0;
 static int last_right_vel = 0;
 
 /*
- * @brief configure the motor for forward move
- *
- * @param[in] gpio_forward gpio of input 1 of motor control
- * @param[in] port_forward port of input 1 of motor control
- * @param[in] gpio_backward gpio of input 2 of motor control
- * @param[in] port_backward port of input 2 of motor control
+ * @brief set the state of left motor
+ * 
+ * @param[in] may be FORWARD or BACKWARD
  */
-void move_forward(uint32_t gpio_forward,
-                  uint32_t port_forward,
-                  uint32_t gpio_backward,
-                  uint32_t port_backward)
+void set_left_motor_state(char state)
 {
-  gpio_set(gpio_forward, port_forward);
-  gpio_clear(gpio_backward, port_backward);
-}
-
-
-/*
- * @brief configure the motor for backward move
- *
- * @param[in] gpio_forward gpio of input 1 of motor control
- * @param[in] port_forward port of input 1 of motor control
- * @param[in] gpio_backward gpio of input 2 of motor control
- * @param[in] port_backward port of input 2 of motor control
- */
-void move_backward(uint32_t gpio_forward,
-                  uint32_t port_forward,
-                  uint32_t gpio_backward,
-                  uint32_t port_backward)
-{
-  gpio_clear(gpio_forward, port_forward);
-  gpio_set(gpio_backward, port_backward);
+  if (state == FORWARD) {
+    gpio_set(LEFT_MOTOR_IN1_PORT, LEFT_MOTOR_IN1_PIN);
+    gpio_clear(LEFT_MOTOR_IN2_PORT, LEFT_MOTOR_IN2_PIN);
+  } else if (state == BACKWARD) {
+    gpio_clear(LEFT_MOTOR_IN1_PORT, LEFT_MOTOR_IN1_PIN);
+    gpio_set(LEFT_MOTOR_IN2_PORT, LEFT_MOTOR_IN2_PIN);
+  }
 }
 
 /*
- * @brief sets pwm for motor velocity
- *
- * @param[in] left_vel velocity of left motor
- * @param[in] right_vel velocity of right motor
+ * @brief set the state of right motor
+ * 
+ * @param[in] may be FORWARD or BACKWARD
  */
-void set_motor_velocity(int left_vel, int right_vel)
+void set_right_motor_state(char state)
 {
-  if (LEFT_INVERTED)
-    {
-      left_vel = MAX_VEL_MOTOR - left_vel;
-    }
+  if (state == FORWARD) {
+    gpio_set(RIGHT_MOTOR_IN1_PORT, RIGHT_MOTOR_IN1_PIN);
+    gpio_clear(RIGHT_MOTOR_IN2_PORT, RIGHT_MOTOR_IN2_PIN);
+  } else if (state == BACKWARD) {
+    gpio_clear(RIGHT_MOTOR_IN1_PORT, RIGHT_MOTOR_IN1_PIN);
+    gpio_set(RIGHT_MOTOR_IN2_PORT, RIGHT_MOTOR_IN2_PIN);
+  }
+}
 
-  if (RIGHT_INVERTED)
-    {
-      right_vel = MAX_VEL_MOTOR - right_vel;
-    }
+/*
+ * @brief set the value of the PWM of the left motor to control velocity
+ * 
+ * @param[in] an integer between 0 and 1023
+ */
+void set_left_motor_pwm(int value)
+{
+  if (LEFT_MOTOR_PWM_ANTIPHASE) value = MAX_PWM_VALUE - value;
+  timer_set_oc_value(PWM_MOTOR_TIMER, LEFT_MOTOR_OUTPUT_CHANNEL, value);
+}
 
-  timer_set_oc_value(TIM4, TIM_OC3, left_vel);
-  timer_set_oc_value(TIM4, TIM_OC4, right_vel);
- 
+/*
+ * @brief set the value of the PWM of the right motor to control velocity
+ * 
+ * @param[in] an integer between 0 and 1023
+ */
+void set_right_motor_pwm(int value)
+{
+  if (RIGHT_MOTOR_PWM_ANTIPHASE) value = MAX_PWM_VALUE - value;
+  timer_set_oc_value(PWM_MOTOR_TIMER, RIGHT_MOTOR_OUTPUT_CHANNEL, value);
 }
 
 /*
@@ -82,87 +78,73 @@ int get_target_velocity(void) {
 }
 
 /*
- * given an error, obtain the velocity for the left and right motors 
- *
- * @param[in] error pid error (typically line position error) 
+ * @brief helper function to truncate a value between min and max
  */
-void motor_control(int error)
+static int trunc_to_range(int value, int min, int max)
 {
-  int left_vel = 0;
-  int right_vel = 0;
+  int trunc_value = value;
 
-  if (error > MAX_PID_ERROR)
-    {
-      error = MAX_PID_ERROR;
-    }
-  else if (error < -MAX_PID_ERROR)
-    {
-      error = -MAX_PID_ERROR;
-    }
+  if (value < min)
+    trunc_value = min;
+  else if (value > max)
+    trunc_value = max;
 
-  left_vel = target_velocity - error;
-  right_vel = target_velocity + error;
+  return trunc_value;
+}
 
-  if (left_vel > MAX_VEL_MOTOR)
-    {
-      left_vel = MAX_VEL_MOTOR;
-    }
-  else if (left_vel < -MAX_VEL_MOTOR)
-    {
-      left_vel = -MAX_VEL_MOTOR;
-    }
+/*
+ * @brief set left motor velocity
+ */
+void set_left_motor_velocity(int velocity)
+{
+  velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
+  last_left_vel = velocity;
 
-  if (right_vel > MAX_VEL_MOTOR)
-    {
-      right_vel = MAX_VEL_MOTOR;
-    }
-  else if (right_vel < -MAX_VEL_MOTOR)
-    {
-      right_vel = -MAX_VEL_MOTOR;
-    }
-  
-  last_left_vel = left_vel;
-  last_right_vel = right_vel;
+  if (velocity >= 0) {
+    set_left_motor_state(FORWARD);
+    set_left_motor_pwm(velocity);
+  } else {
+    set_left_motor_state(BACKWARD);
+    set_left_motor_pwm(-velocity);
+  }
+}
 
-  if (left_vel >= 0)
+/*
+ * @brief set right motor velocity
+ */
+void set_right_motor_velocity(int velocity)
+{
+  velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
+  last_right_vel = velocity;
+
+  if (velocity >= 0) {
+    set_right_motor_state(FORWARD);
+    set_right_motor_pwm(velocity);
+  } else {
+    set_right_motor_state(BACKWARD);
+    set_right_motor_pwm(-velocity);
+  }
+}
+
+/*
+ * given a control signal, obtain the velocity for the left and right motors 
+ *
+ * @param[in] control from pid
+ */
+void motor_control(int control)
+{
+  control = trunc_to_range(control, -MAX_PID_ERROR, MAX_PID_ERROR);
+
+  if (DEBUG_INERTIA_TEST)
     {
-      /* move left motor forward */
-      move_forward(LEFT_MOTOR_IN1_PORT,
-                   LEFT_MOTOR_IN1_PIN,
-                   LEFT_MOTOR_IN2_PORT,
-                   LEFT_MOTOR_IN2_PIN);
+      set_left_motor_velocity(target_velocity);  //FIXME delete
+      set_right_motor_velocity(target_velocity); //FIXME delete
     }
   else
     {
-      /* move left motor backward */
-      move_backward(LEFT_MOTOR_IN1_PORT,
-                    LEFT_MOTOR_IN1_PIN,
-                    LEFT_MOTOR_IN2_PORT,
-                    LEFT_MOTOR_IN2_PIN);
-
-      left_vel = -left_vel;
+      set_left_motor_velocity(target_velocity + control);
+      set_right_motor_velocity(target_velocity - control); 
     }
-
-  if (right_vel >= 0)
-    {
-      /* move right motor forward */
-      move_forward(RIGHT_MOTOR_IN1_PORT,
-                   RIGHT_MOTOR_IN1_PIN,
-                   RIGHT_MOTOR_IN2_PORT,
-                   RIGHT_MOTOR_IN2_PIN);
-    }
-  else
-    {
-      /* move right motor backward */
-      move_backward(RIGHT_MOTOR_IN1_PORT,
-                    RIGHT_MOTOR_IN1_PIN,
-                    RIGHT_MOTOR_IN2_PORT,
-                    RIGHT_MOTOR_IN2_PIN);
-
-      right_vel = -right_vel;
-    }
-  
-  set_motor_velocity(left_vel, right_vel);
   
 }
 
@@ -174,7 +156,24 @@ void motor_control(int error)
  */
 void stop_motors()
 {
-  set_motor_velocity(0, 0);
-  
+  set_left_motor_velocity(0);
+  set_right_motor_velocity(0);
 }
 
+
+/*
+ * @brief get last left velocity
+ */
+int get_last_left_vel()
+{
+  return last_left_vel;
+}
+
+
+/*
+ * @brief get last right velocity
+ */
+int get_last_right_vel()
+{
+  return last_right_vel;
+}

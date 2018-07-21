@@ -1,9 +1,9 @@
 #include "jukebox_songs.h"
 
 static uint8_t notes_pitch_SUPERMAN[SONG_LEN_SUPERMAN] = {
-        D5, D5, D5, G5, R, G5, D6, R, D6, E6, D6, C6, D6, R, D5, D5, D5, G5, R, G5, D6, D6, D6, E6, C6, G5, E6, D6, R, G5, G5, G5, FX6, D6, G5, G5, G5, FX6, D6, G5, G5, G5, FX6, E6, FX6, G6, G5, G5, G5, G5};
+        D5, D5, D5, G5, R, G5, D6, R, D6, E6, D6, C6, D6, R, D5, D5, D5, G5, R, G5, D6, D6, D6, E6, C6, G5, E6, D6, R, G5, G5, G5, FX6, D6, R, G5, G5, G5, FX6, D6, R, G5, G5, G5, FX6, E6, FX6, G6, G5, G5, G5, G5, R};
 static uint8_t notes_duration_SUPERMAN[SONG_LEN_SUPERMAN] = {
-        16, 16, 16, 16, 8, 16, 64, 16, 16, 16, 16, 16, 128, 16, 16, 16, 16, 16, 8, 16, 64, 16, 16, 16, 16, 16, 16, 64, 32, 16, 16, 16, 64, 32, 16, 16, 16, 64, 32, 16, 16, 16, 16, 16, 16, 64, 16, 16, 16, 64};
+        16, 16, 16, 16, 8, 16, 64, 16, 16, 16, 16, 16,128,16, 16, 16, 16, 16,8, 16, 64, 16, 16, 16, 16, 16, 16, 64, 16, 16, 16, 16,  64, 32,16, 16, 16, 16,  64, 32,16, 16, 16, 16,  16, 16,  16, 64, 16, 16, 16, 64, 64};
 
 static uint8_t notes_pitch_EUROPE[SONG_LEN_EUROPE] = {
         CX6, B5, R, CX6, R, FX5, R, D6, R, CX6, R, D6, R, CX6, R, B5, R, D6, R, CX6, R, D6, FX5, R, B5, R, A5, R, B5, R, A5, R, GX5, R, B5, R, A5, CX6, R, B5, R, CX6, FX5, R, R, D6, R, CX6, R, D6, R, CX6, R, B5, R, D6, R, CX6, R, D6, FX5, R, B5, R, A5, R, B5, R, A5, R, GX5, R, B5, R, A5, R, GX5, R, A5, R, B5, A5, B5, CX6, B5, A5, GX5, FX5, D6, CX6, R, CX6, D6, CX6, B5, CX6, R};
@@ -15,7 +15,27 @@ static uint8_t notes_pitch_INDIANAJONES[SONG_LEN_INDIANAJONES] = {
 static uint8_t notes_duration_INDIANAJONES[SONG_LEN_INDIANAJONES] = {
         32, 16, 16, 16, 16, 64, 16, 32, 16, 16, 128, 32, 32, 16, 16, 16, 16, 64, 32, 32, 16, 16, 64, 64, 64, 32, 16, 16, 16, 16, 128, 32, 32, 16, 16, 128, 32, 16, 16, 32, 16, 32, 16, 16, 32, 16, 32, 16, 16, 32, 16, 32, 16, 16, 128};
 
+static uint8_t notes_pitch_ONE_BEAT[SONG_LEN_ONE_BEAT] = {
+  A6, R
+};
 
+static uint8_t notes_duration_ONE_BEAT[SONG_LEN_ONE_BEAT] = {
+    30, 255};
+
+static uint8_t notes_pitch_TWO_BEAT[SONG_LEN_TWO_BEAT] = {
+  A6, R, A6, R
+};
+
+static uint8_t notes_duration_TWO_BEAT[SONG_LEN_TWO_BEAT] = {
+    30, 15, 30, 255};
+
+static uint8_t notes_pitch_THREE_BEAT[SONG_LEN_THREE_BEAT] = {
+  A6, R, A6, R, A6, R};
+
+static uint8_t notes_duration_THREE_BEAT[SONG_LEN_THREE_BEAT] = {
+  30, 15, 30, 15, 30, 255};
+
+  
 // Returns the number of songs in the jukebox
 uint8_t init_jukebox_songs() {
 
@@ -33,6 +53,24 @@ uint8_t init_jukebox_songs() {
   jukebox_song_list[SONG_EUROPE_ORDER].bpm = SONG_VEL_EUROPE;
   jukebox_song_list[SONG_EUROPE_ORDER].notes_pitch = notes_pitch_EUROPE;
   jukebox_song_list[SONG_EUROPE_ORDER].notes_duration = notes_duration_EUROPE;
+
+
+  /* Beat songs */
+  jukebox_song_list[SONG_ONE_BEAT_ORDER].length = SONG_LEN_ONE_BEAT;
+  jukebox_song_list[SONG_ONE_BEAT_ORDER].bpm = SONG_VEL_ONE_BEAT;
+  jukebox_song_list[SONG_ONE_BEAT_ORDER].notes_pitch = notes_pitch_ONE_BEAT;
+  jukebox_song_list[SONG_ONE_BEAT_ORDER].notes_duration = notes_duration_ONE_BEAT;
+
+  jukebox_song_list[SONG_TWO_BEAT_ORDER].length = SONG_LEN_TWO_BEAT;
+  jukebox_song_list[SONG_TWO_BEAT_ORDER].bpm = SONG_VEL_TWO_BEAT;
+  jukebox_song_list[SONG_TWO_BEAT_ORDER].notes_pitch = notes_pitch_TWO_BEAT;
+  jukebox_song_list[SONG_TWO_BEAT_ORDER].notes_duration = notes_duration_TWO_BEAT;
+
+  jukebox_song_list[SONG_THREE_BEAT_ORDER].length = SONG_LEN_THREE_BEAT;
+  jukebox_song_list[SONG_THREE_BEAT_ORDER].bpm = SONG_VEL_THREE_BEAT;
+  jukebox_song_list[SONG_THREE_BEAT_ORDER].notes_pitch = notes_pitch_THREE_BEAT;
+  jukebox_song_list[SONG_THREE_BEAT_ORDER].notes_duration = notes_duration_THREE_BEAT;
+  
   
   return JUKEBOX_SONGS_TOTAL_SONGS;
 }
