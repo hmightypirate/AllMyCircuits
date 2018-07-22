@@ -234,13 +234,11 @@ int main(void)
             if (is_enable_avg_readings())
               {
                 // Obtain the average number of readings
-                int16_t avg_proportional = get_avg_readings();
+                int16_t avg_proportional = get_avg_abs_readings();
 
-                if ((avg_proportional > AVG_READINGS_POS) ||
-                    (avg_proportional < -AVG_READINGS_POS))
+                if (avg_proportional > AVG_READINGS_POS)
                   {
                     update_state(GO_TO_NORMAL_EVENT);
-                   
                   }
                 else
                   {

@@ -35,6 +35,6 @@ int get_derivative(void);
 void reset_prop_readings();
 void set_new_reading(uint16_t proportional);
 uint8_t is_enable_avg_readings();
-int16_t  get_avg_readings();
+int16_t  get_avg_abs_readings();
 
 #endif /* __PID_H */
