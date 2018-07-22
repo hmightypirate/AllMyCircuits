@@ -91,7 +91,7 @@ void reset_target_velocity_turbo(int target_vel)
  */
 void reset_target_velocity_incorner(int target_vel)
 {
-  target_velocity_turbo = target_vel;
+  target_velocity_incorner = target_vel;
 }
 
 

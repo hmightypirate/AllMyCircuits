@@ -52,13 +52,24 @@ uint8_t is_enable_avg_readings()
   return 0;
 }
 
+
+/*
+ * @brief obtain the mean of absulte position readings
+ */
 int16_t  get_avg_readings()
 {
   int16_t avg_prop = 0;
   
   for (int i=0; i<NUMBER_POS_READINGS; i++)
     {
-      avg_prop += array_prop_readings[i];
+      if (array_prop_readings[i] > 0)
+        {
+          avg_prop += array_prop_readings[i];
+        }
+      else
+        {
+          avg_prop -= array_prop_readings[i];
+        }
       
     }
   return avg_prop /= NUMBER_POS_READINGS;

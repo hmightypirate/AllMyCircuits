@@ -12,7 +12,7 @@ const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  450, 450, 450
+  425, 425, 425
 };
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
@@ -22,13 +22,13 @@ const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  600, 600, 600
+  550, 550, 550
 };
 
 const int16_t pid_incorner_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  700, 0, 800,
-  700, 0, 800,
-  700, 0, 800
+  700, 0, 1800,
+  700, 0, 1800,
+  700, 0, 1800
 };
 
 const int16_t vel_incorner_maps[NUMBER_PIDVEL_MAPPINGS] = {
@@ -44,7 +44,8 @@ const uint8_t map_songs[MAX_MAPPINGS] = {
 uint32_t delay_start_ms = 0;
 uint32_t pidvel_map_ms = 0;
 uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
-int32_t iterations_in_corner = MAX_ITS_CORNER;
+int32_t iterations_in_corner = -1;
+uint32_t iterations_in_turbo = 0;
 
 /*
  * @brief extremely simple finite state machine
@@ -125,22 +126,25 @@ void update_state(event_e new_event)
         }
       else if (new_event == GO_TO_TURBO_EVENT && ENABLE_TURBO_MODE)
         {
-          // resets the time in corner
+          // resets the time in corner          
           iterations_in_corner = MAX_ITS_CORNER;
-
+          iterations_in_turbo += 1;
+          
           current_state = SET_TURBO_MODE_STATE;
         }
       else if (new_event == GO_TO_NORMAL_EVENT && ENABLE_TURBO_MODE)
         {
           iterations_in_corner -= 1;
 
-          if (iterations_in_corner < 0)
+          if (iterations_in_corner > 0 && iterations_in_turbo > MIN_ITS_TURBO)
             {
-              current_state = SET_NORMAL_MODE_STATE;
+              current_state = SET_INCORNER_MODE_STATE;
+              iterations_in_turbo = 0;
             }
           else
             {
-              current_state = SET_INCORNER_MODE_STATE;
+              // NOrmal
+              current_state = SET_NORMAL_MODE_STATE;
             }
         }
       else if (new_event == GO_TO_INCORNER_EVENT)

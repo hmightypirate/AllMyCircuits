@@ -4,7 +4,7 @@
 void print_telemetry(int millis)
 {
     if (SHOW_MILLIS) printf("%d,", millis % 10);
-    if (SHOW_POSITION) printf("%+04d", get_position());
+    if (SHOW_POSITION) printf("%+04d,", get_position());
     if (SHOW_K_P) printf("%d,", get_kp());
     if (SHOW_K_I) printf("%d,", get_ki());
     if (SHOW_K_D) printf("%d,", get_kd());

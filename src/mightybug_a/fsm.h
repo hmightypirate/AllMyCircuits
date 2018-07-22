@@ -21,6 +21,7 @@
 /* Activate/deactivate special functions */
 #define ENABLE_TURBO_MODE 1
 #define MAX_ITS_CORNER 10
+#define MIN_ITS_TURBO 10
 
 typedef enum {
   IDLE_STATE,
