@@ -99,15 +99,12 @@ int main(void)
     /* should read battery? 
        battery measurement could have a different period than sensor/pid reads
      */
-
-    /* FIXME Disconnecting batt measurement till it is reliably enough to use it
-    if (current_loop_millisecs % SYS_BETWEEN_READS == 0) {
+    if (current_loop_millisecs % VBATT_SYS_BETWEEN_READS == 0) {
       // Check if battery drained
       if (has_batt_drained()) {
         update_state(OUT_OF_BATTERY_EVENT); 
       }
     }
-    */
 
     state_e current_state = get_state();
 

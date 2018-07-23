@@ -4,6 +4,17 @@ static uint16_t last_batt_meas = 0;
 // For safety reasons battery flag should not be set to 0 in the code
 static uint8_t out_of_battery_flag = 0;
 
+#define VBATT_LAST_MEASUREMENTS_ARRAY_LEN 100
+static uint16_t last_measurements[VBATT_LAST_MEASUREMENTS_ARRAY_LEN];
+static uint32_t last_measurements_index = 0;
+
+void vbatt_setup(){
+  for (uint32_t i = 0; i < VBATT_LAST_MEASUREMENTS_ARRAY_LEN; i++){
+    last_measurements[i] = BATTERY_LIMIT_MV+10;
+  }
+  last_measurements_index = 0;
+}
+
 static uint16_t read_adc_naiive(uint8_t channel) {
 	uint8_t channel_array[1];
 	channel_array[0] = channel;
@@ -28,17 +39,31 @@ static uint16_t read_adc_mean(uint8_t channel, int samples) {
 // returns battery in milivolts
 uint16_t read_vbatt() {
 
-	return read_adc_mean(BATTERY_CHANNEL,
+  return read_adc_mean(BATTERY_CHANNEL,
                              AVG_BATTERY_SAMPLES) * 100 / RESISTOR_DIVISOR;
+}
+
+uint16_t read_vbatt_mean()
+{
+  last_measurements[last_measurements_index] = read_vbatt();
+  last_measurements_index = (last_measurements_index + 1)
+    % VBATT_LAST_MEASUREMENTS_ARRAY_LEN;
+
+  uint32_t sum = 0;
+  for (uint32_t i = 0; i < VBATT_LAST_MEASUREMENTS_ARRAY_LEN; i++){
+    sum = sum + last_measurements[i];
+  }
+  return (uint16_t) (sum / VBATT_LAST_MEASUREMENTS_ARRAY_LEN);
 }
 
 uint8_t has_batt_drained(void)
 {
-  last_batt_meas = read_vbatt();
-  if (last_batt_meas < BATTERY_LIMIT_MV)
-    {
-      out_of_battery_flag = 1;
-    }
+  if (read_vbatt_mean() < BATTERY_LIMIT_MV)
+  {
+    out_of_battery_flag = 1;
+  } else {
+    out_of_battery_flag = 0;
+  }
 
   return out_of_battery_flag;
 }
