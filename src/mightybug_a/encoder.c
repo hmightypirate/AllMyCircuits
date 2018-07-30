@@ -1,7 +1,7 @@
 #include "encoder.h"
 
-static uint32_t new_left_encoder[SYSTICK_MEAS];
-static uint32_t new_right_encoder[SYSTICK_MEAS];
+static volatile uint32_t new_left_encoder[SYSTICK_MEAS];
+static volatile uint32_t new_right_encoder[SYSTICK_MEAS];
 
 static uint8_t measures_done = 0;
 
@@ -17,7 +17,7 @@ static uint16_t current_ticks = 0;
 /*
  * @brief summing the contributions of the encoder in the window
  */
-uint32_t get_sum_ticks(uint32_t *p_encoder)
+uint32_t get_sum_ticks(volatile uint32_t *p_encoder)
 {
 
   uint32_t sum_ticks = 0;
