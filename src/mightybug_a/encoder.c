@@ -14,6 +14,9 @@ uint16_t systick_between_meas = SYSTICK_MEAS;
 static uint16_t current_ticks = 0;
 
 
+/*
+ * @brief summing the contributions of the encoder in the window
+ */
 uint32_t get_sum_ticks(uint32_t *p_encoder)
 {
 
@@ -25,7 +28,6 @@ uint32_t get_sum_ticks(uint32_t *p_encoder)
 
   return sum_ticks;
 }
-
 
 /*
  * @brief get current encoder ticks (left engine)
