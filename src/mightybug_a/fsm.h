@@ -29,7 +29,6 @@ typedef enum {
   RUNNING_STATE,
   SET_TURBO_MODE_STATE,
   SET_NORMAL_MODE_STATE,
-  SET_INCORNER_MODE_STATE,
   NO_BATTERY_STATE,
   STOP_STATE,
   DELAYED_START_STATE,
@@ -46,13 +45,17 @@ typedef enum {
   GO_TO_RUN_EVENT,
   GO_TO_TURBO_EVENT,
   GO_TO_NORMAL_EVENT,
-  GO_TO_INCORNER_EVENT,
   OUT_OF_BATTERY_EVENT,
   NEXT_PIDANDVELMAP_EVENT,
   FORCE_PIDANDVELMAP_EVENT,
   NEXT_BUZZER_EVENT,
   MAX_EVENTS
 } event_e;
+
+typedef enum {
+  RUNNING_NORMAL,
+  RUNNING_STLINE,
+} rnstate_e;
 
 
 state_e get_state(void);
@@ -68,5 +71,8 @@ void force_mapping_to_current(void);
 void reset_pids_normal(void);
 void reset_pids_turbo(void);
 void reset_pids_incorner(void);
+void get_next_running_state(int16_t avg_proportional);
+rnstate_e get_running_state();
+void set_running_state(rnstate_e state);
 
 #endif /* __FSM_H */

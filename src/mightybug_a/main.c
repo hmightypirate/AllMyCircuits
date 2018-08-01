@@ -116,30 +116,23 @@ int main(void)
     menu_functions(current_loop_millisecs);
 
     // loop out of period
-
     if (current_state == SET_NORMAL_MODE_STATE)
       {
         set_target_as_normal();
         /* change pid normal */
         reset_pids_normal();
-        current_state = RUNNING_STATE;
+        current_state = RUNNING_STATE; //FIXME this assignment is local (and useless)
+        set_running_state(RUNNING_NORMAL);
       }
     else if (current_state == SET_TURBO_MODE_STATE)
       {
         set_target_as_turbo();
         /* change pid consts */
         reset_pids_turbo();
-        current_state = RUNNING_STATE;
+        current_state = RUNNING_STATE;  //FIXME this assignment is local (and useless)
+        set_running_state(RUNNING_STLINE);
       }
-    else if (current_state == SET_INCORNER_MODE_STATE)
-      {
-        set_target_as_incorner();
 
-        /* change pid consts */
-        reset_pids_incorner();
-        current_state = RUNNING_STATE;
-      }
-    
     // loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS) {
         
@@ -236,14 +229,7 @@ int main(void)
                 // Obtain the average number of readings
                 int16_t avg_proportional = get_avg_abs_readings();
 
-                if (avg_proportional > AVG_READINGS_POS)
-                  {
-                    update_state(GO_TO_NORMAL_EVENT);
-                  }
-                else
-                  {
-                    update_state(GO_TO_TURBO_EVENT);
-                  }
+                get_next_running_state(avg_proportional);
               }
           }
         
