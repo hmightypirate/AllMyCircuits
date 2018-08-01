@@ -1,7 +1,11 @@
 #include "cli.h"
 
-char command_line[80];
-int command_line_size = 0;
+#define CLI_MAX_BUFFER_SIZE 64
+
+char input_buffer[CLI_MAX_BUFFER_SIZE];
+uint8_t buffer_str_size = 0;
+char command_line[CLI_MAX_BUFFER_SIZE];
+uint8_t command_line_size = 0;
 char head[20];
 char tail[80];
 
@@ -20,7 +24,7 @@ void check_command_car(void);
 void check_command_led(void);
 void check_module(void);
 void clear_head_tail(void);
-void clear_command_line(void);
+void clear_input_buffer(void);
 void set_head_tail(char *origin);
 void check_command_pid(void);
 void check_command_line(void);
@@ -39,7 +43,7 @@ bool is_command_received() {
 void execute_command() {
     command_received = false;
     check_module();
-    clear_command_line(); // TODO copy command_line to another variable to avoid usart rewriting before reading 
+    clear_input_buffer();
 }
 
 /**
@@ -58,15 +62,29 @@ int _write(int file, char *ptr, int len) {
     return -1;
 }
 
+void copy_buffer_to_command(){
+	command_line_size = buffer_str_size;
+	for (uint8_t i = 0; i < command_line_size; i++){
+		command_line[i] = input_buffer[i];
+	}
+	command_line[command_line_size] = '\0';
+}
+
 void usart1_isr(void) {
     if (((USART_CR1(USART1) & USART_CR1_RXNEIE) != 0) &&
     ((USART_SR(USART1) & USART_SR_RXNE) != 0)) {
         uint8_t data = usart_recv(USART1);
-        if (data != '\n') {
-            command_line[command_line_size++] = data;
+        if ((data != '\n')&&(data != '\r')) {
+            input_buffer[buffer_str_size++] = data;
+            if (buffer_str_size >= CLI_MAX_BUFFER_SIZE){
+                clear_input_buffer();
+            }
         } else {
-            command_line[command_line_size] = '\0';
-            command_received = true;
+            if (buffer_str_size > 1){
+                copy_buffer_to_command();
+                command_received = true;
+            }
+            clear_input_buffer();
         }
     }
 }
@@ -192,9 +210,9 @@ void welcome_message() {
     printf("Version v1.3.0\n");
 }
 
-void clear_command_line(void) {
-    command_line[0] = '\0';
-    command_line_size = 0;
+void clear_input_buffer(void) {
+    input_buffer[0] = '\0';
+    buffer_str_size = 0;
 }
 
 void set_head_tail(char *origin) {
