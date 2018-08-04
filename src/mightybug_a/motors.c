@@ -9,6 +9,15 @@ static int target_velocity = 0;
 static int last_left_vel = 0;
 static int last_right_vel = 0;
 
+
+uint16_t PICKLE_TURBO_TABLE[32] =  {
+  0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,
+};
+
+
 /*
  * @brief set the state of left motor
  * 
@@ -62,6 +71,22 @@ void set_right_motor_pwm(int value)
   if (RIGHT_MOTOR_PWM_ANTIPHASE) value = MAX_PWM_VALUE - value;
   timer_set_oc_value(PWM_MOTOR_TIMER, RIGHT_MOTOR_OUTPUT_CHANNEL, value);
 }
+
+
+/*
+ * @brief obtain the pickle turbo
+ *
+ */
+
+int32_t get_pickle_turbo(int32_t velocity)
+{
+  int32_t new_velocity = velocity;
+
+
+  return new_velocity;
+  
+}
+
 
 /*
  * @brief resets target velocity to a given value (also de normal velocity)
@@ -195,8 +220,18 @@ void motor_control(int control)
     }
   else
     {
-      set_left_motor_velocity(target_velocity + control);
-      set_right_motor_velocity(target_velocity - control); 
+
+      int32_t left_velocity = target_velocity + control;
+      int32_t right_velocity = target_velocity - control;
+      
+      if (TURBO_PICKLE)
+        {
+          left_velocity = get_pickle_turbo(left_velocity);
+          right_velocity = get_pickle_turbo(right_velocity);
+        }
+      
+      set_left_motor_velocity(left_velocity);
+      set_right_motor_velocity(right_velocity); 
     }
   
 }

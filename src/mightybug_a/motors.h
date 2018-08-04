@@ -13,6 +13,7 @@
 
 /* if this flag is set, both motors will received target velocity till they reach and end of line */
 #define DEBUG_INERTIA_TEST 0
+#define TURBO_PICKLE 1
 
 void reset_target_velocity(int target_vel);
 int get_target_velocity(void);
