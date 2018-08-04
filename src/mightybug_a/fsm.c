@@ -6,23 +6,23 @@ static rnstate_e running_state = RUNNING_NORMAL;
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
 const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  400, 0, 1600,
-  400, 0, 1600,
+  500, 0, 1600,
+  300, 0, 1600,
   400, 0, 1600
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  425, 425, 425
+  375, 375, 375
 };
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  400, 0, 1600,
   500, 0, 1600,
-  600, 0, 1600
+  300, 0, 1600,
+  400, 0, 1600
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  550, 550, 550
+  500, 500, 500
 };
 
 const int16_t normal_out_hyst = 15;    // going out of pid (position)

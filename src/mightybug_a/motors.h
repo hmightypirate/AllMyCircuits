@@ -4,6 +4,8 @@
 #include "commons.h"
 #include "setup.h"
 #include "pid.h"
+#include "encoder.h"
+#include "fsm.h"
 
 #define RIGHT_MOTOR_PWM_ANTIPHASE 1
 #define LEFT_MOTOR_PWM_ANTIPHASE 0
@@ -14,6 +16,9 @@
 /* if this flag is set, both motors will received target velocity till they reach and end of line */
 #define DEBUG_INERTIA_TEST 0
 #define TURBO_PICKLE 1
+#define PICKLE_ENC_DISTANCE 5
+#define PICKLE_TURBO_VEL 200
+
 
 void reset_target_velocity(int target_vel);
 int get_target_velocity(void);

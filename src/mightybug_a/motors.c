@@ -10,11 +10,11 @@ static int last_left_vel = 0;
 static int last_right_vel = 0;
 
 
-uint16_t PICKLE_TURBO_TABLE[32] =  {
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,
+uint16_t PICKLE_TURBO_TABLE[33] =  {
+  0,0,0,2,4,7,10,13,  // 224
+  15,18,21,24,27,30,33,35, // 480
+  38,41,44,47,50,52,54,55, // 736
+  57,58,60,61,63,64,66,67,69,
 };
 
 
@@ -78,10 +78,43 @@ void set_right_motor_pwm(int value)
  *
  */
 
-int32_t get_pickle_turbo(int32_t velocity)
+int32_t get_pickle_turbo(int32_t velocity, uint32_t current_enc)
 {
   int32_t new_velocity = velocity;
 
+  int16_t idx_enc = velocity >> 5;
+
+  int32_t min_vel = idx_enc << 5;
+  int32_t max_vel = (idx_enc + 1) << 5;
+
+
+  uint16_t target_enc = 0;
+  if ((max_vel - velocity) > (velocity - min_vel))
+    {
+      target_enc = PICKLE_TURBO_TABLE[idx_enc + 1]; 
+    }
+  else
+    {
+      target_enc = PICKLE_TURBO_TABLE[idx_enc];
+    }
+
+  if (current_enc > target_enc)
+    {
+      // Do inverse pickle?
+
+      if ((current_enc - target_enc) > PICKLE_ENC_DISTANCE)
+        {
+          new_velocity = velocity - PICKLE_TURBO_VEL;
+        }
+    }
+
+  else
+    {
+      if ((target_enc - current_enc) > PICKLE_ENC_DISTANCE)
+        {
+          new_velocity = velocity + PICKLE_TURBO_VEL;
+        }
+    }
 
   return new_velocity;
   
@@ -224,10 +257,12 @@ void motor_control(int control)
       int32_t left_velocity = target_velocity + control;
       int32_t right_velocity = target_velocity - control;
       
-      if (TURBO_PICKLE)
+      if (TURBO_PICKLE) // && get_running_state() == RUNNING_STLINE)
         {
-          left_velocity = get_pickle_turbo(left_velocity);
-          right_velocity = get_pickle_turbo(right_velocity);
+          left_velocity = get_pickle_turbo(left_velocity,
+                                           get_left_encoder_ticks());
+          right_velocity = get_pickle_turbo(right_velocity,
+                                            get_right_encoder_ticks());
         }
       
       set_left_motor_velocity(left_velocity);
