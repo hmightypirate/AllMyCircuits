@@ -188,8 +188,8 @@ void check_module() {
 
 
 void welcome_message() {
-    printf("Bat Bolido CLI by Mighty Escuderida\n");
-    printf("Version v1.1.0\n");
+    printf("Disable Drive CLI by Mighty Escuderida\n");
+    printf("Version v1.3.0\n");
 }
 
 void clear_command_line(void) {
