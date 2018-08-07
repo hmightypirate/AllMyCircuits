@@ -96,7 +96,7 @@ static void cli_buz_off() {
 
 char str_BAT[] = "BAT";
 static void cli_bat() {
-	printf("%u mV", read_vbatt());
+	printf("%u mV\n", read_vbatt());
 }
 
 char str_CLK_syntax[] = "Syntax: CLK GET\n";
@@ -114,6 +114,7 @@ static void cli_mtr_set() {
 	}
 	int velocity = atoi(command_line + 8);
 	reset_target_velocity(velocity);
+	printf("%i\n", get_target_velocity());
 }
 
 char str_MTR_GET[] = "MTR GET";
@@ -352,18 +353,29 @@ static void reset_choices_array(){
 // number if there are not commands left. In the last case, returns a negative
 // number with the index of the nearest command.
 static int discard_commands_using_index(int index, int commands_left){
+	int new_commands_left = commands_left;
 	for (int i = 0; i < CLI_COMMANDS_LIST_SIZE; i++){
 		if (commands_list[i].is_a_candidate == 'n') continue;
 
 		if (commands_list[i].text[index] != command_line[index]){
 			commands_list[i].is_a_candidate = 'n';
-			commands_left = commands_left - 1;
-			if (commands_left == 0){
+			new_commands_left = new_commands_left - 1;
+			if (new_commands_left == 0){
 				return i * -1;
 			}
 		}
 	}
-	return commands_left;
+	return new_commands_left;
+}
+
+
+int get_choosen_command(){
+	for (int i = 0; i < CLI_COMMANDS_LIST_SIZE; i++){
+		if (commands_list[i].is_a_candidate == 'y') {
+			return i;
+		}
+	}
+	return -1;
 }
 
 // Discovers the command typed and executes it
@@ -374,7 +386,14 @@ void execute_command() {
 	for (int i = 0; i < command_line_size; i++){
 		commands_left = discard_commands_using_index(i, commands_left);
 		if (commands_left == 1){
-			commands_list[commands_left * -1].functionPtr();
+			int chosen_command_index = get_choosen_command();
+			if ((chosen_command_index >= 0) &&
+					(chosen_command_index < CLI_COMMANDS_LIST_SIZE) ){
+				commands_list[chosen_command_index].functionPtr();
+			} else {
+				printf("Trying to execute out of the command list %s\n",
+						command_line);
+			}
 			break;
 		}
 		if (commands_left <= 0){
