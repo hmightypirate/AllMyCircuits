@@ -77,6 +77,7 @@ void reset_pids_turbo(void);
 void reset_pids_incorner(void);
 void get_next_running_state(int16_t avg_proportional);
 rnstate_e get_running_state();
+uint32_t get_running_ms();
 void set_running_state(rnstate_e state);
 
 #endif /* __FSM_H */

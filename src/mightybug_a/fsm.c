@@ -63,7 +63,9 @@ void update_state(event_e new_event)
               MAX_NUM_NOT_CALLIBRATED_SENSORS)
             {
               current_state = RUNNING_STATE;
-            }
+              // Set the ms at the start of the running state
+              running_loop_millisecs = get_millisecs_since_start();
+            }          
         }
       else if (new_event == OUT_OF_BATTERY_EVENT)
         {
@@ -84,8 +86,6 @@ void update_state(event_e new_event)
           else if (current_state == RUNNING_STATE)
             {
               current_state = IDLE_STATE;
-              // Set the ms at the start of the running state
-              running_loop_millisecs = get_millisecs_since_start();
               
             }
           /* if in any other state -> go to callibration state */

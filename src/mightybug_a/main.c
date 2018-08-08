@@ -236,7 +236,7 @@ int main(void)
             
         /* motor control */
         if ((is_out_of_line() && !DEBUG_INERTIA_TEST) ||
-            (DEBUG_INERTIA_TEST && current_loop_millisecs - get_running_ms() > DEBUG_INERTIA_TIME_MS)) {
+            (DEBUG_INERTIA_TEST &&  (current_loop_millisecs - get_running_ms() > DEBUG_INERTIA_TIME_MS))) {
           // stop the motors if out of line
           stop_motors();
                 
