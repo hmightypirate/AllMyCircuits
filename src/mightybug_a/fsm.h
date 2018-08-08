@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include "sensors.h"
 #include "pid.h"
+#include "cron.h"
 #include "motors.h"
 #include "libjukebox.h"
 

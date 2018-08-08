@@ -2,6 +2,7 @@
 
 static state_e current_state = CALLIBRATION_STATE;
 static rnstate_e running_state = RUNNING_NORMAL;
+uint32_t running_loop_millisecs = 0;
 
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
@@ -12,7 +13,7 @@ const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  425, 450, 475
+  300, 450, 600
 };
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
@@ -36,6 +37,14 @@ uint32_t delay_start_ms = 0;
 uint32_t pidvel_map_ms = 0;
 uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
+
+/*
+ * @brief get the ms the car entered the running state
+ */
+uint32_t get_running_ms()
+{
+  return running_loop_millisecs;
+}
 
 /*
  * @brief extremely simple finite state machine
@@ -75,6 +84,9 @@ void update_state(event_e new_event)
           else if (current_state == RUNNING_STATE)
             {
               current_state = IDLE_STATE;
+              // Set the ms at the start of the running state
+              running_loop_millisecs = get_millisecs_since_start();
+              
             }
           /* if in any other state -> go to callibration state */
           else

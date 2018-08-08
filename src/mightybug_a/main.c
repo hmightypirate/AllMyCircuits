@@ -80,8 +80,7 @@ int main(void)
                                              (uint32_t) BUTTON2_PORT};
   uint16_t button_pin_array[NUM_BUTTONS] = {(uint16_t) BUTTON0_PIN,
                                             (uint16_t) BUTTON1_PIN,
-                                            (uint16_t) BUTTON2_PIN};
-  
+                                            (uint16_t) BUTTON2_PIN};  
   keypad_setup(get_millisecs_since_start(),
                button_port_array,
                button_pin_array);
@@ -92,7 +91,7 @@ int main(void)
   uint32_t sync_iterations = 0;
   
   while(1) {
-    int current_loop_millisecs = get_millisecs_since_start();
+    uint32_t current_loop_millisecs = get_millisecs_since_start();
     sync_iterations += 1;
     
     if (is_command_received()) {
@@ -159,7 +158,6 @@ int main(void)
 
         /* Clear led during idle state */
         clear_led();
-
         
       } else if (current_state == NO_BATTERY_STATE) {
             
@@ -179,8 +177,7 @@ int main(void)
           
           if (current_loop_millisecs - get_delay_start_time() >
               DELAYED_START_MS)
-            {
-              
+            {              
               reset_encoder_ticks();
               update_state(GO_TO_RUN_EVENT);
             }
@@ -238,7 +235,8 @@ int main(void)
         error = pid(proportional);
             
         /* motor control */
-        if (is_out_of_line()) {
+        if ((is_out_of_line() && !DEBUG_INERTIA_TEST) ||
+            (DEBUG_INERTIA_TEST && current_loop_millisecs - get_running_ms() > DEBUG_INERTIA_TIME_MS)) {
           // stop the motors if out of line
           stop_motors();
                 
