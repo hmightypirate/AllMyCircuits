@@ -23,6 +23,9 @@
 #define MAX_ITS_CORNER 10
 #define MIN_ITS_TURBO 10
 
+#define OUT_NORMAL_HYST 15
+#define OUT_TURBO_HYST 25
+
 typedef enum {
   IDLE_STATE,
   CALLIBRATION_STATE,

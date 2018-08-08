@@ -258,6 +258,7 @@ void motor_control(int control)
 
   if (DEBUG_INERTIA_TEST)
     {
+      // running in straight lines
       control = 0;
     }
   

@@ -25,8 +25,8 @@ const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
   500, 500, 500
 };
 
-const int16_t normal_out_hyst = 15;    // going out of pid (position)
-const int16_t turbo_out_hyst = 25;  // going out of turbo (position)
+const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)
+const int16_t turbo_out_hyst = OUT_TURBO_HYST;  // going out of turbo (position)
 
 const uint8_t map_songs[MAX_MAPPINGS] = {
   SONG_ONE_BEAT_ORDER, SONG_TWO_BEAT_ORDER, SONG_THREE_BEAT_ORDER
