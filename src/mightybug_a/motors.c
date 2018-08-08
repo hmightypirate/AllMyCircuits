@@ -258,32 +258,30 @@ void motor_control(int control)
 
   if (DEBUG_INERTIA_TEST)
     {
-      set_left_motor_velocity(target_velocity);  //FIXME delete
-      set_right_motor_velocity(target_velocity); //FIXME delete
-    }
-  else
-    {
-      int32_t left_velocity = target_velocity + control;
-      int32_t right_velocity = target_velocity - control;
-      
-      if ((TURBO_PICKLE && TURBO_PICKLE_IN_CORNERS) ||
-          (TURBO_PICKLE && get_running_state() == RUNNING_STLINE))
-        {
-
-          
-          left_velocity = get_pickle_turbo(left_velocity,
-                                           get_left_encoder_ticks(),
-                                           &left_turbo_pickle_flag);
-          right_velocity = get_pickle_turbo(right_velocity,
-                                            get_right_encoder_ticks(),
-                                            &right_turbo_pickle_flag);
-        }
-      
-      set_left_motor_velocity(left_velocity);
-      set_right_motor_velocity(right_velocity); 
+      control = 0;
     }
   
+  int32_t left_velocity = target_velocity + control;
+  int32_t right_velocity = target_velocity - control;
+
+  // aplying pickle
+  if ((TURBO_PICKLE && TURBO_PICKLE_IN_CORNERS) ||
+      (TURBO_PICKLE && get_running_state() == RUNNING_STLINE))
+    {
+
+      
+      left_velocity = get_pickle_turbo(left_velocity,
+                                       get_left_encoder_ticks(),
+                                           &left_turbo_pickle_flag);
+      right_velocity = get_pickle_turbo(right_velocity,
+                                        get_right_encoder_ticks(),
+                                        &right_turbo_pickle_flag);
+    }
+      
+  set_left_motor_velocity(left_velocity);
+  set_right_motor_velocity(right_velocity); 
 }
+  
 
 /*
  * @brief stop the motors
