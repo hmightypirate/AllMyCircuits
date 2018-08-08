@@ -74,7 +74,7 @@ void set_right_motor_pwm(int value)
 
 
 /*
- * @brief obtain the pickle turbo
+ * @brief obtain the pickle turbo (an extra acceleration if the motors are far from the objective (measured with the encoders)
  *
  */
 

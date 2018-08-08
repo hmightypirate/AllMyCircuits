@@ -16,8 +16,8 @@
 /* if this flag is set, both motors will received target velocity till they reach and end of line */
 #define DEBUG_INERTIA_TEST 0
 #define TURBO_PICKLE 1
-#define PICKLE_ENC_DISTANCE 5
-#define PICKLE_TURBO_VEL 100
+#define PICKLE_ENC_DISTANCE 10
+#define PICKLE_TURBO_VEL 200
 
 
 void reset_target_velocity(int target_vel);
