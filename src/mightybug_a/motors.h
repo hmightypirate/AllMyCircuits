@@ -20,6 +20,13 @@
 #define PICKLE_ENC_DISTANCE 10
 #define PICKLE_TURBO_VEL 200
 
+typedef enum {
+  NO_PICKLE_TURBO,
+  PICKLE_TURBO,
+  ANTIPICKLE_TURBO
+} state_pickle_e;
+
+
 
 void reset_target_velocity(int target_vel);
 int get_target_velocity(void);
