@@ -17,7 +17,7 @@
 #define DEBUG_INERTIA_TEST 0
 #define TURBO_PICKLE 1
 #define PICKLE_ENC_DISTANCE 5
-#define PICKLE_TURBO_VEL 200
+#define PICKLE_TURBO_VEL 100
 
 
 void reset_target_velocity(int target_vel);
