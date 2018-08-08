@@ -28,6 +28,10 @@ clean_all:
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $(BIN_PATH)/$< $(BIN_PATH)/$@
+	$(info ‘text’ is what ends up typically in FLASH and has code and constant data.)
+	$(info ‘data’ is used for initialized data.)
+	$(info ‘bss’ contains all the uninitalized data.)
+	arm-none-eabi-size --format=Berkeley -d $(BIN_PATH)/$(VERSION_NAME).elf
 
 bin: $(VERSION_NAME).bin
 
