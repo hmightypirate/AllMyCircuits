@@ -257,7 +257,8 @@ void motor_control(int control)
       int32_t left_velocity = target_velocity + control;
       int32_t right_velocity = target_velocity - control;
       
-      if (TURBO_PICKLE) // && get_running_state() == RUNNING_STLINE)
+      if ((TURBO_PICKLE && TURBO_PICKLE_IN_CORNERS) ||
+          (TURBO_PICKLE && get_running_state() == RUNNING_STLINE))
         {
           left_velocity = get_pickle_turbo(left_velocity,
                                            get_left_encoder_ticks());
