@@ -110,9 +110,9 @@ int get_position_before_drift()
   int pos;
 
   if (last_drift == LEFT_DRIFT) {
-    pos = 1*100;
+    pos = 1*SEP_SENSORS;
   } else {
-    pos = NUM_SENSORS * 100;
+    pos = NUM_SENSORS * SEP_SENSORS;
   }
 
   return pos;
@@ -120,7 +120,7 @@ int get_position_before_drift()
 
 void set_drift_side(int pos)
 {
-  if (pos < ((NUM_SENSORS + 1) * 100/2)) 
+  if (pos < ((NUM_SENSORS + 1) * SEP_SENSORS/2)) 
     last_drift = LEFT_DRIFT;
   else 
     last_drift = RIGHT_DRIFT;
@@ -152,7 +152,7 @@ int get_line_position(uint16_t* value)
     value[i] = trunc_to_range(value[i], white_sensors[i], black_sensors[i]);
     value[i] = rescale_in_range(value[i], white_sensors[i], black_sensors[i], K_SENSOR);
     
-    avg_sensors += ((uint32_t)value[i])*(i+1)*100;
+    avg_sensors += ((uint32_t)value[i])*(i+1)*SEP_SENSORS;
     sum_sensors += value[i];
   }
 
@@ -180,13 +180,13 @@ int get_line_position(uint16_t* value)
   }
 
   if (FOLLOW_WHITE_LINE) {
-      position = (NUM_SENSORS + 1) * 100 - position;
+      position = (NUM_SENSORS + 1) * SEP_SENSORS - position;
   }
 
   set_drift_side(position);
 
   /* Zero-center position */
-  position = position - (NUM_SENSORS + 1) * 100/2;
+  position = position - (NUM_SENSORS + 1) * SEP_SENSORS/2;
 
   return position;
 }

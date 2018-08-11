@@ -47,9 +47,9 @@ int main(void)
   /* setup microcontroller */
   setup_microcontroller();
   
-  /* reset motors */
-  reset_target_velocity(INITIAL_TARGET_VELOCITY);
-
+  /* reset motors and pid to the current mapping */
+  force_mapping_to_current();
+  
   /* reset sensors */
   //FIXME: better do some callibration
   if (!SOFT_CALLIBRATION) {
@@ -61,6 +61,9 @@ int main(void)
   
   /* reset pid */
   reset_pid();
+
+  /* reset readings for turbo calculation */
+  reset_prop_readings();
 
   /* led: setting async period */
   set_async_period(LED_ASYNC_PERIOD);
@@ -77,21 +80,20 @@ int main(void)
                                              (uint32_t) BUTTON2_PORT};
   uint16_t button_pin_array[NUM_BUTTONS] = {(uint16_t) BUTTON0_PIN,
                                             (uint16_t) BUTTON1_PIN,
-                                            (uint16_t) BUTTON2_PIN};
-  
+                                            (uint16_t) BUTTON2_PIN};  
   keypad_setup(get_millisecs_since_start(),
                button_port_array,
                button_pin_array);
-
-  /* reset mappings */
-  reset_mappings();
   
   clear_led();
 
   uint32_t last_loop_execution_ms = 0;
+  uint32_t sync_iterations = 0;
   
   while(1) {
-    int current_loop_millisecs = get_millisecs_since_start();
+    uint32_t current_loop_millisecs = get_millisecs_since_start();
+    sync_iterations += 1;
+    
     if (is_command_received()) {
       execute_command();
     }
@@ -111,7 +113,25 @@ int main(void)
     music_update(current_loop_millisecs);
     keypad_loop(current_loop_millisecs);
     menu_functions(current_loop_millisecs);
-    
+
+    // loop out of period
+    if (current_state == SET_NORMAL_MODE_STATE)
+      {
+        set_target_as_normal();
+        /* change pid normal */
+        reset_pids_normal();
+        current_state = RUNNING_STATE; //FIXME this assignment is local (and useless)
+        set_running_state(RUNNING_NORMAL);
+      }
+    else if (current_state == SET_TURBO_MODE_STATE)
+      {
+        set_target_as_turbo();
+        /* change pid consts */
+        reset_pids_turbo();
+        current_state = RUNNING_STATE;  //FIXME this assignment is local (and useless)
+        set_running_state(RUNNING_STLINE);
+      }
+
     // loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS) {
         
@@ -138,7 +158,6 @@ int main(void)
 
         /* Clear led during idle state */
         clear_led();
-
         
       } else if (current_state == NO_BATTERY_STATE) {
             
@@ -158,16 +177,13 @@ int main(void)
           
           if (current_loop_millisecs - get_delay_start_time() >
               DELAYED_START_MS)
-            {
-              
+            {              
               reset_encoder_ticks();
               update_state(GO_TO_RUN_EVENT);
             }
 
           /* Led on */
           set_led();
-
-
         }
       else if (current_state == PIDANDVEL_MAPPING_STATE)
         {
@@ -198,13 +214,29 @@ int main(void)
             
         // Running 
         int proportional = get_line_position(sensor_value);
-      
+
+        // Meas turbo mode
+        if (sync_iterations % TIME_BETWEEN_STORE_POS == 0)
+          {
+            set_new_reading(proportional);
+
+            // Check that the minimum number of readings was performed
+            if (is_enable_avg_readings())
+              {
+                // Obtain the average number of readings
+                int16_t avg_proportional = get_avg_abs_readings();
+
+                get_next_running_state(avg_proportional);
+              }
+          }
+        
         /* pid control */
         int error = 0;
         error = pid(proportional);
             
         /* motor control */
-        if (is_out_of_line()) {
+        if ((is_out_of_line() && !DEBUG_INERTIA_TEST) ||
+            (DEBUG_INERTIA_TEST &&  (current_loop_millisecs - get_running_ms() > DEBUG_INERTIA_TIME_MS))) {
           // stop the motors if out of line
           stop_motors();
                 

@@ -32,6 +32,15 @@
 /* if 1 the car stops after finding an horizontal line -> all sensors detect line */
 #define FINISH_ALL_INLINE 0
 
+/* the line follower position will be calculated between
+   (-(NUM_SENSORS-1)/2 * SEP_SENSORS , (NUM_SENSORS-1)/2 * SEP_SENSORS)
+
+   This value only has to be high enough in order to have an accurate position value
+   (100 is more than enough)
+
+ */
+#define SEP_SENSORS 100
+
 /* Callibration functions */
 uint8_t get_calibrated_sensors_count(void);
 void reset_calibration_values(void);

@@ -9,6 +9,72 @@ static int16_t derivative = 0;
 static int16_t proportional = 0;
 static int16_t last_error = 0;
 
+
+int16_t array_prop_readings[NUMBER_POS_READINGS]; 
+uint8_t total_prop_readings = 0;
+uint8_t curr_prop_idx = 0;
+
+void reset_prop_readings()
+{
+  for (int i=0; i<NUMBER_POS_READINGS; i++)
+    {
+      array_prop_readings[i] = 0;
+    }
+  total_prop_readings = 0;
+  curr_prop_idx = 0;
+}
+
+void set_new_reading(uint16_t proportional)
+{
+  array_prop_readings[curr_prop_idx] = proportional;
+
+  curr_prop_idx += 1;
+  total_prop_readings += 1;
+
+  if (curr_prop_idx >= NUMBER_POS_READINGS)
+    {
+      curr_prop_idx = 0;
+    }
+
+  if (total_prop_readings > NUMBER_POS_READINGS)
+    {
+      total_prop_readings = NUMBER_POS_READINGS;
+    }
+}
+
+uint8_t is_enable_avg_readings()
+{
+  if (total_prop_readings == NUMBER_POS_READINGS)
+    {
+      return 1;
+    }
+
+  return 0;
+}
+
+
+/*
+ * @brief obtain the mean of absulte position readings
+ */
+int16_t  get_avg_abs_readings()
+{
+  int16_t avg_prop = 0;
+  
+  for (int i=0; i<NUMBER_POS_READINGS; i++)
+    {
+      if (array_prop_readings[i] > 0)
+        {
+          avg_prop += array_prop_readings[i];
+        }
+      else
+        {
+          avg_prop -= array_prop_readings[i];
+        }
+      
+    }
+  return avg_prop /= NUMBER_POS_READINGS;
+}
+  
 /*
  * @brief resets pid variables
  */

@@ -1,6 +1,6 @@
 #include "cli.h"
 
-#define TELEMETRY 0
+#define TELEMETRY 1
 #define SHOW_MILLIS 1
 #define SHOW_POSITION 0
 #define SHOW_K_P 0
@@ -13,5 +13,6 @@
 #define SHOW_RIGHT_PWM 0
 #define SHOW_LEFT_ENCODER 1
 #define SHOW_RIGHT_ENCODER 1
+#define SHOW_TARGET_VEL 1
 
 void print_telemetry(int);

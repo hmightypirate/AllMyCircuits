@@ -4,7 +4,7 @@
 void print_telemetry(int millis)
 {
     if (SHOW_MILLIS) printf("%d,", millis % 10);
-    if (SHOW_POSITION) printf("%+04d", get_position());
+    if (SHOW_POSITION) printf("%+04d,", get_position());
     if (SHOW_K_P) printf("%d,", get_kp());
     if (SHOW_K_I) printf("%d,", get_ki());
     if (SHOW_K_D) printf("%d,", get_kd());
@@ -15,5 +15,6 @@ void print_telemetry(int millis)
     if (SHOW_RIGHT_PWM) printf("%d,", get_last_right_vel());
     if (SHOW_LEFT_ENCODER) printf("%u,", (unsigned int)get_left_encoder_ticks());
     if (SHOW_RIGHT_ENCODER) printf("%u,", (unsigned int)get_right_encoder_ticks());
+    if (SHOW_TARGET_VEL) printf("%d,", get_target_velocity());
     printf("\n");
 }

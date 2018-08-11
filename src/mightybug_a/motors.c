@@ -1,10 +1,24 @@
 #include "motors.h"
 
+static int target_velocity_turbo = 0;
+static int target_velocity_normal = 0;
+static int target_velocity_incorner = 0;
 static int target_velocity = 0;
 
 /* storing last velocities for debug */
 static int last_left_vel = 0;
 static int last_right_vel = 0;
+static state_pickle_e left_turbo_pickle_flag = NO_PICKLE_TURBO;
+static state_pickle_e right_turbo_pickle_flag = NO_PICKLE_TURBO;
+
+
+uint16_t PICKLE_TURBO_TABLE[33] =  {
+  0,0,0,2,4,7,10,13,  // 224
+  15,18,21,24,27,30,33,35, // 480
+  38,41,44,47,50,52,54,55, // 736
+  57,58,60,61,63,64,66,67,69,
+};
+
 
 /*
  * @brief set the state of left motor
@@ -60,14 +74,121 @@ void set_right_motor_pwm(int value)
   timer_set_oc_value(PWM_MOTOR_TIMER, RIGHT_MOTOR_OUTPUT_CHANNEL, value);
 }
 
+
 /*
- * @brief resets target velocity to a given value
+ * @brief obtain the pickle turbo (an extra acceleration if the motors are far from the objective (measured with the encoders)
+ *
+ */
+
+int32_t get_pickle_turbo(int32_t velocity, uint32_t current_enc, state_pickle_e* pickle_state)
+{
+  int32_t new_velocity = velocity;
+
+  int16_t idx_enc = velocity >> 5;
+
+  int32_t min_vel = idx_enc << 5;
+  int32_t max_vel = (idx_enc + 1) << 5;
+
+  // reset of pickle state
+  (*pickle_state) = NO_PICKLE_TURBO;
+  
+  uint16_t target_enc = 0;
+  if ((max_vel - velocity) > (velocity - min_vel))
+    {
+      target_enc = PICKLE_TURBO_TABLE[idx_enc + 1]; 
+    }
+  else
+    {
+      target_enc = PICKLE_TURBO_TABLE[idx_enc];
+    }
+
+  if (current_enc > target_enc)
+    {
+      // Do inverse pickle?
+
+      if ((current_enc - target_enc) > PICKLE_ENC_DISTANCE)
+        {
+          new_velocity = velocity - PICKLE_TURBO_VEL;
+
+          // update of pickle state
+          (*pickle_state) = ANTIPICKLE_TURBO;
+        }
+    }
+
+  else
+    {
+      if ((target_enc - current_enc) > PICKLE_ENC_DISTANCE)
+        {
+          new_velocity = velocity + PICKLE_TURBO_VEL;
+
+          // update of pickle state
+          (*pickle_state) = PICKLE_TURBO;
+        }
+    }
+
+  return new_velocity;
+  
+}
+
+
+/*
+ * @brief resets target velocity to a given value (also de normal velocity)
  *
  * @param[in] target_vel initial target velocity
  */
 void reset_target_velocity(int target_vel)
 {
+  target_velocity_normal = target_vel;
   target_velocity = target_vel;
+}
+
+/* 
+ * @brief resets target velocity in turbo
+ *
+ * @param[in] target_vel initial target velocity
+ */
+void reset_target_velocity_turbo(int target_vel)
+{
+  target_velocity_turbo = target_vel;
+}
+
+/* 
+ * @brief resets target velocity in corners
+ *
+ * @param[in] target_vel initial target velocity
+ */
+void reset_target_velocity_incorner(int target_vel)
+{
+  target_velocity_incorner = target_vel;
+}
+
+
+/* 
+ * @brief resets current target velocity with the turbo velocity
+ *
+ */
+void set_target_as_turbo(void)
+{
+  target_velocity = target_velocity_turbo;
+}
+
+/* 
+ * @brief resets current target velocity with the velocity in corners
+ *
+ */
+void set_target_as_incorner(void)
+{
+  target_velocity = target_velocity_incorner;
+}
+
+
+/* 
+ * @brief resets current target velocity with the normal velocity
+ *
+ */
+void set_target_as_normal(void)
+{
+  target_velocity = target_velocity_normal;
 }
 
 /*
@@ -137,16 +258,31 @@ void motor_control(int control)
 
   if (DEBUG_INERTIA_TEST)
     {
-      set_left_motor_velocity(target_velocity);  //FIXME delete
-      set_right_motor_velocity(target_velocity); //FIXME delete
-    }
-  else
-    {
-      set_left_motor_velocity(target_velocity + control);
-      set_right_motor_velocity(target_velocity - control); 
+      // running in straight lines
+      control = 0;
     }
   
+  int32_t left_velocity = target_velocity + control;
+  int32_t right_velocity = target_velocity - control;
+
+  // aplying pickle
+  if ((TURBO_PICKLE && TURBO_PICKLE_IN_CORNERS) ||
+      (TURBO_PICKLE && get_running_state() == RUNNING_STLINE))
+    {
+
+      
+      left_velocity = get_pickle_turbo(left_velocity,
+                                       get_left_encoder_ticks(),
+                                           &left_turbo_pickle_flag);
+      right_velocity = get_pickle_turbo(right_velocity,
+                                        get_right_encoder_ticks(),
+                                        &right_turbo_pickle_flag);
+    }
+      
+  set_left_motor_velocity(left_velocity);
+  set_right_motor_velocity(right_velocity); 
 }
+  
 
 /*
  * @brief stop the motors
@@ -159,7 +295,6 @@ void stop_motors()
   set_left_motor_velocity(0);
   set_right_motor_velocity(0);
 }
-
 
 /*
  * @brief get last left velocity

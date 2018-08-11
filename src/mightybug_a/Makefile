@@ -7,7 +7,6 @@ CSRC = $(wildcard *.c)
 OBJ_NO_DIR = $(CSRC:%.c=%.o)
 OBJ = $(patsubst %.c,$(BIN_PATH)/%.o,$(CSRC))
 
-
 bin/%.o: %.c
 	@printf "  CC      $(<F)\n"
 	mkdir -p $(BIN_PATH)
@@ -15,7 +14,7 @@ bin/%.o: %.c
 
 $(VERSION_NAME).elf: $(OBJ)
 	mkdir -p $(BIN_PATH)
-	$(CC) $(LDFLAGS) -o $(BIN_PATH)/$@ $(OBJ) $(LDLIBS)
+	$(CC) $(LDFLAGS) -o $(BIN_PATH)/$@ $(OBJ) $(LDLIBS) $(CFLAGS)
 
 .PHONY: clean
 clean:
