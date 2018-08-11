@@ -7,8 +7,6 @@ CSRC = $(wildcard *.c)
 OBJ_NO_DIR = $(CSRC:%.c=%.o)
 OBJ = $(patsubst %.c,$(BIN_PATH)/%.o,$(CSRC))
 
-<<<<<<< HEAD
-
 bin/%.o: %.c
 	@printf "  CC      $(<F)\n"
 	mkdir -p $(BIN_PATH)
