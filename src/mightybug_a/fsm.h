@@ -21,6 +21,7 @@
 
 /* Activate/deactivate special functions */
 #define ENABLE_TURBO_MODE 1
+#define TURBO_PITCH_DEBUG 1  // Disturbing pitch to discern normal/turbo states
 #define MAX_ITS_CORNER 10
 #define MIN_ITS_TURBO 10
 
@@ -59,10 +60,12 @@ typedef enum {
 typedef enum {
   RUNNING_NORMAL,
   RUNNING_STLINE,
+  MAX_RUNNING_STATES,
 } rnstate_e;
 
 
 state_e get_state(void);
+void set_state(state_e state);
 void update_state(event_e new_event);
 void set_delay_start_time(uint32_t delay);
 uint32_t get_delay_start_time();

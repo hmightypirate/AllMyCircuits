@@ -109,7 +109,7 @@ void motor_pwm_setup(void)
   timer_set_mode(PWM_MOTOR_TIMER, TIM_CR1_CKD_CK_INT,
                  TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
   /* Set divider to 3 */
-  timer_set_prescaler(PWM_MOTOR_TIMER, 3);
+  timer_set_prescaler(PWM_MOTOR_TIMER, 7);
   /* A timer update event is generated only after the specified number of
    * repeat count cycles have been completed. */
   timer_set_repetition_counter(PWM_MOTOR_TIMER, 0);

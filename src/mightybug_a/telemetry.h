@@ -2,7 +2,7 @@
 
 #define TELEMETRY 1
 #define SHOW_MILLIS 1
-#define SHOW_POSITION 0
+#define SHOW_POSITION 1
 #define SHOW_K_P 0
 #define SHOW_K_I 0
 #define SHOW_K_D 0

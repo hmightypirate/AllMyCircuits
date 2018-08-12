@@ -13,7 +13,7 @@ const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  300, 450, 600
+  350, 425, 475
 };
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
@@ -174,6 +174,14 @@ uint32_t get_delay_start_time()
 state_e get_state()
 {
   return current_state;
+}
+
+/*
+ * @brief set state
+ */
+void set_state(state_e state)
+{
+  current_state = state;
 }
 
 /*

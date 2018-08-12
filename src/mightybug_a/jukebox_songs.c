@@ -15,6 +15,7 @@ static uint8_t notes_pitch_INDIANAJONES[SONG_LEN_INDIANAJONES] = {
 static uint8_t notes_duration_INDIANAJONES[SONG_LEN_INDIANAJONES] = {
         32, 16, 16, 16, 16, 64, 16, 32, 16, 16, 128, 32, 32, 16, 16, 16, 16, 64, 32, 32, 16, 16, 64, 64, 64, 32, 16, 16, 16, 16, 128, 32, 32, 16, 16, 128, 32, 16, 16, 32, 16, 32, 16, 16, 32, 16, 32, 16, 16, 32, 16, 32, 16, 16, 128};
 
+
 static uint8_t notes_pitch_ONE_BEAT[SONG_LEN_ONE_BEAT] = {
   A6, R
 };
@@ -35,7 +36,26 @@ static uint8_t notes_pitch_THREE_BEAT[SONG_LEN_THREE_BEAT] = {
 static uint8_t notes_duration_THREE_BEAT[SONG_LEN_THREE_BEAT] = {
   30, 15, 30, 15, 30, 255};
 
+
+static uint8_t notes_pitch_SOPRANO_BEAT[SOPRANO_LEN_BEAT] = {
+  A6, R
+};
+
+static uint8_t notes_duration_SOPRANO_BEAT[SOPRANO_LEN_BEAT] = {
+  128, 10
+};
+
+
+static uint8_t notes_pitch_TENOR_BEAT[TENOR_LEN_BEAT] = {
+  G5, R,
+};
+
+static uint8_t notes_duration_TENOR_BEAT[TENOR_LEN_BEAT] = {
+  128, 10
+};
+
   
+
 // Returns the number of songs in the jukebox
 uint8_t init_jukebox_songs() {
 
@@ -71,6 +91,15 @@ uint8_t init_jukebox_songs() {
   jukebox_song_list[SONG_THREE_BEAT_ORDER].notes_pitch = notes_pitch_THREE_BEAT;
   jukebox_song_list[SONG_THREE_BEAT_ORDER].notes_duration = notes_duration_THREE_BEAT;
   
+  jukebox_song_list[SOPRANO_BEAT_ORDER].length = SOPRANO_LEN_BEAT;
+  jukebox_song_list[SOPRANO_BEAT_ORDER].bpm = SOPRANO_VEL_BEAT;
+  jukebox_song_list[SOPRANO_BEAT_ORDER].notes_pitch = notes_pitch_SOPRANO_BEAT;
+  jukebox_song_list[SOPRANO_BEAT_ORDER].notes_duration = notes_duration_SOPRANO_BEAT;
+
+  jukebox_song_list[TENOR_BEAT_ORDER].length = TENOR_LEN_BEAT;
+  jukebox_song_list[TENOR_BEAT_ORDER].bpm = TENOR_VEL_BEAT;
+  jukebox_song_list[TENOR_BEAT_ORDER].notes_pitch = notes_pitch_TENOR_BEAT;
+  jukebox_song_list[TENOR_BEAT_ORDER].notes_duration = notes_duration_TENOR_BEAT;
   
   return JUKEBOX_SONGS_TOTAL_SONGS;
 }
