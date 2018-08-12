@@ -28,6 +28,24 @@ void music_update(int millis)
   } else if (current_state == PIDANDVEL_MAPPING_STATE) {
     jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
     jukebox_play_in_loop(millis);
+  } else if (TURBO_PITCH_DEBUG && (current_state == RUNNING_STATE)) {
+
+    if (get_running_state() == RUNNING_STLINE)
+      {
+	jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+	jukebox_play_in_loop(millis);
+      }
+    else if (get_running_state() == RUNNING_NORMAL)
+      {
+	jukebox_setcurrent_song(TENOR_BEAT_ORDER);
+	jukebox_play_in_loop(millis);
+      }
+    else
+      {
+	jukebox_setcurrent_song(SONG_TWO_BEAT_ORDER);
+	jukebox_play_in_loop(millis);
+      }
+      
   } else {
     if (is_out_of_line()) {
       jukebox_setcurrent_song(OUT_OF_LINE_SONG);
@@ -120,7 +138,7 @@ int main(void)
         set_target_as_normal();
         /* change pid normal */
         reset_pids_normal();
-        current_state = RUNNING_STATE; //FIXME this assignment is local (and useless)
+        set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
         set_running_state(RUNNING_NORMAL);
       }
     else if (current_state == SET_TURBO_MODE_STATE)
@@ -128,7 +146,7 @@ int main(void)
         set_target_as_turbo();
         /* change pid consts */
         reset_pids_turbo();
-        current_state = RUNNING_STATE;  //FIXME this assignment is local (and useless)
+        set_state(RUNNING_STATE);  //FIXME this assignment is local (and useless)
         set_running_state(RUNNING_STLINE);
       }
 
