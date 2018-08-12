@@ -145,15 +145,30 @@ int get_line_position(uint16_t* value)
   out_of_line = 0;
   
   for (int i = 0; i < NUM_SENSORS; i++) {
+    bool active_sensor = false;
     //Check whites/blacks detected
-    if (value[i] > threshold[i]) blacks_detected++;
-    if (value[i] < threshold[i]) whites_detected++;
+    if (value[i] > threshold[i]) {
+      blacks_detected++;
+      if (FOLLOW_BLACK_LINE) {
+        active_sensor = true;
+      }
+    }
+
+    if (value[i] < threshold[i]) {
+      whites_detected++;
+      if (FOLLOW_WHITE_LINE) {
+        active_sensor = true;
+      }
+    }
 
     value[i] = trunc_to_range(value[i], white_sensors[i], black_sensors[i]);
     value[i] = rescale_in_range(value[i], white_sensors[i], black_sensors[i], K_SENSOR);
     
-    avg_sensors += ((uint32_t)value[i])*(i+1)*SEP_SENSORS;
-    sum_sensors += value[i];
+    if (active_sensor) {
+      avg_sensors += ((uint32_t)value[i])*(i+1)*SEP_SENSORS;
+      sum_sensors += value[i];
+    }
+    active_sensor = false;
   }
 
 
