@@ -2,7 +2,7 @@
 
 static int target_velocity_turbo = 0;
 static int target_velocity_normal = 0;
-static int target_velocity_incorner = 0;
+static int target_velocity_nool = 0;
 static int target_velocity = 0;
 
 /* storing last velocities for debug */
@@ -153,13 +153,13 @@ void reset_target_velocity_turbo(int target_vel)
 }
 
 /* 
- * @brief resets target velocity in corners
+ * @brief resets target velocity in nearly out of lines
  *
  * @param[in] target_vel initial target velocity
  */
-void reset_target_velocity_incorner(int target_vel)
+void reset_target_velocity_nool(int target_vel)
 {
-  target_velocity_incorner = target_vel;
+  target_velocity_nool = target_vel;
 }
 
 
@@ -176,9 +176,9 @@ void set_target_as_turbo(void)
  * @brief resets current target velocity with the velocity in corners
  *
  */
-void set_target_as_incorner(void)
+void set_target_as_nool(void)
 {
-  target_velocity = target_velocity_incorner;
+  target_velocity = target_velocity_nool;
 }
 
 

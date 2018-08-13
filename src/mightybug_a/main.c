@@ -40,6 +40,11 @@ void music_update(int millis)
 	jukebox_setcurrent_song(TENOR_BEAT_ORDER);
 	jukebox_play_in_loop(millis);
       }
+    else if (get_running_state() == RUNNING_NOOL)
+      {
+	jukebox_setcurrent_song(BASS_BEAT_ORDER);
+	jukebox_play_in_loop(millis);
+      }    
     else
       {
 	jukebox_setcurrent_song(SONG_TWO_BEAT_ORDER);
@@ -149,7 +154,16 @@ int main(void)
         set_state(RUNNING_STATE);  //FIXME this assignment is local (and useless)
         set_running_state(RUNNING_STLINE);
       }
+    else if (current_state == SET_NOOL_MODE_STATE)
+      {
+	set_target_as_nool();
 
+	/* change pid consts */
+	reset_pids_nool();
+	set_state(RUNNING_STATE);
+	set_running_state(RUNNING_NOOL);
+      }
+    
     // loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS) {
         
