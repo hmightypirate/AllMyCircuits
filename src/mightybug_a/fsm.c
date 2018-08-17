@@ -4,6 +4,10 @@ static state_e current_state = CALLIBRATION_STATE;
 static rnstate_e running_state = RUNNING_NORMAL;
 uint32_t running_loop_millisecs = 0;
 
+// Variables for handling target velocity in normal mode
+static uint16_t seq_decrease_line_pos = 0;
+static uint16_t seq_increase_line_pos = 0;
+
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
 const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
@@ -253,7 +257,7 @@ void force_mapping_to_current()
   reset_pids_normal();
 
   /* change vel cts */
-  reset_target_velocity(vel_maps[current_pidvel_mapping]);
+  reset_target_velocity_normal(vel_maps[current_pidvel_mapping]);
 
   /* reset target turbo velocity */
   reset_target_velocity_turbo(vel_turbo_maps[current_pidvel_mapping]);
@@ -346,6 +350,64 @@ void get_next_running_state(int16_t avg_proportional)
       if (avg_proportional < nool_normal_out_hyst)
 	{
 	  update_state(GO_TO_NORMAL_EVENT);
+	}
+    }
+}
+
+
+/* 
+ * @brief obtains the aggregate number of pos readings improving/decreasing line position
+ *
+ */
+void update_sequential_readings(int16_t new_proportional, int16_t past_proportional)
+{
+  if (new_proportional < 0)
+    {
+      new_proportional = -new_proportional;
+    }
+
+  if (past_proportional < 0)
+    {
+      past_proportional = -past_proportional;
+    }
+
+  if (new_proportional > past_proportional)
+    {
+      seq_increase_line_pos += 1;
+      seq_decrease_line_pos = 0;
+    }
+  else
+    {
+      seq_decrease_line_pos += 1;
+      seq_increase_line_pos = 0;
+    }
+
+}
+
+void reset_sequential_readings(void)
+{
+  seq_decrease_line_pos = 0;
+  seq_increase_line_pos = 0;
+
+}
+
+/* 
+ * @brief updates the target velocity
+ *
+ */
+void update_target_normal()
+{
+
+  /* only works in normal mode */
+  if (running_state == RUNNING_NORMAL)
+    {
+      if (seq_decrease_line_pos > DEC_NORMAL_THRESHOLD)
+	{
+	  reset_target_velocity(get_target_velocity() + DEC_NORMAL_QTY);
+	}
+      else if (seq_increase_line_pos > INC_NORMAL_THRESHOLD)
+	{
+	  reset_target_velocity(get_target_velocity() + INC_NORMAL_QTY);
 	}
     }
 }

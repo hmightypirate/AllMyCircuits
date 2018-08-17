@@ -33,6 +33,7 @@ void reset_target_velocity(int target_vel);
 int get_target_velocity(void);
 void reset_target_velocity_turbo(int target_vel);
 void reset_target_velocity_nool(int target_vel);
+void reset_target_velocity_normal(int target_vel);
 void motor_control(int error);
 void stop_motors();
 void set_target_as_turbo(void);

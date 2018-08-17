@@ -138,9 +138,15 @@ int32_t get_pickle_turbo(int32_t velocity, uint32_t current_enc, state_pickle_e*
  */
 void reset_target_velocity(int target_vel)
 {
-  target_velocity_normal = target_vel;
   target_velocity = target_vel;
 }
+
+void reset_target_velocity_normal(int target_vel)
+{
+  target_velocity_normal = target_vel;
+  reset_target_velocity(target_vel);
+}
+
 
 /* 
  * @brief resets target velocity in turbo

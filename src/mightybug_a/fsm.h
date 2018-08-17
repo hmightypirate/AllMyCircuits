@@ -37,6 +37,15 @@
 #define OUT_NORMAL_NOOL_HYST 200
 #define OUT_NOOL_NORMAL_HYST 150
 
+/* Incremental/Decremental target velocity in NORMAL mode */
+#define ENABLE_INCDEC_NORMAL_FLAG 1
+#define ITS_INCDEC_NORMAL 1
+#define INC_NORMAL_THRESHOLD 10
+#define DEC_NORMAL_THRESHOLD 10
+#define INC_NORMAL_QTY -5
+#define DEC_NORMAL_QTY 5
+
+
 typedef enum {
   IDLE_STATE,
   CALLIBRATION_STATE,
@@ -102,5 +111,8 @@ uint32_t get_running_ms();
 void set_running_state(rnstate_e state);
 void update_ms_inline(uint32_t current_ms);
 uint8_t exceeds_time_out_of_line(uint32_t current_ms);
+void update_sequential_readings(int16_t new_proportional, int16_t past_proportional);
+void reset_sequential_readings(void);
+void update_target_normal();
 
 #endif /* __FSM_H */
