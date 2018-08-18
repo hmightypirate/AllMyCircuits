@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #define MAX_INTEGRAL 100
-#define MAX_PID_ERROR 2000
+#define MAX_PID_ERROR 2000 //FIXME Value was 2000
 #define PID_CONTROL_DIVISOR 100
 
 

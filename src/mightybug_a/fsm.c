@@ -27,7 +27,7 @@ const int16_t pid_nool_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_nool_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  200, 250, 275
+  350, 350, 350
 };
 
 
@@ -38,7 +38,7 @@ const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  500, 500, 500
+  450, 450, 450
 };
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)
@@ -401,11 +401,11 @@ void update_target_normal()
   /* only works in normal mode */
   if (running_state == RUNNING_NORMAL)
     {
-      if (seq_decrease_line_pos > DEC_NORMAL_THRESHOLD)
+      if (seq_decrease_line_pos > DEC_NORMAL_THRESHOLD && (get_target_velocity() < MAX_VEL_MOTOR_DEC_MODE))
 	{
 	  reset_target_velocity(get_target_velocity() + DEC_NORMAL_QTY);
 	}
-      else if (seq_increase_line_pos > INC_NORMAL_THRESHOLD)
+      else if ((seq_increase_line_pos > INC_NORMAL_THRESHOLD) && (get_target_velocity() > MIN_VEL_MOTOR_INC_MODE))
 	{
 	  reset_target_velocity(get_target_velocity() + INC_NORMAL_QTY);
 	}

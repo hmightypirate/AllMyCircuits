@@ -22,6 +22,7 @@
 /* Activate/deactivate special functions */
 #define ENABLE_TURBO_MODE 1
 
+#define ENABLE_NOOL_MODE 0
 #define TURBO_PITCH_DEBUG 0  // Disturbing pitch to discern normal/turbo states
 #define MAX_ITS_CORNER 10
 #define MIN_ITS_TURBO 10
@@ -30,19 +31,20 @@
 #define FLAG_DELAY_STOP_OUT_OF_LINE 0
 #define MS_DELAY_OUT_OF_LINE 600 //ms
 
-#define ENABLE_NOOL_MODE 1
 /* Hysteresis values for changing state whilst running  */
 #define OUT_NORMAL_HYST 15
 #define OUT_TURBO_HYST 25
-#define OUT_NORMAL_NOOL_HYST 200
-#define OUT_NOOL_NORMAL_HYST 150
+#define OUT_NORMAL_NOOL_HYST 130
+#define OUT_NOOL_NORMAL_HYST 80
 
 /* Incremental/Decremental target velocity in NORMAL mode */
-#define ENABLE_INCDEC_NORMAL_FLAG 1
-#define ITS_INCDEC_NORMAL 1
+#define ENABLE_INCDEC_NORMAL_FLAG 0
+#define ITS_INCDEC_NORMAL 10
 #define INC_NORMAL_THRESHOLD 10
 #define DEC_NORMAL_THRESHOLD 10
 #define INC_NORMAL_QTY -5
+#define MIN_VEL_MOTOR_INC_MODE 250
+#define MAX_VEL_MOTOR_DEC_MODE 475
 #define DEC_NORMAL_QTY 5
 
 
