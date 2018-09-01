@@ -274,7 +274,7 @@ void calibrate_sensors(uint16_t* values)
            white_sensors[i] = values[i];
         }
       
-      threshold[i] = (black_sensors[i] + white_sensors[i])/2;
+      threshold[i] = (black_sensors[i] + white_sensors[i])/4;
     }
   check_calibrated_sensors();     
 }
