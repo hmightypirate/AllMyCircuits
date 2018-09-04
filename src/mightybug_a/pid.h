@@ -13,7 +13,7 @@
 */
 #define TIME_BETWEEN_STORE_POS 1
 #define NUMBER_POS_READINGS 5
-#define AVG_READINGS_POS 20 // 25 works in mightybuga (alpha version)
+#define AVG_READINGS_POS 25 // 25 works in mightybuga (alpha version)
 
 
 #define DIFF_ERROR_STACK 20

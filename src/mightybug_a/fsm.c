@@ -21,13 +21,13 @@ const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
 };
 
 const int16_t pid_nool_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  400, 0, 1600,
-  400, 0, 1600,
-  400, 0, 1600
+  800, 0, 1600,
+  800, 0, 1600,
+  800, 0, 1600
 };
 
 const int16_t vel_nool_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  350, 350, 350
+  300, 300, 300
 };
 
 
@@ -38,7 +38,7 @@ const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  425, 425, 425
+  375, 425, 425
 };
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)
@@ -388,7 +388,6 @@ void reset_sequential_readings(void)
 {
   seq_decrease_line_pos = 0;
   seq_increase_line_pos = 0;
-
 }
 
 /* 
@@ -397,17 +396,24 @@ void reset_sequential_readings(void)
  */
 void update_target_normal()
 {
-
   /* only works in normal mode */
   if (running_state == RUNNING_NORMAL)
     {
-      if (seq_decrease_line_pos > DEC_NORMAL_THRESHOLD && (get_target_velocity() < MAX_VEL_MOTOR_DEC_MODE))
+      if ((seq_decrease_line_pos > DEC_NORMAL_THRESHOLD) && (get_target_velocity() < MAX_VEL_MOTOR_DEC_MODE))
 	{
 	  reset_target_velocity(get_target_velocity() + DEC_NORMAL_QTY);
+	  if (RESET_DEC_AFTER_SET)
+	    {
+	      seq_decrease_line_pos = 0;
+	    }
 	}
       else if ((seq_increase_line_pos > INC_NORMAL_THRESHOLD) && (get_target_velocity() > MIN_VEL_MOTOR_INC_MODE))
 	{
 	  reset_target_velocity(get_target_velocity() + INC_NORMAL_QTY);
+	  if (RESET_INC_AFTER_SET)
+	    {
+	      seq_increase_line_pos = 0;
+	    }
 	}
     }
 }

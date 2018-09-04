@@ -32,19 +32,22 @@
 #define MS_DELAY_OUT_OF_LINE 600 //ms
 
 /* Hysteresis values for changing state whilst running  */
-#define OUT_NORMAL_HYST 15
-#define OUT_TURBO_HYST 25
-#define OUT_NORMAL_NOOL_HYST 130
-#define OUT_NOOL_NORMAL_HYST 80
+#define OUT_NORMAL_HYST 10
+#define OUT_TURBO_HYST 20
+#define OUT_NORMAL_NOOL_HYST 200
+#define OUT_NOOL_NORMAL_HYST 150
+
 
 /* Incremental/Decremental target velocity in NORMAL mode */
-#define ENABLE_INCDEC_NORMAL_FLAG 1
+#define ENABLE_INCDEC_NORMAL_FLAG 0
 #define ITS_INCDEC_NORMAL 10
 #define INC_NORMAL_THRESHOLD 10
 #define DEC_NORMAL_THRESHOLD 10
+#define RESET_INC_AFTER_SET 0
+#define RESET_DEC_AFTER_SET 0
 #define INC_NORMAL_QTY -5
 #define MIN_VEL_MOTOR_INC_MODE 250
-#define MAX_VEL_MOTOR_DEC_MODE 400
+#define MAX_VEL_MOTOR_DEC_MODE 475
 #define DEC_NORMAL_QTY 5
 
 
