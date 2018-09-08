@@ -252,8 +252,18 @@ int main(void)
         int error = 0;
         error = pid(proportional);
             
-        /* motor control */
-        if ((is_out_of_line() && !DEBUG_INERTIA_TEST) ||
+        /* motor control 
+
+	   stops if:
+	   1) is out of line and not delay is used
+	   2) is out of line and has exceeded the maximum time allowed
+	   3) the time of an inertia test is over
+
+	 */
+        if ((is_out_of_line() && !DEBUG_INERTIA_TEST &&
+	     (!FLAG_DELAY_STOP_OUT_OF_LINE ||
+	      (FLAG_DELAY_STOP_OUT_OF_LINE &&
+	       exceeds_time_out_of_line(current_loop_millisecs)))) ||
             (DEBUG_INERTIA_TEST &&  (current_loop_millisecs - get_running_ms() > DEBUG_INERTIA_TIME_MS))) {
           // stop the motors if out of line
           stop_motors();
@@ -268,10 +278,17 @@ int main(void)
             }
                             
         } else {
+	  
           motor_control(error);
                 
           // blinking: normal behaviour
           async_blink();
+
+	  // Set the current ms (inline)
+	  if (!is_out_of_line())
+	    {
+	      update_ms_inline(current_loop_millisecs);
+	    }
          }
 
         // update encoders velocity

@@ -175,7 +175,7 @@ int get_line_position(uint16_t* value)
 
   } else {
       
-    position = avg_sensors/sum_sensors;
+    position = (int32_t) avg_sensors/sum_sensors;
 
   }
 
@@ -183,11 +183,19 @@ int get_line_position(uint16_t* value)
       position = (NUM_SENSORS + 1) * SEP_SENSORS - position;
   }
 
-  set_drift_side(position);
-
+  if (!out_of_line)
+    {
+      set_drift_side(position);
+    }
+  
   /* Zero-center position */
   position = position - (NUM_SENSORS + 1) * SEP_SENSORS/2;
 
+  if (out_of_line)
+    {
+      position = (20 * position)/100;
+    }
+  
   return position;
 }
 

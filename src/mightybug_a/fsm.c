@@ -13,7 +13,7 @@ const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  350, 425, 475
+  400, 425, 475
 };
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
@@ -37,6 +37,28 @@ uint32_t delay_start_ms = 0;
 uint32_t pidvel_map_ms = 0;
 uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
+uint32_t last_ms_inline = 0;
+
+
+/*
+ * @brief gets the current ms inline
+ */
+void update_ms_inline(uint32_t current_ms)
+{
+  last_ms_inline = current_ms;
+}
+
+/*
+ * @brief checks if the car has exceeded the time out of line
+ */
+uint8_t exceeds_time_out_of_line(uint32_t current_ms)
+{
+  if ((current_ms - last_ms_inline) > MS_DELAY_OUT_OF_LINE)
+    {
+      return 1;
+    }
+  else return 0;
+}
 
 /*
  * @brief get the ms the car entered the running state

@@ -25,6 +25,10 @@
 #define MAX_ITS_CORNER 10
 #define MIN_ITS_TURBO 10
 
+/* Delay stop if out of line */
+#define FLAG_DELAY_STOP_OUT_OF_LINE 1
+#define MS_DELAY_OUT_OF_LINE 600 //ms
+
 #define OUT_NORMAL_HYST 15
 #define OUT_TURBO_HYST 25
 
@@ -82,5 +86,7 @@ void get_next_running_state(int16_t avg_proportional);
 rnstate_e get_running_state();
 uint32_t get_running_ms();
 void set_running_state(rnstate_e state);
+void update_ms_inline(uint32_t current_ms);
+uint8_t exceeds_time_out_of_line(uint32_t current_ms);
 
 #endif /* __FSM_H */
