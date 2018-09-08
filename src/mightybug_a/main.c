@@ -285,7 +285,10 @@ int main(void)
           async_blink();
 
 	  // Set the current ms (inline)
-	  update_ms_inline(current_loop_millisecs);
+	  if (!is_out_of_line())
+	    {
+	      update_ms_inline(current_loop_millisecs);
+	    }
          }
 
         // update encoders velocity

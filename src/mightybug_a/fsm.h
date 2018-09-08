@@ -27,7 +27,7 @@
 
 /* Delay stop if out of line */
 #define FLAG_DELAY_STOP_OUT_OF_LINE 1
-#define MS_DELAY_OUT_OF_LINE 200 //ms
+#define MS_DELAY_OUT_OF_LINE 600 //ms
 
 #define OUT_NORMAL_HYST 15
 #define OUT_TURBO_HYST 25
