@@ -126,6 +126,18 @@ void set_drift_side(int pos)
     last_drift = RIGHT_DRIFT;
 }
 
+
+int get_max_sensor_index(uint16_t* value)
+{
+  int max_i = 0;
+  for (int i = 1; i < NUM_SENSORS; i++) {
+    if (value[i] > value[max_i]) {
+      max_i = i;
+    }
+  }
+  return max_i;
+}
+
 /*
  * @brief transform sensor measures in line position
  *
@@ -145,30 +157,35 @@ int get_line_position(uint16_t* value)
   out_of_line = 0;
   
   for (int i = 0; i < NUM_SENSORS; i++) {
-    bool active_sensor = false;
     //Check whites/blacks detected
     if (value[i] > threshold[i]) {
       blacks_detected++;
-      if (FOLLOW_BLACK_LINE) {
-        active_sensor = true;
-      }
     }
 
     if (value[i] < threshold[i]) {
       whites_detected++;
-      if (FOLLOW_WHITE_LINE) {
-        active_sensor = true;
-      }
     }
 
     value[i] = trunc_to_range(value[i], white_sensors[i], black_sensors[i]);
     value[i] = rescale_in_range(value[i], white_sensors[i], black_sensors[i], K_SENSOR);
     
-    if (active_sensor) {
-      avg_sensors += ((uint32_t)value[i])*(i+1)*SEP_SENSORS;
-      sum_sensors += value[i];
-    }
-    active_sensor = false;
+    // if (active_sensor) {
+    //   avg_sensors += ((uint32_t)value[i])*(i+1)*SEP_SENSORS;
+    //   sum_sensors += value[i];
+    // }
+  }
+
+  int max_i = get_max_sensor_index(value);
+
+  if (max_i != 0) {
+    avg_sensors += ((uint32_t)value[max_i-1])*(max_i)*SEP_SENSORS;
+    sum_sensors += value[max_i - 1];
+  }
+  avg_sensors += ((uint32_t)value[max_i])*(max_i+1)*SEP_SENSORS;
+  sum_sensors += value[max_i];
+  if (max_i != 7) {
+    avg_sensors += ((uint32_t)value[max_i+1])*(max_i+2)*SEP_SENSORS;
+    sum_sensors += value[max_i + 1];
   }
 
 
