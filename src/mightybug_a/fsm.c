@@ -13,7 +13,7 @@ const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  400, 425, 475
+  425, 450, 475
 };
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {

@@ -20,7 +20,7 @@
 #define INITIAL_PIDVEL_MAPPING 0
 
 /* Activate/deactivate special functions */
-#define ENABLE_TURBO_MODE 0
+#define ENABLE_TURBO_MODE 1
 #define TURBO_PITCH_DEBUG 0  // Disturbing pitch to discern normal/turbo states
 #define MAX_ITS_CORNER 10
 #define MIN_ITS_TURBO 10

@@ -16,7 +16,7 @@
 #define AVG_READINGS_POS 20 // 25 works in mightybuga (alpha version)
 
 
-#define DIFF_ERROR_STACK 10
+#define DIFF_ERROR_STACK 20
 #define FLAG_USE_DIFF_STACK 1
 
 int32_t pid(int32_t error);
