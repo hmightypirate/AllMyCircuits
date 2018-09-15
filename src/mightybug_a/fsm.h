@@ -21,12 +21,12 @@
 
 /* Activate/deactivate special functions */
 #define ENABLE_TURBO_MODE 1
-#define TURBO_PITCH_DEBUG 1  // Disturbing pitch to discern normal/turbo states
+#define TURBO_PITCH_DEBUG 0  // Disturbing pitch to discern normal/turbo states
 #define MAX_ITS_CORNER 10
 #define MIN_ITS_TURBO 10
 
 /* Delay stop if out of line */
-#define FLAG_DELAY_STOP_OUT_OF_LINE 1
+#define FLAG_DELAY_STOP_OUT_OF_LINE 0
 #define MS_DELAY_OUT_OF_LINE 600 //ms
 
 #define OUT_NORMAL_HYST 15

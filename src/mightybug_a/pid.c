@@ -9,6 +9,9 @@ static int16_t derivative = 0;
 static int16_t proportional = 0;
 static int16_t last_error = 0;
 
+static int16_t last_error_stack[DIFF_ERROR_STACK];
+static int16_t current_stack_idx = 0;
+
 
 int16_t array_prop_readings[NUMBER_POS_READINGS]; 
 uint8_t total_prop_readings = 0;
@@ -84,6 +87,12 @@ void reset_pid()
   proportional = 0;
   derivative = 0;
   integral = 0;
+
+  for (int i=0; i < DIFF_ERROR_STACK; i++)
+    {
+      last_error_stack[i] = 0;     
+    }
+  current_stack_idx = 0;
 }
 
 
@@ -100,6 +109,30 @@ static int32_t trunc_to_range(int32_t value, int32_t min, int32_t max)
   return trunc_value;
 }
 
+
+int16_t get_last_error(void)
+{
+
+  if (!FLAG_USE_DIFF_STACK)
+    {
+      return last_error;
+    }
+ 
+  return last_error_stack[current_stack_idx];
+}
+
+void set_new_stack_error(int32_t error)
+{
+  last_error_stack[current_stack_idx] = (int16_t) error;
+
+  current_stack_idx += 1;
+
+  if (current_stack_idx == DIFF_ERROR_STACK)
+    {
+      current_stack_idx = 0;
+    }
+}
+  
 /*
  * @brief pid calculation
  *
@@ -112,15 +145,17 @@ int32_t pid(int32_t error)
   proportional = error;
   integral += error;
   integral = trunc_to_range(integral, -MAX_INTEGRAL, MAX_INTEGRAL);
-  derivative = error - last_error;
+  derivative = error - get_last_error();
 
   last_error = error;
+  set_new_stack_error(error);
   
   control = proportional * k_p + integral * k_i + derivative * k_d;
   control = control/PID_CONTROL_DIVISOR;
   
   return control;
 }
+
 
 void set_kp(int kp)
 {

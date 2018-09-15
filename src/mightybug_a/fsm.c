@@ -7,19 +7,19 @@ uint32_t running_loop_millisecs = 0;
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
 const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  400, 0, 1600,
-  400, 0, 1600,
-  400, 0, 1600
+  400, 0, 500,
+  400, 0, 500,
+  400, 0, 500
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  400, 425, 475
+  425, 450, 475
 };
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  300, 0, 1600,
-  300, 0, 1600,
-  300, 0, 1600
+  300, 0, 600,
+  300, 0, 600,
+  300, 0, 600
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
