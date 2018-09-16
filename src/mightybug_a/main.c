@@ -40,6 +40,11 @@ void music_update(int millis)
 	jukebox_setcurrent_song(TENOR_BEAT_ORDER);
 	jukebox_play_in_loop(millis);
       }
+    else if (get_running_state() == RUNNING_NOOL)
+      {
+	jukebox_setcurrent_song(BASS_BEAT_ORDER);
+	jukebox_play_in_loop(millis);
+      }    
     else
       {
 	jukebox_setcurrent_song(SONG_TWO_BEAT_ORDER);
@@ -140,6 +145,9 @@ int main(void)
         reset_pids_normal();
         set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
         set_running_state(RUNNING_NORMAL);
+
+	// reset variables used for special acc/dec in NORMAL mode
+	reset_sequential_readings();
       }
     else if (current_state == SET_TURBO_MODE_STATE)
       {
@@ -149,7 +157,16 @@ int main(void)
         set_state(RUNNING_STATE);  //FIXME this assignment is local (and useless)
         set_running_state(RUNNING_STLINE);
       }
+    else if (current_state == SET_NOOL_MODE_STATE)
+      {
+	set_target_as_nool();
 
+	/* change pid consts */
+	reset_pids_nool();
+	set_state(RUNNING_STATE);
+	set_running_state(RUNNING_NOOL);
+      }
+    
     // loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS) {
         
@@ -233,6 +250,9 @@ int main(void)
         // Running 
         int proportional = get_line_position(sensor_value);
 
+	// update proportional sequence
+	update_sequential_readings(proportional, get_proportional());
+	
         // Meas turbo mode
         if (sync_iterations % TIME_BETWEEN_STORE_POS == 0)
           {
@@ -247,6 +267,13 @@ int main(void)
                 get_next_running_state(avg_proportional);
               }
           }
+
+
+	// Accelerate/Break in NORMAL mode
+	if ((ENABLE_INCDEC_NORMAL_FLAG) && (sync_iterations % ITS_INCDEC_NORMAL == 0))
+	  {
+	    update_target_normal();
+	  }
         
         /* pid control */
         int error = 0;

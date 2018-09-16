@@ -15,6 +15,9 @@
 /* systick measurements */
 #define SYSTICK_MEAS 10
 
+/* encoder acc. measurements */
+#define ACC_MEAS 10
+
 /* Weird encoder measures */
 #define WEIRD_ENCODER_MEAS UINT16_MAX/2
 
@@ -26,5 +29,7 @@ uint32_t get_right_encoder_ticks(void);
 uint32_t get_left_velocity(void);
 uint32_t get_right_velocity(void);
 void reset_encoder_ticks(void);
+int32_t get_left_acc(void);
+int32_t get_right_acc(void);
 
 #endif /* __ENCODER_H */

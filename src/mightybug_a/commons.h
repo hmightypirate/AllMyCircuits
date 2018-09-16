@@ -15,7 +15,7 @@
 /** 
  * Maximum PWM period (max velocity)
 */
-#define MAX_PWM_VALUE 1023
+#define MAX_PWM_VALUE 999
 #define MAX_VEL_MOTOR 999
 #define MIN_VEL_MOTOR 0
 #define MAX_INT 65535

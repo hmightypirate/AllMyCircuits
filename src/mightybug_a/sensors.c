@@ -195,6 +195,8 @@ int get_line_position(uint16_t* value)
     {
       position = (20 * position)/100;
     }
+
+  position = -1 * position;
   
   return position;
 }

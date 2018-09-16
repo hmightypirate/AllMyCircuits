@@ -54,6 +54,15 @@ static uint8_t notes_duration_TENOR_BEAT[TENOR_LEN_BEAT] = {
   128, 10
 };
 
+
+static uint8_t notes_pitch_BASS_BEAT[BASS_LEN_BEAT] = {
+  E4, R,
+};
+
+static uint8_t notes_duration_BASS_BEAT[BASS_LEN_BEAT] = {
+  128, 10
+};
+
   
 
 // Returns the number of songs in the jukebox
@@ -100,6 +109,11 @@ uint8_t init_jukebox_songs() {
   jukebox_song_list[TENOR_BEAT_ORDER].bpm = TENOR_VEL_BEAT;
   jukebox_song_list[TENOR_BEAT_ORDER].notes_pitch = notes_pitch_TENOR_BEAT;
   jukebox_song_list[TENOR_BEAT_ORDER].notes_duration = notes_duration_TENOR_BEAT;
+
+  jukebox_song_list[BASS_BEAT_ORDER].length = BASS_LEN_BEAT;
+  jukebox_song_list[BASS_BEAT_ORDER].bpm = BASS_VEL_BEAT;
+  jukebox_song_list[BASS_BEAT_ORDER].notes_pitch = notes_pitch_BASS_BEAT;
+  jukebox_song_list[BASS_BEAT_ORDER].notes_duration = notes_duration_BASS_BEAT;
   
   return JUKEBOX_SONGS_TOTAL_SONGS;
 }

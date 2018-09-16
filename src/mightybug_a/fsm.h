@@ -21,6 +21,8 @@
 
 /* Activate/deactivate special functions */
 #define ENABLE_TURBO_MODE 1
+
+#define ENABLE_NOOL_MODE 1
 #define TURBO_PITCH_DEBUG 0  // Disturbing pitch to discern normal/turbo states
 #define MAX_ITS_CORNER 10
 #define MIN_ITS_TURBO 10
@@ -29,8 +31,25 @@
 #define FLAG_DELAY_STOP_OUT_OF_LINE 0
 #define MS_DELAY_OUT_OF_LINE 600 //ms
 
-#define OUT_NORMAL_HYST 15
-#define OUT_TURBO_HYST 25
+/* Hysteresis values for changing state whilst running  */
+#define OUT_NORMAL_HYST 10
+#define OUT_TURBO_HYST 20
+#define OUT_NORMAL_NOOL_HYST 200
+#define OUT_NOOL_NORMAL_HYST 150
+
+
+/* Incremental/Decremental target velocity in NORMAL mode */
+#define ENABLE_INCDEC_NORMAL_FLAG 0
+#define ITS_INCDEC_NORMAL 10
+#define INC_NORMAL_THRESHOLD 10
+#define DEC_NORMAL_THRESHOLD 10
+#define RESET_INC_AFTER_SET 0
+#define RESET_DEC_AFTER_SET 0
+#define INC_NORMAL_QTY -5
+#define MIN_VEL_MOTOR_INC_MODE 250
+#define MAX_VEL_MOTOR_DEC_MODE 475
+#define DEC_NORMAL_QTY 5
+
 
 typedef enum {
   IDLE_STATE,
@@ -38,6 +57,7 @@ typedef enum {
   RUNNING_STATE,
   SET_TURBO_MODE_STATE,
   SET_NORMAL_MODE_STATE,
+  SET_NOOL_MODE_STATE,
   NO_BATTERY_STATE,
   STOP_STATE,
   DELAYED_START_STATE,
@@ -54,6 +74,7 @@ typedef enum {
   GO_TO_RUN_EVENT,
   GO_TO_TURBO_EVENT,
   GO_TO_NORMAL_EVENT,
+  GO_TO_NOOL_EVENT,
   OUT_OF_BATTERY_EVENT,
   NEXT_PIDANDVELMAP_EVENT,
   FORCE_PIDANDVELMAP_EVENT,
@@ -61,9 +82,16 @@ typedef enum {
   MAX_EVENTS
 } event_e;
 
+/* Sub-states in the RUNNING State 
+   NORMAL: normal operation of the car
+   TURBO: in straight lines
+   NOOL (nearly out of line): harsh correction
+
+*/
 typedef enum {
   RUNNING_NORMAL,
   RUNNING_STLINE,
+  RUNNING_NOOL,
   MAX_RUNNING_STATES,
 } rnstate_e;
 
@@ -81,12 +109,15 @@ uint8_t get_map_song(uint8_t id_map);
 void force_mapping_to_current(void);
 void reset_pids_normal(void);
 void reset_pids_turbo(void);
-void reset_pids_incorner(void);
+void reset_pids_nool();
 void get_next_running_state(int16_t avg_proportional);
 rnstate_e get_running_state();
 uint32_t get_running_ms();
 void set_running_state(rnstate_e state);
 void update_ms_inline(uint32_t current_ms);
 uint8_t exceeds_time_out_of_line(uint32_t current_ms);
+void update_sequential_readings(int16_t new_proportional, int16_t past_proportional);
+void reset_sequential_readings(void);
+void update_target_normal();
 
 #endif /* __FSM_H */
