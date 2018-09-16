@@ -16,7 +16,7 @@
 /* if this flag is set, both motors will received target velocity till they reach and end of line */
 #define DEBUG_INERTIA_TEST 0
 #define DEBUG_INERTIA_TIME_MS 1000
-#define TURBO_PICKLE 0
+#define TURBO_PICKLE 1
 #define TURBO_PICKLE_IN_CORNERS 0
 #define PICKLE_ENC_DISTANCE 7
 #define PICKLE_TURBO_VEL 100
