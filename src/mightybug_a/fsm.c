@@ -75,8 +75,6 @@ mapping_e get_mapping_info()
   return mapping_circuit;
 }
 
-
-
 /*
  * @brief update the mapping pointer taking into account the repetitions (if flag set)
  */
@@ -165,6 +163,15 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
 			{
 			  mapping_circuit.rep_pointer = curr_mapping_pointer;
 			}
+		    }
+		  else
+		    {
+		      // Change the largest line if not equal
+		      if (new_stline_ticks > total_stline_ticks)
+			{
+			  mapping_circuit.large_stline_pointer = curr_mapping_pointer;
+			}
+
 		    }
 		}
 	    }
