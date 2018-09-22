@@ -311,12 +311,11 @@ static void cli_map_all() {
 	     last_map.mapstates[i],
 	     (unsigned int) last_map.agg_left_ticks[i],
 	     (unsigned int) last_map.agg_right_ticks[i]);
-
-      printf("Large stline found %d ", (int) last_map.large_stline_pointer);
-      printf("End of circuit %d ", (int) last_map.rep_pointer);
     }
-  
-  
+
+  printf("Large stline found %d ", (int) last_map.large_stline_pointer);
+  printf("End of circuit %d ", (int) last_map.rep_pointer);
+
 }
 
 char str_VER[] = "VER";
