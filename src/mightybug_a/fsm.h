@@ -57,6 +57,10 @@
 #define PICKLE_ENC_DISTANCE 7
 #define PICKLE_TURBO_VEL 200
 
+/* Mapping variables */
+#define MAX_MAP_STATES 50
+#define OUT_MAPCORNER_STATE 2  // diff in abs encoder ticks
+#define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks
 
 typedef enum {
   IDLE_STATE,
@@ -99,8 +103,24 @@ typedef enum {
   RUNNING_NORMAL,
   RUNNING_STLINE,
   RUNNING_NOOL,
-  MAX_RUNNING_STATES,
+  MAX_RUNNING_STATES
 } rnstate_e;
+
+typedef enum {
+  NONE,
+  LEFT_CORNER,
+  RIGHT_CORNER,
+  ST_LINE,
+  MAX_MAP_EVENTS
+} mapstate_e;
+
+
+typedef struct {
+  int32_t agg_left_ticks[MAX_MAP_STATES];
+  int32_t agg_right_ticks[MAX_MAP_STATES];
+  mapstate_e mapstates[MAX_MAP_STATES];
+  
+} mapping_e;
 
 
 state_e get_state(void);

@@ -8,6 +8,13 @@ uint32_t running_loop_millisecs = 0;
 static uint16_t seq_decrease_line_pos = 0;
 static uint16_t seq_increase_line_pos = 0;
 
+//Mapping circuit vars
+mapping_e mapping_circuit;
+uint16_t curr_mapping_pointer = 0;
+uint32_t curr_agg_left_ticks = 0;
+uint32_t curr_agg_right_ticks = 0;
+
+
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
 const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
@@ -57,6 +64,39 @@ uint32_t pidvel_map_ms = 0;
 uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
 uint32_t last_ms_inline = 0;
+
+
+
+/* 
+ * Reset the pointer to the map
+ */
+void reset_mapping_pointer()
+{
+  curr_mapping_pointer = 0;
+}
+
+
+/* 
+ *  @brief reset mappings
+ */
+void reset_circuit_mapping()
+{
+
+  mapping_e mapping_circuit;
+
+  for (int i=0; i < MAX_MAP_STATES; i++)
+    {
+      mapping_circuit.agg_left_ticks[i] = 0;
+      mapping_circuit.agg_right_ticks[i] = 0;
+      mapping_circuit.mapstates[i] = NONE;
+    }
+  
+  curr_agg_left_ticks = 0;
+  curr_agg_right_ticks = 0;
+
+  reset_mapping_pointer();
+}
+
 
 
 /*
