@@ -107,12 +107,17 @@ int main(void)
   keypad_setup(get_millisecs_since_start(),
                button_port_array,
                button_pin_array);
+
+
+  if (FLAG_CIRCUIT_MAPPING)
+    {
+      reset_circuit_mapping();
+    }
   
   clear_led();
 
   uint32_t last_loop_execution_ms = 0;
   uint32_t sync_iterations = 0;
-  
   while(1) {
     uint32_t current_loop_millisecs = get_millisecs_since_start();
     sync_iterations += 1;

@@ -217,4 +217,39 @@ void update_encoder_ticks()
     }
 }
 
+/*
+ * @brief obtain last measurement pointer to encoder ticks
+ */
+uint16_t get_last_meas_pointer()
+{
+  if (current_ticks == 0)
+    {
+      return systick_between_meas - 1;
+    }
+  else
+    {
+      return current_ticks - 1;
+    }
+}
+
+/*
+ * @brief get last left tick
+ */
+uint32_t get_last_left_ticks()
+{
+  uint16_t pointer_ticks = get_last_meas_pointer();
+
+  return new_left_encoder[pointer_ticks];
+}
+
+/*
+ * @brief get last right ticks
+ */
+uint32_t get_last_right_ticks()
+{
+  uint16_t pointer_ticks = get_last_meas_pointer();
+
+  return new_right_encoder[pointer_ticks];
+}
+
 

@@ -11,9 +11,12 @@ static uint16_t seq_increase_line_pos = 0;
 //Mapping circuit vars
 mapping_e mapping_circuit;
 uint16_t curr_mapping_pointer = 0;
+uint16_t mapping_repetion_pointer = 0;
+mapstate_e curr_mapstate = NONE;
 uint32_t curr_agg_left_ticks = 0;
 uint32_t curr_agg_right_ticks = 0;
-
+int16_t large_stline_pointer = -1;
+uint16_t rep_pointer = 0;
 
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
@@ -66,23 +69,106 @@ uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 uint32_t last_ms_inline = 0;
 
 
+/* 
+ * @brief check if two ticks corresponds to the same state (aproximate)
+ */
+uint8_t aprox_stline_equal(uint32_t new_stline_ticks,
+			   uint32_t total_stline_ticks)
+{
+  if (new_stline_ticks > total_stline_ticks)
+    {
+      if (new_stline_ticks - total_stline_ticks < DIFF_TICKS_EQUAL)
+	{
+	  return 1;
+	}
+      else
+	{
+	  return 0;
+	}
+    }
+  else
+    {
+      if (total_stline_ticks - new_stline_ticks < DIFF_TICKS_EQUAL)
+	{
+	  return 1;
+	}
+      else
+	{
+	  return 0;
+	}
+    }
+}
+
+/*
+ * @brief save the state if it is a new state and get a pointer to the next state
+ */
+void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_ticks)
+{
+
+  /* only do something if it has not exceeded the number of mappings */
+  if (curr_mapping_pointer < MAX_MAP_STATES)
+    {
+      if (mapping_circuit.mapstates[curr_mapping_pointer] != NONE)
+	{
+	  if (state != mapping_circuit.mapstates[curr_mapping_pointer])
+	    {
+	      // something wrong happened
+	      // TODO: flag? rewrite?
+	    }
+	}
+      else
+	{
+	  // reached a new state
+	  mapping_circuit.mapstates[curr_mapping_pointer] = state;
+	  mapping_circuit.agg_left_ticks[curr_mapping_pointer] = curr_agg_left_ticks;
+	  mapping_circuit.agg_right_ticks[curr_mapping_pointer] = curr_agg_right_ticks;
+
+	  // have seen this stline before?
+	  if (state == ST_LINE)
+	    {
+	      if (large_stline_pointer == -1) 
+		{
+		  large_stline_pointer = curr_mapping_pointer;
+		}
+	      // it is the largest stline
+	      else
+		{
+		  uint32_t total_stline_ticks = mapping_circuit.agg_left_ticks[large_stline_pointer] + mapping_circuit.agg_right_ticks[large_stline_pointer];
+
+		  uint32_t new_stline_ticks = left_ticks + right_ticks;
+
+		  if (aprox_stline_equal(new_stline_ticks, total_stline_ticks))
+		    {
+		      
+		    }
+		}
+	    }
+	}
+    }
+      
+  //Reset aggregation
+  curr_agg_left_ticks = 0;
+  curr_agg_right_ticks = 0;
+
+  // update pointer
+  curr_mapping_pointer += 1;
+
+}
 
 /* 
- * Reset the pointer to the map
+ * @brief Reset the pointer to the map
  */
 void reset_mapping_pointer()
 {
   curr_mapping_pointer = 0;
 }
-
+ 
 
 /* 
  *  @brief reset mappings
  */
 void reset_circuit_mapping()
 {
-
-  mapping_e mapping_circuit;
 
   for (int i=0; i < MAX_MAP_STATES; i++)
     {
@@ -91,10 +177,127 @@ void reset_circuit_mapping()
       mapping_circuit.mapstates[i] = NONE;
     }
   
+  curr_mapstate = mapping_circuit.mapstates[0];
   curr_agg_left_ticks = 0;
   curr_agg_right_ticks = 0;
 
   reset_mapping_pointer();
+}
+
+uint8_t reach_consolidated_state(uint32_t agg_left_ticks,
+				 uint32_t agg_right_ticks)
+{
+  if ((agg_left_ticks > MIN_TICKS_FOR_MAP) ||
+      (agg_right_ticks > MIN_TICKS_FOR_MAP))
+    {
+      return 1;
+    }
+  else
+    {
+      return 0;
+    }
+}
+
+/*
+ * @brief circuit map
+ */
+void do_circuit_ampping()
+{
+  // aggregated ticks
+  uint32_t left_ticks = get_left_encoder_ticks();
+  uint32_t right_ticks = get_right_encoder_ticks();
+
+  // difference between encoders
+  int16_t diff_encoders = get_abs_diff_encoders();
+  
+  // last ticks
+  uint32_t last_left_ticks = get_last_left_ticks();
+  uint32_t last_right_ticks = get_last_right_ticks();
+
+  //Init the current mapping (if none)
+  if (curr_mapstate == NONE)
+    {
+      if (diff_encoders < OUT_MAPSTLINE_STATE)
+	{
+	  curr_mapstate = ST_LINE;
+	}
+      else
+	{
+	  if (last_left_ticks > last_right_ticks)
+	    {
+	      curr_mapstate = RIGHT_CORNER;
+	    }
+	  else
+	    {
+	      curr_mapstate = LEFT_CORNER;
+	    }
+	}
+    }
+
+  // Check if we need to store/change mapping
+  // Change stline -> corner (any)
+  if (curr_mapstate == ST_LINE && diff_encoders > OUT_MAPSTLINE_STATE)
+    {
+      if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
+	{
+	  //save state
+	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	}
+     
+      // a corner, update only the state
+      if (left_ticks > right_ticks)
+	{
+	  curr_mapstate = RIGHT_CORNER;
+	}
+      else
+	{
+	  curr_mapstate = LEFT_CORNER;
+	}
+    }
+  
+  // change corner (any) -> stline
+  else if (curr_mapstate != ST_LINE && diff_encoders <= OUT_MAPCORNER_STATE)
+    {
+      if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
+	{
+	  //save state
+	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	}
+     
+      curr_mapstate = ST_LINE;
+    }
+
+  // change corner (right) -> corner(left)
+  else if (curr_mapstate == RIGHT_CORNER && (left_ticks < right_ticks))
+    {
+      if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
+	{
+	  //save state
+	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	}
+
+      // update state
+      curr_mapstate = LEFT_CORNER;
+      
+    }
+  // change corner (left) -> corner (right)
+  else
+    {
+      if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
+	{
+	  //save state
+	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	}
+
+      // update state
+      curr_mapstate = RIGHT_CORNER;
+      
+    }
+      
+  // Aggregate ticks
+  curr_agg_left_ticks += last_left_ticks;
+  curr_agg_right_ticks += last_right_ticks;
+
 }
 
 

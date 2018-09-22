@@ -58,7 +58,10 @@
 #define PICKLE_TURBO_VEL 200
 
 /* Mapping variables */
+#define FLAG_CIRCUIT_MAPPING 1
 #define MAX_MAP_STATES 50
+#define MIN_TICKS_FOR_MAP 100
+#define DIFF_TICKS_EQUAL 100
 #define OUT_MAPCORNER_STATE 2  // diff in abs encoder ticks
 #define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks
 
@@ -146,5 +149,7 @@ uint8_t exceeds_time_out_of_line(uint32_t current_ms);
 void update_sequential_readings(int16_t new_proportional, int16_t past_proportional);
 void reset_sequential_readings(void);
 void update_target_normal();
+void reset_circuit_mapping(void);
+void reset_mapping_pointer(void);
 
 #endif /* __FSM_H */
