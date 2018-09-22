@@ -32,10 +32,11 @@
 #define MS_DELAY_OUT_OF_LINE 600 //ms
 
 /* Hysteresis values for changing state whilst running  */
-#define OUT_NORMAL_HYST 10
-#define OUT_TURBO_HYST 20
-#define OUT_NORMAL_NOOL_HYST 200
-#define OUT_NOOL_NORMAL_HYST 150
+#define USE_ENCODERS_FOR_STATE 1
+#define OUT_NORMAL_HYST USE_ENCODERS_FOR_STATE? 2:10  
+#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 4:20 
+#define OUT_NORMAL_NOOL_HYST USE_ENCODERS_FOR_STATE? 27:200
+#define OUT_NOOL_NORMAL_HYST USE_ENCODERS_FOR_STATE? 20:150
 
 
 /* Incremental/Decremental target velocity in NORMAL mode */

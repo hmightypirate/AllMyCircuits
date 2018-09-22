@@ -22,6 +22,21 @@ static int32_t current_acc_right = 0;
 uint16_t systick_between_meas = SYSTICK_MEAS;
 static uint16_t current_ticks = 0;
 
+/*
+ * @brief get the absolute diff between encoders
+ */
+
+int16_t get_abs_diff_encoders()
+{
+  if (left_encoder_ticks > right_encoder_ticks)
+    {
+      return (int16_t) left_encoder_ticks - right_encoder_ticks;
+    }
+  else
+    {
+      return (int16_t) right_encoder_ticks - left_encoder_ticks;
+    }
+}
 
 /*
  * @brief updating the acceleration of the encoders

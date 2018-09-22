@@ -258,14 +258,22 @@ int main(void)
           {
             set_new_reading(proportional);
 
-            // Check that the minimum number of readings was performed
-            if (is_enable_avg_readings())
-              {
-                // Obtain the average number of readings
-                int16_t avg_proportional = get_avg_abs_readings();
+	    if (!USE_ENCODERS_FOR_STATE)
+	      {
+	    
+		// Check that the minimum number of readings was performed
+		if (is_enable_avg_readings())
+		  {
+		    // Obtain the average number of readings
+		    int16_t avg_proportional = get_avg_abs_readings();
 
-                get_next_running_state(avg_proportional);
-              }
+		    get_next_running_state(avg_proportional);
+		  }
+	      }
+	    else
+	      {
+		get_next_running_state(get_abs_diff_encoders());
+	      }
           }
 
 
