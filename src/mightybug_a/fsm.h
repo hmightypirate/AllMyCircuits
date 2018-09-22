@@ -38,6 +38,7 @@
 
 
 /* Incremental/Decremental target velocity in NORMAL mode */
+#define USE_ENCODERS_FOR_INCDEC 1  // use encoders for acceleartion instead of line position (recommended)
 #define ENABLE_INCDEC_NORMAL_FLAG 0
 #define ITS_INCDEC_NORMAL 10
 #define INC_NORMAL_THRESHOLD 10
@@ -48,6 +49,7 @@
 #define MIN_VEL_MOTOR_INC_MODE 250
 #define MAX_VEL_MOTOR_DEC_MODE 475
 #define DEC_NORMAL_QTY 5
+#define STEP_NORMAL_QTY 20 // used by the encoder acc functionality only
 
 /* Pickle configuration */
 #define TURBO_PICKLE 0

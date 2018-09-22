@@ -278,9 +278,19 @@ int main(void)
 
 
 	// Accelerate/Break in NORMAL mode
-	if ((ENABLE_INCDEC_NORMAL_FLAG) && (sync_iterations % ITS_INCDEC_NORMAL == 0))
+	if (!USE_ENCODERS_FOR_INCDEC)
 	  {
-	    update_target_normal();
+	    if ((ENABLE_INCDEC_NORMAL_FLAG) && (sync_iterations % ITS_INCDEC_NORMAL == 0))
+	      {
+		update_target_normal();
+	      }
+	  }
+	else
+	  {
+	    if (ENABLE_INCDEC_NORMAL_FLAG)
+	      {
+		update_target_normal_with_encoders();
+	      }
 	  }
         
         /* pid control */

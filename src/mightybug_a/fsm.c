@@ -417,3 +417,31 @@ void update_target_normal()
 	}
     }
 }
+
+/* 
+ * @brief updates the target velocity
+ *
+ */
+void update_target_normal_with_encoders()
+{
+
+  /* only works in normal mode */
+  if (running_state == RUNNING_NORMAL)
+    {
+      int32_t diff_acc = 0;
+      // is left wheel running faster than right wheel 
+      if (get_left_encoder_ticks() > get_right_encoder_ticks())
+	{
+	  // right wheel is acc faster ?
+	  diff_acc = get_right_acc() - get_left_acc();
+	}
+      else
+	{
+	  diff_acc = get_left_acc() - get_right_acc();
+	}
+
+      reset_target_velocity(vel_maps[current_pidvel_mapping] + STEP_NORMAL_QTY * diff_acc);      
+    }
+  
+}
+
