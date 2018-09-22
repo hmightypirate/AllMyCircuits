@@ -298,6 +298,27 @@ static void cli_enc_all(){
 			(unsigned int) right_enc_ticks);
 }
 
+char str_MAP_syntax[] = "Syntax: MAP ALL\n";
+char str_MAP_ALL[] = "MAP_ALL";
+static void cli_map_all() {
+
+  mapping_e last_map = get_mapping_info();
+  
+  for (int i = 0; i < MAX_MAP_STATES; i++)
+    {
+      printf("%i State: %d, Ticks left: %zu, Ticks right: %zu\n",
+	     (int) i,
+	     last_map.mapstates[i],
+	     (unsigned int) last_map.agg_left_ticks[i],
+	     (unsigned int) last_map.agg_right_ticks[i]);
+
+      printf("Large stline found %d ", (int) last_map.large_stline_pointer);
+      printf("End of circuit %d ", (int) last_map.rep_pointer);
+    }
+  
+  
+}
+
 char str_VER[] = "VER";
 static void cli_ver() {
 	printf("Disable Drive CLI by Mighty Escuderida\n");
@@ -339,6 +360,7 @@ struct command_struct commands_list[] = {
 	{.text = str_ENC_LEFT, .functionPtr = cli_enc_left, .is_a_candidate = 'y', .syntax_hint = str_ENC_syntax},
 	{.text = str_ENC_RIGHT, .functionPtr = cli_enc_right, .is_a_candidate = 'y', .syntax_hint = str_ENC_syntax},
 	{.text = str_ENC_ALL, .functionPtr = cli_enc_all, .is_a_candidate = 'y', .syntax_hint = str_ENC_syntax},
+	{.text = str_MAP_ALL, .functionPtr = cli_map_all, .is_a_candidate = 'y', .syntax_hint = str_MAP_syntax},
 	{.text = str_VER, .functionPtr = cli_ver, .is_a_candidate = 'y', .syntax_hint = NULL}
 };
 

@@ -15,8 +15,6 @@ uint16_t mapping_repetion_pointer = 0;
 mapstate_e curr_mapstate = NONE;
 uint32_t curr_agg_left_ticks = 0;
 uint32_t curr_agg_right_ticks = 0;
-int16_t large_stline_pointer = -1;
-int16_t rep_pointer = -1;
 
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
@@ -69,6 +67,16 @@ uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 uint32_t last_ms_inline = 0;
 
 
+/* 
+ * @brief get mapping state
+ */
+mapping_e get_mapping_info()
+{
+  return mapping_circuit;
+}
+
+
+
 /*
  * @brief update the mapping pointer taking into account the repetitions (if flag set)
  */
@@ -76,9 +84,9 @@ void update_map_pointer(void)
 {
   curr_mapping_pointer += 1;
 
-  if (FLAG_MAPPING_REPS && rep_pointer != -1 && curr_mapping_pointer == rep_pointer)
+  if (FLAG_MAPPING_REPS && mapping_circuit.rep_pointer != -1 && curr_mapping_pointer == mapping_circuit.rep_pointer)
     {
-      curr_mapping_pointer = rep_pointer;
+      curr_mapping_pointer = mapping_circuit.large_stline_pointer;
     }
 }
 
@@ -139,23 +147,23 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
 	  // have seen this stline before?
 	  if (state == ST_LINE)
 	    {
-	      if (large_stline_pointer == -1) 
+	      if (mapping_circuit.large_stline_pointer == -1) 
 		{
-		  large_stline_pointer = curr_mapping_pointer;
+		  mapping_circuit.large_stline_pointer = curr_mapping_pointer;
 		}
 	      // it is the largest stline
 	      else
 		{
-		  uint32_t total_stline_ticks = mapping_circuit.agg_left_ticks[large_stline_pointer] + mapping_circuit.agg_right_ticks[large_stline_pointer];
+		  uint32_t total_stline_ticks = mapping_circuit.agg_left_ticks[mapping_circuit.large_stline_pointer] + mapping_circuit.agg_right_ticks[mapping_circuit.large_stline_pointer];
 
 		  uint32_t new_stline_ticks = left_ticks + right_ticks;
 
 		  if (aprox_stline_equal(new_stline_ticks, total_stline_ticks))
 		    {
 		      // set the pointer
-		      if (rep_pointer != -1)
+		      if (mapping_circuit.rep_pointer != -1)
 			{
-			  rep_pointer = curr_mapping_pointer;
+			  mapping_circuit.rep_pointer = curr_mapping_pointer;
 			}
 		    }
 		}
@@ -177,6 +185,8 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
 void reset_mapping_pointer()
 {
   curr_mapping_pointer = 0;
+  curr_agg_left_ticks = 0;
+  curr_agg_right_ticks = 0;
 }
  
 
@@ -194,6 +204,8 @@ void reset_circuit_mapping()
     }
   
   curr_mapstate = mapping_circuit.mapstates[0];
+  mapping_circuit.large_stline_pointer = -1;
+  mapping_circuit.rep_pointer = -1;
   curr_agg_left_ticks = 0;
   curr_agg_right_ticks = 0;
 

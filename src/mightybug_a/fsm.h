@@ -123,6 +123,8 @@ typedef struct {
   int32_t agg_left_ticks[MAX_MAP_STATES];
   int32_t agg_right_ticks[MAX_MAP_STATES];
   mapstate_e mapstates[MAX_MAP_STATES];
+  int16_t large_stline_pointer;
+  int16_t rep_pointer;
   
 } mapping_e;
 
@@ -154,5 +156,6 @@ void update_target_normal_with_encoders();
 void reset_circuit_mapping(void);
 void reset_mapping_pointer(void);
 void do_circuit_mapping(void);
+mapping_e get_mapping_info(void);
 
 #endif /* __FSM_H */
