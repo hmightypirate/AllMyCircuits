@@ -56,7 +56,6 @@
 #define PICKLE_TURBO_VEL 200
 
 
-
 typedef enum {
   IDLE_STATE,
   CALLIBRATION_STATE,
