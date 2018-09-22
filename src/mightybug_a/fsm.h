@@ -24,8 +24,6 @@
 
 #define ENABLE_NOOL_MODE 1
 #define TURBO_PITCH_DEBUG 0  // Disturbing pitch to discern normal/turbo states
-#define MAX_ITS_CORNER 10
-#define MIN_ITS_TURBO 10
 
 /* Delay stop if out of line */
 #define FLAG_DELAY_STOP_OUT_OF_LINE 0
