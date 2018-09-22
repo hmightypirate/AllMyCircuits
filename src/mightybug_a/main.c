@@ -214,10 +214,12 @@ int main(void)
         {
           /* Stop motors */
           stop_motors();
-          
+	  
           if (current_loop_millisecs - get_delay_start_time() >
               DELAYED_START_MS)
-            {              
+            {
+	      // Reset pointer (starting from the beginning)
+	      if (FLAG_CIRCUIT_MAPPING) reset_mapping_pointer();
               reset_encoder_ticks();
               update_state(GO_TO_RUN_EVENT);
             }
@@ -338,6 +340,12 @@ int main(void)
 	  if (!is_out_of_line())
 	    {
 	      update_ms_inline(current_loop_millisecs);
+	    }
+
+	  // Do circuit mapping
+	  if (FLAG_CIRCUIT_MAPPING)
+	    {
+	      do_circuit_mapping();
 	    }
          }
 

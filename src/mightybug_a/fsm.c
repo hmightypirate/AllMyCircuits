@@ -16,7 +16,7 @@ mapstate_e curr_mapstate = NONE;
 uint32_t curr_agg_left_ticks = 0;
 uint32_t curr_agg_right_ticks = 0;
 int16_t large_stline_pointer = -1;
-uint16_t rep_pointer = 0;
+int16_t rep_pointer = -1;
 
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
@@ -68,6 +68,19 @@ uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
 uint32_t last_ms_inline = 0;
 
+
+/*
+ * @brief update the mapping pointer taking into account the repetitions (if flag set)
+ */
+void update_map_pointer(void)
+{
+  curr_mapping_pointer += 1;
+
+  if (FLAG_MAPPING_REPS && rep_pointer != -1 && curr_mapping_pointer == rep_pointer)
+    {
+      curr_mapping_pointer = rep_pointer;
+    }
+}
 
 /* 
  * @brief check if two ticks corresponds to the same state (aproximate)
@@ -139,7 +152,11 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
 
 		  if (aprox_stline_equal(new_stline_ticks, total_stline_ticks))
 		    {
-		      
+		      // set the pointer
+		      if (rep_pointer != -1)
+			{
+			  rep_pointer = curr_mapping_pointer;
+			}
 		    }
 		}
 	    }
@@ -151,8 +168,7 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
   curr_agg_right_ticks = 0;
 
   // update pointer
-  curr_mapping_pointer += 1;
-
+  update_map_pointer();
 }
 
 /* 
@@ -201,7 +217,7 @@ uint8_t reach_consolidated_state(uint32_t agg_left_ticks,
 /*
  * @brief circuit map
  */
-void do_circuit_ampping()
+void do_circuit_mapping()
 {
   // aggregated ticks
   uint32_t left_ticks = get_left_encoder_ticks();

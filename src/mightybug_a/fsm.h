@@ -64,6 +64,7 @@
 #define DIFF_TICKS_EQUAL 100
 #define OUT_MAPCORNER_STATE 2  // diff in abs encoder ticks
 #define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks
+#define FLAG_MAPPING_REPS 1 // mapping with repetitions
 
 typedef enum {
   IDLE_STATE,
@@ -152,5 +153,6 @@ void update_target_normal();
 void update_target_normal_with_encoders();
 void reset_circuit_mapping(void);
 void reset_mapping_pointer(void);
+void do_circuit_mapping(void);
 
 #endif /* __FSM_H */
