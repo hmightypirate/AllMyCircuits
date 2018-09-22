@@ -11,13 +11,25 @@ static int last_right_vel = 0;
 static state_pickle_e left_turbo_pickle_flag = NO_PICKLE_TURBO;
 static state_pickle_e right_turbo_pickle_flag = NO_PICKLE_TURBO;
 
-
+/*
 uint16_t PICKLE_TURBO_TABLE[33] =  {
   0,0,0,2,4,7,10,13,  // 224
   15,18,21,24,27,30,33,35, // 480
   38,41,44,47,50,52,54,55, // 736
   57,58,60,61,63,64,66,67,69,
 };
+*/
+
+
+/* pickle pololu wheels */
+uint16_t PICKLE_TURBO_TABLE[33] =  {
+  0,0,0,11,13,15,17,19,  // 224
+  21,23,25,27,29,31,33,35, // 480
+  37,39,41,43,45,47,49,51, // 736
+  53,55,57,59,61,63,65,67,69,
+};
+
+
 
 
 /*
