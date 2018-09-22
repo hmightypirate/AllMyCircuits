@@ -49,6 +49,13 @@
 #define MAX_VEL_MOTOR_DEC_MODE 475
 #define DEC_NORMAL_QTY 5
 
+/* Pickle configuration */
+#define TURBO_PICKLE 0
+#define TURBO_PICKLE_IN_CORNERS 0
+#define PICKLE_ENC_DISTANCE 7
+#define PICKLE_TURBO_VEL 200
+
+
 
 typedef enum {
   IDLE_STATE,
