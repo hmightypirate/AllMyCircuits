@@ -149,6 +149,7 @@ uint8_t exceeds_time_out_of_line(uint32_t current_ms);
 void update_sequential_readings(int16_t new_proportional, int16_t past_proportional);
 void reset_sequential_readings(void);
 void update_target_normal();
+void update_target_normal_with_encoders();
 void reset_circuit_mapping(void);
 void reset_mapping_pointer(void);
 
