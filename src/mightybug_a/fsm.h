@@ -32,14 +32,14 @@
 /* Hysteresis values for changing state whilst running  */
 #define USE_ENCODERS_FOR_STATE 1
 #define OUT_NORMAL_HYST USE_ENCODERS_FOR_STATE? 2:10  
-#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 4:20 
+#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 5:20 
 #define OUT_NORMAL_NOOL_HYST USE_ENCODERS_FOR_STATE? 27:200
 #define OUT_NOOL_NORMAL_HYST USE_ENCODERS_FOR_STATE? 20:150
 
 
 /* Incremental/Decremental target velocity in NORMAL mode */
 #define USE_ENCODERS_FOR_INCDEC 1  // use encoders for acceleartion instead of line position (recommended)
-#define ENABLE_INCDEC_NORMAL_FLAG 0
+#define ENABLE_INCDEC_NORMAL_FLAG 1
 #define ITS_INCDEC_NORMAL 10
 #define INC_NORMAL_THRESHOLD 10
 #define DEC_NORMAL_THRESHOLD 10
@@ -49,22 +49,23 @@
 #define MIN_VEL_MOTOR_INC_MODE 250
 #define MAX_VEL_MOTOR_DEC_MODE 475
 #define DEC_NORMAL_QTY 5
-#define STEP_NORMAL_QTY 20 // used by the encoder acc functionality only
+#define STEP_NORMAL_QTY 35 // used by the encoder acc functionality only
 
 /* Pickle configuration */
 #define TURBO_PICKLE 0
 #define TURBO_PICKLE_IN_CORNERS 0
 #define PICKLE_ENC_DISTANCE 7
-#define PICKLE_TURBO_VEL 200
+#define PICKLE_TURBO_VEL 150
 
 /* Mapping variables */
 #define FLAG_CIRCUIT_MAPPING 1
 #define MAX_MAP_STATES 50
-#define MIN_TICKS_FOR_MAP 100
-#define DIFF_TICKS_EQUAL 100
-#define OUT_MAPCORNER_STATE 2  // diff in abs encoder ticks
+#define MIN_TICKS_FOR_MAP 300
+#define DIFF_TICKS_EQUAL 200
+#define OUT_MAPCORNER_STATE 1  // diff in abs encoder ticks
 #define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks
 #define FLAG_MAPPING_REPS 1 // mapping with repetitions
+#define MAX_CHANGE_MAP_IT 3
 
 typedef enum {
   IDLE_STATE,

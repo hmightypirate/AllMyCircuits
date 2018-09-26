@@ -299,7 +299,7 @@ static void cli_enc_all(){
 }
 
 char str_MAP_syntax[] = "Syntax: MAP ALL\n";
-char str_MAP_ALL[] = "MAP_ALL";
+char str_MAP_ALL[] = "MAP ALL";
 static void cli_map_all() {
 
   mapping_e last_map = get_mapping_info();
