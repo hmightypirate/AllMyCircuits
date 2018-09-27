@@ -107,12 +107,17 @@ int main(void)
   keypad_setup(get_millisecs_since_start(),
                button_port_array,
                button_pin_array);
+
+
+  if (FLAG_CIRCUIT_MAPPING)
+    {
+      reset_circuit_mapping();
+    }
   
   clear_led();
 
   uint32_t last_loop_execution_ms = 0;
   uint32_t sync_iterations = 0;
-  
   while(1) {
     uint32_t current_loop_millisecs = get_millisecs_since_start();
     sync_iterations += 1;
@@ -209,10 +214,12 @@ int main(void)
         {
           /* Stop motors */
           stop_motors();
-          
+	  
           if (current_loop_millisecs - get_delay_start_time() >
               DELAYED_START_MS)
-            {              
+            {
+	      // Reset pointer (starting from the beginning)
+	      if (FLAG_CIRCUIT_MAPPING) reset_mapping_pointer();
               reset_encoder_ticks();
               update_state(GO_TO_RUN_EVENT);
             }
@@ -258,21 +265,39 @@ int main(void)
           {
             set_new_reading(proportional);
 
-            // Check that the minimum number of readings was performed
-            if (is_enable_avg_readings())
-              {
-                // Obtain the average number of readings
-                int16_t avg_proportional = get_avg_abs_readings();
+	    if (!USE_ENCODERS_FOR_STATE)
+	      {
+	    
+		// Check that the minimum number of readings was performed
+		if (is_enable_avg_readings())
+		  {
+		    // Obtain the average number of readings
+		    int16_t avg_proportional = get_avg_abs_readings();
 
-                get_next_running_state(avg_proportional);
-              }
+		    get_next_running_state(avg_proportional);
+		  }
+	      }
+	    else
+	      {
+		get_next_running_state(get_abs_diff_encoders());
+	      }
           }
 
 
 	// Accelerate/Break in NORMAL mode
-	if ((ENABLE_INCDEC_NORMAL_FLAG) && (sync_iterations % ITS_INCDEC_NORMAL == 0))
+	if (!USE_ENCODERS_FOR_INCDEC)
 	  {
-	    update_target_normal();
+	    if ((ENABLE_INCDEC_NORMAL_FLAG) && (sync_iterations % ITS_INCDEC_NORMAL == 0))
+	      {
+		update_target_normal();
+	      }
+	  }
+	else
+	  {
+	    if (ENABLE_INCDEC_NORMAL_FLAG)
+	      {
+		update_target_normal_with_encoders();
+	      }
 	  }
         
         /* pid control */
@@ -315,6 +340,12 @@ int main(void)
 	  if (!is_out_of_line())
 	    {
 	      update_ms_inline(current_loop_millisecs);
+	    }
+
+	  // Do circuit mapping
+	  if (FLAG_CIRCUIT_MAPPING)
+	    {
+	      do_circuit_mapping();
 	    }
          }
 

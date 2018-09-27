@@ -31,5 +31,8 @@ uint32_t get_right_velocity(void);
 void reset_encoder_ticks(void);
 int32_t get_left_acc(void);
 int32_t get_right_acc(void);
+int16_t get_abs_diff_encoders(void);
+uint32_t get_last_left_ticks();
+uint32_t get_last_right_ticks();
 
 #endif /* __ENCODER_H */

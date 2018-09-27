@@ -24,22 +24,22 @@
 
 #define ENABLE_NOOL_MODE 1
 #define TURBO_PITCH_DEBUG 0  // Disturbing pitch to discern normal/turbo states
-#define MAX_ITS_CORNER 10
-#define MIN_ITS_TURBO 10
 
 /* Delay stop if out of line */
 #define FLAG_DELAY_STOP_OUT_OF_LINE 0
 #define MS_DELAY_OUT_OF_LINE 600 //ms
 
 /* Hysteresis values for changing state whilst running  */
-#define OUT_NORMAL_HYST 10
-#define OUT_TURBO_HYST 20
-#define OUT_NORMAL_NOOL_HYST 200
-#define OUT_NOOL_NORMAL_HYST 150
+#define USE_ENCODERS_FOR_STATE 1
+#define OUT_NORMAL_HYST USE_ENCODERS_FOR_STATE? 2:10  
+#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 5:20 
+#define OUT_NORMAL_NOOL_HYST USE_ENCODERS_FOR_STATE? 27:200
+#define OUT_NOOL_NORMAL_HYST USE_ENCODERS_FOR_STATE? 20:150
 
 
 /* Incremental/Decremental target velocity in NORMAL mode */
-#define ENABLE_INCDEC_NORMAL_FLAG 0
+#define USE_ENCODERS_FOR_INCDEC 1  // use encoders for acceleartion instead of line position (recommended)
+#define ENABLE_INCDEC_NORMAL_FLAG 1
 #define ITS_INCDEC_NORMAL 10
 #define INC_NORMAL_THRESHOLD 10
 #define DEC_NORMAL_THRESHOLD 10
@@ -49,7 +49,23 @@
 #define MIN_VEL_MOTOR_INC_MODE 250
 #define MAX_VEL_MOTOR_DEC_MODE 475
 #define DEC_NORMAL_QTY 5
+#define STEP_NORMAL_QTY 35 // used by the encoder acc functionality only
 
+/* Pickle configuration */
+#define TURBO_PICKLE 0
+#define TURBO_PICKLE_IN_CORNERS 0
+#define PICKLE_ENC_DISTANCE 7
+#define PICKLE_TURBO_VEL 150
+
+/* Mapping variables */
+#define FLAG_CIRCUIT_MAPPING 1
+#define MAX_MAP_STATES 50
+#define MIN_TICKS_FOR_MAP 300
+#define DIFF_TICKS_EQUAL 200
+#define OUT_MAPCORNER_STATE 1  // diff in abs encoder ticks
+#define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks
+#define FLAG_MAPPING_REPS 1 // mapping with repetitions
+#define MAX_CHANGE_MAP_IT 3
 
 typedef enum {
   IDLE_STATE,
@@ -92,8 +108,26 @@ typedef enum {
   RUNNING_NORMAL,
   RUNNING_STLINE,
   RUNNING_NOOL,
-  MAX_RUNNING_STATES,
+  MAX_RUNNING_STATES
 } rnstate_e;
+
+typedef enum {
+  NONE,
+  LEFT_CORNER,
+  RIGHT_CORNER,
+  ST_LINE,
+  MAX_MAP_EVENTS
+} mapstate_e;
+
+
+typedef struct {
+  int32_t agg_left_ticks[MAX_MAP_STATES];
+  int32_t agg_right_ticks[MAX_MAP_STATES];
+  mapstate_e mapstates[MAX_MAP_STATES];
+  int16_t large_stline_pointer;
+  int16_t rep_pointer;
+  
+} mapping_e;
 
 
 state_e get_state(void);
@@ -119,5 +153,10 @@ uint8_t exceeds_time_out_of_line(uint32_t current_ms);
 void update_sequential_readings(int16_t new_proportional, int16_t past_proportional);
 void reset_sequential_readings(void);
 void update_target_normal();
+void update_target_normal_with_encoders();
+void reset_circuit_mapping(void);
+void reset_mapping_pointer(void);
+void do_circuit_mapping(void);
+mapping_e get_mapping_info(void);
 
 #endif /* __FSM_H */
