@@ -13,13 +13,13 @@ static int wait_ticks = 0;
 
 
 void stop_note(){
-    timer_set_oc_value(BUZZER_TIMER, BUZZER_OUTPUT_CHANNEL, 0);
+    timer_set_oc_value(BUZZER_TIMER, BUZZER_OUTPUT_CHANNEL, MAX_DUTY_BUZZER);
 }
 
 
 int play_note(int note_number){
 
-    if (note_number >= 108){
+    if (note_number >= R){
         stop_note();
         return -1;
     }

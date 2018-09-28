@@ -69,6 +69,7 @@ or define PILL=BLACK as an environment variable
 
 # Related Projects
 
+* for our line follower, we are using the chassis from https://gitlab.com/punkto/line_follower_3d_designs
 * stm32loader.py: https://github.com/jsnyder/stm32loader
 * libopencm3: https://github.com/libopencm3/libopencm3
 * pill_blink: https://github.com/satoshinm/pill_blink
