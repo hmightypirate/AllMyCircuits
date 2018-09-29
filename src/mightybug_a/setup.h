@@ -72,9 +72,11 @@
 #define SENSOR_7_PORT GPIOA
 #define SENSOR_7_PIN GPIO0 
 
-/* LED */
+/* LEDs */
 #define LED_PORT GPIOC
 #define LED_PIN GPIO13
+#define LED2_PORT GPIOB
+#define LED2_PIN GPIO12
 
 /* MOTOR CONTROL */
 #define LEFT_MOTOR_IN1_PORT GPIOB 
