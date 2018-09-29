@@ -116,6 +116,7 @@ Both motors are controlled with one timer
 #define BATTERY_PIN GPIO0
 #define BATTERY_CHANNEL 8
 #define AVG_BATTERY_SAMPLES 20
+#define BATTERY_ADC ADC1
 
 /* Keypad */
 #define NUM_BUTTONS 3

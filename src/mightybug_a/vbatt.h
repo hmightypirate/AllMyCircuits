@@ -10,10 +10,12 @@
 /* Time between battery readings: 1000 ms => 1s */
 #define VBATT_SYS_BETWEEN_READS 5000
 
+/* Length of array of past measurements */
+#define VBATT_LAST_MEASUREMENTS_ARRAY_LEN 100
+
 void vbatt_setup();
 uint16_t read_vbatt();
 uint16_t read_vbatt_mean();
 uint8_t has_batt_drained(void);
-uint16_t get_last_batt_meas(void);
 
 #endif /* __VBATT_H */
