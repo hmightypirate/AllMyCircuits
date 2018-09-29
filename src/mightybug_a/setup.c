@@ -287,6 +287,10 @@ void gpio_setup(void)
   /* Set internal LED */
   gpio_set_mode(LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 LED_PIN);
+
+  /* Set secondary LED */
+  gpio_set_mode(LED2_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                LED2_PIN);  
   
   /* Set motor control ports */
   /* Control GPIOs configuration for right motor */
