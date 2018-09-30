@@ -6,33 +6,29 @@ uint16_t async_period2 = 0;
 uint16_t num_calls2 = 0;
 
 /*
- * @brief sets the calss period of the async blink
+ * @brief sets the period of the async blink
  *
- * @param[in] async_calls ticks between toggle calls 
- *
- */
-void set_async_period(uint16_t async_calls)
-{
-  async_period = async_calls;
-}
-
-/*
- * @brief sets the period of the async blink of led2
- *
- * @param[in] async_calls ticks between toggle calls 
+ * @param[in] async_calls ticks between toggle calls
+ * @param[in] led led number (1 or 2)
  *
  */
-void set_async_period2(uint16_t async_calls)
+void set_async_period(uint16_t async_calls, uint8_t led)
 {
-  async_period2 = async_calls;
+  if (led == 1) {
+    async_period = async_calls;
+  } else if (led == 2) {
+    async_period2 = async_calls;
+  }
 }
 
 /*
  * @brief makes the led blink (using the async period)
  * 
+ * @param[in] led led number (1 or 2)
  */
-void async_blink()
+void async_blink(uint8_t led)
 {
+  if (led == 1) {
   if (num_calls >= async_period)
     {
       gpio_toggle(LED_PORT, LED_PIN);
@@ -40,16 +36,8 @@ void async_blink()
       // resetting counter
       num_calls = 0;
     }
-  
   num_calls++;
-}
-
-/*
- * @brief makes the led 2 blink (using the async period2)
- * 
- */
-void async_blink2()
-{
+  } else if (led == 2) {
   if (num_calls2 >= async_period2)
     {
       gpio_toggle(LED2_PORT, LED2_PIN);
@@ -59,40 +47,34 @@ void async_blink2()
     }
   
   num_calls2++;
+  }
 }
 
 /*
  * @brief sets the led
  *
+ * @param[in] led led number (1 or 2)
  */
-void set_led()
+void set_led(uint8_t led)
 {
+  if (led == 1) {
   gpio_clear(LED_PORT, LED_PIN);
+  } else if (led == 2) {
+    gpio_clear(LED2_PORT, LED2_PIN);    
+  }
 }
 
 /*
  * @brief clears the led
  *
+ * @param[in] led led number (1 or 2)
  */
-void clear_led()
+void clear_led(uint8_t led)
 {
+  if (led == 1) {
   gpio_set(LED_PORT, LED_PIN);
+  } else if (led == 2) {
+    gpio_set(LED2_PORT, LED2_PIN);
+  }
 }
 
-/*
- * @brief sets the led
- *
- */
-void set_led2()
-{
-  gpio_clear(LED2_PORT, LED2_PIN);
-}
-
-/*
- * @brief clears the led
- *
- */
-void clear_led2()
-{
-  gpio_set(LED2_PORT, LED2_PIN);
-}

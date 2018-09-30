@@ -8,13 +8,9 @@
 
 //FIXME: it uses the internal led (make it configurable)
 
-void set_async_period(uint16_t async_calls);
-void async_blink();
-void set_async_period2(uint16_t async_calls);
-void async_blink2();
-void set_led();
-void clear_led();
-void set_led2();
-void clear_led2();
+void set_async_period(uint16_t async_calls, uint8_t led);
+void async_blink(uint8_t led);
+void set_led(uint8_t led);
+void clear_led(uint8_t led);
 
 #endif /* __LED_H */

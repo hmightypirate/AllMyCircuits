@@ -89,7 +89,7 @@ int main(void)
   reset_prop_readings();
 
   /* led: setting async period */
-  set_async_period(LED_ASYNC_PERIOD);
+  set_async_period(LED_ASYNC_PERIOD, 1);
 
   /* enable sensors */
   enable_line_sensors();
@@ -114,7 +114,7 @@ int main(void)
       reset_circuit_mapping();
     }
   
-  clear_led();
+  clear_led(1);
 
   uint32_t last_loop_execution_ms = 0;
   uint32_t sync_iterations = 0;
@@ -188,7 +188,7 @@ int main(void)
         /* stop motors during calibration */
         stop_motors();
          /* led is on during callibration */
-        set_led();
+        set_led(1);
 
       } else if (current_state == IDLE_STATE) {
 
@@ -198,7 +198,7 @@ int main(void)
         stop_motors();
 
         /* Clear led during idle state */
-        clear_led();
+        clear_led(1);
         
       } else if (current_state == NO_BATTERY_STATE) {
             
@@ -209,7 +209,7 @@ int main(void)
         stop_motors();
             
         /* Led off */
-        clear_led();
+        clear_led(1);
 
       } else if (current_state == DELAYED_START_STATE)
         {
@@ -226,7 +226,7 @@ int main(void)
             }
 
           /* Led on */
-          set_led();
+          set_led(1);
         }
       else if (current_state == PIDANDVEL_MAPPING_STATE)
         {
@@ -241,7 +241,7 @@ int main(void)
               pull_enable_jukebox();
             }
 
-          set_led();
+          set_led(1);
         }
       else if (current_state == PIDANDVEL_CHANGE_STATE)
         {
@@ -322,7 +322,7 @@ int main(void)
           stop_motors();
                 
           // led off
-          clear_led();
+          clear_led(1);
 
           // Send car to callibration if reached the end of line
           if (get_all_inline())
@@ -335,7 +335,7 @@ int main(void)
           motor_control(error);
                 
           // blinking: normal behaviour
-          async_blink();
+          async_blink(1);
 
 	  // Set the current ms (inline)
 	  if (!is_out_of_line())
