@@ -30,11 +30,11 @@ int16_t get_abs_diff_encoders()
 {
   if (left_encoder_ticks > right_encoder_ticks)
     {
-      return (int16_t) left_encoder_ticks - right_encoder_ticks;
+      return (int16_t) (left_encoder_ticks - right_encoder_ticks);
     }
   else
     {
-      return (int16_t) right_encoder_ticks - left_encoder_ticks;
+      return (int16_t) (right_encoder_ticks - left_encoder_ticks);
     }
 }
 

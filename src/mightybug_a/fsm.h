@@ -65,7 +65,7 @@
 #define OUT_MAPCORNER_STATE 1  // diff in abs encoder ticks
 #define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks
 #define FLAG_MAPPING_REPS 1 // mapping with repetitions
-#define MAX_CHANGE_MAP_IT 3
+
 
 typedef enum {
   IDLE_STATE,
