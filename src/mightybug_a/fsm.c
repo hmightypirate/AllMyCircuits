@@ -128,6 +128,7 @@ void add_map_prevstate(uint32_t curr_agg_left_ticks, uint32_t curr_agg_right_tic
   if ((curr_mapping_pointer - 1 < MAX_MAP_STATES) &&
       (curr_mapping_pointer - 1 > 0))
     {
+
       mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] += curr_agg_left_ticks;
       mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] += curr_agg_right_ticks;
     }
@@ -166,7 +167,6 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
 	  // adds ticks to the previous state (if it is calculated in several steps)
 	  mapping_circuit.agg_left_ticks[curr_mapping_pointer] += curr_agg_left_ticks;
 	  mapping_circuit.agg_right_ticks[curr_mapping_pointer] += curr_agg_right_ticks;
-
 
 	  // search the largest straight line
 	  // have seen this stline before?
