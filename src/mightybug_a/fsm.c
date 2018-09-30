@@ -15,7 +15,6 @@ uint16_t mapping_repetion_pointer = 0;
 mapstate_e curr_mapstate = NONE;
 uint32_t curr_agg_left_ticks = 0;
 uint32_t curr_agg_right_ticks = 0;
-uint32_t should_change_map = 0;
 
 
 /* FIXME this should be moved to a *.h */
@@ -121,6 +120,20 @@ uint8_t aprox_stline_equal(uint32_t new_stline_ticks,
 }
 
 /*
+ * @brief add ticks to previous state
+ */
+void add_map_prevstate(uint32_t curr_agg_left_ticks, uint32_t curr_agg_right_ticks)
+{
+
+  if ((curr_mapping_pointer - 1 < MAX_MAP_STATES) &&
+      (curr_mapping_pointer - 1 > 0))
+    {
+      mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] = curr_agg_left_ticks;
+      mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] = curr_agg_right_ticks;
+    }
+}
+
+/*
  * @brief save the state if it is a new state and get a pointer to the next state
  */
 void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_ticks)
@@ -140,10 +153,22 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
       else
 	{
 	  // reached a new state
-	  mapping_circuit.mapstates[curr_mapping_pointer] = state;
-	  mapping_circuit.agg_left_ticks[curr_mapping_pointer] = curr_agg_left_ticks;
-	  mapping_circuit.agg_right_ticks[curr_mapping_pointer] = curr_agg_right_ticks;
 
+	  // Check if the new state is different than the previous one
+	  if ((curr_mapping_pointer > 0) &&
+	      (state == mapping_circuit.mapstates[curr_mapping_pointer-1]))
+	    {
+	      // we are still in the previous state
+	      curr_mapping_pointer -= 1;
+	    }
+	  
+	  mapping_circuit.mapstates[curr_mapping_pointer] = state;
+	  // adds ticks to the previous state (if it is calculated in several steps)
+	  mapping_circuit.agg_left_ticks[curr_mapping_pointer] += curr_agg_left_ticks;
+	  mapping_circuit.agg_right_ticks[curr_mapping_pointer] += curr_agg_right_ticks;
+
+
+	  // search the largest straight line
 	  // have seen this stline before?
 	  if (state == ST_LINE)
 	    {
@@ -275,28 +300,28 @@ void do_circuit_mapping()
   // Change stline -> corner (any)
   if (curr_mapstate == ST_LINE && diff_encoders > OUT_MAPSTLINE_STATE)
     {
-      should_change_map += 1;
-      if (should_change_map == MAX_CHANGE_MAP_IT)
-	{
-	  
-	  should_change_map = 0;
-	
       
-	  if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
-	    {
-	      //save state
-	      update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
-	    }
+      if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
+	{
+	  //save state
+	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	}
+      else
+	{
+	  // TODO add to prev state?, join states if equal
+	  add_map_prevstate(curr_agg_left_ticks, curr_agg_right_ticks);
+	  curr_agg_left_ticks = 0;
+	  curr_agg_right_ticks = 0;
+	}
      
-	  // a corner, update only the state
-	  if (left_ticks > right_ticks)
-	    {
-	      curr_mapstate = RIGHT_CORNER;
-	    }
-	  else
-	    {
-	      curr_mapstate = LEFT_CORNER;
-	    }
+      // a corner, update only the state
+      if (left_ticks > right_ticks)
+	{
+	  curr_mapstate = RIGHT_CORNER;
+	}
+      else
+	{
+	  curr_mapstate = LEFT_CORNER;
 	}
     }
   
@@ -308,47 +333,56 @@ void do_circuit_mapping()
 	  //save state
 	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
 	}
-     
+        else
+	  {
+	    // TODO add to prev state?, join states if equal
+	    add_map_prevstate(curr_agg_left_ticks, curr_agg_right_ticks);
+	    curr_agg_left_ticks = 0;
+	    curr_agg_right_ticks = 0;
+	  }
+
       curr_mapstate = ST_LINE;
     }
 
   // change corner (right) -> corner(left)
   else if (curr_mapstate == RIGHT_CORNER && (left_ticks < right_ticks))
     {
-      should_change_map += 1;
-      if (should_change_map == MAX_CHANGE_MAP_IT)
-	{
-	  should_change_map = 0;
 	  
-	  if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
-	    {
-	      //save state
-	      update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
-	    }
-
-	  // update state
-	  curr_mapstate = LEFT_CORNER;
+      if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
+	{
+	  //save state
+	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
 	}
-      
+      else
+	{
+	  // TODO add to prev state?, join states if equal
+	  add_map_prevstate(curr_agg_left_ticks, curr_agg_right_ticks);
+	  curr_agg_left_ticks = 0;
+	  curr_agg_right_ticks = 0;
+	}
+
+      // update state
+      curr_mapstate = LEFT_CORNER;
     }
   // change corner (left) -> corner (right)
   else if (curr_mapstate == LEFT_CORNER && (right_ticks < left_ticks))
     {
-      should_change_map += 1;
-      if (should_change_map == MAX_CHANGE_MAP_IT)
-	{
-	  should_change_map = 0;
-
       
       if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
 	{
 	  //save state
 	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
 	}
+      else
+	{
+	  // TODO add to prev state?, join states if equal
+	  add_map_prevstate(curr_agg_left_ticks, curr_agg_right_ticks);
+	  curr_agg_left_ticks = 0;
+	  curr_agg_right_ticks = 0;
+	}
 
       // update state
       curr_mapstate = RIGHT_CORNER;
-	}
     }
       
   // Aggregate ticks
