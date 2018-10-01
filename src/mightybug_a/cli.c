@@ -232,7 +232,7 @@ static void cli_led_on() {
 		return;
 	}
 	uint8_t led = (uint8_t)atoi(command_line + 7);
-	set_led(led);
+	set_led_mode(led, ON);
 	printf("LED ON %i\n", led);
 }
 
@@ -243,7 +243,7 @@ static void cli_led_off() {
 		return;
 	}
 	uint8_t led = (uint8_t)atoi(command_line + 8);
-	clear_led(led);
+	set_led_mode(led, OFF);
 	printf("LED OFF %i\n", led);
 }
 
@@ -254,7 +254,7 @@ static void cli_led_blink() {
 		return;
 	}
 	uint8_t led = (uint8_t)atoi(command_line + 10);
-	async_blink(led);
+	set_led_mode(led, BLINK);
 	printf("LED BLINK %i\n", led);
 }
 
