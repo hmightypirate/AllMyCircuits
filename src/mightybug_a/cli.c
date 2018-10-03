@@ -224,7 +224,7 @@ static void cli_pid_get_kd() {
 	printf("PID KP: %i\n", k_value);
 }
 
-char str_LED_syntax[] = "Syntax: LED ON|OFF|BLINK|DBLINK|TBLINK 1|2\n";
+char str_LED_syntax[] = "Syntax: LED ON|OFF|BLINK|DBLINK|TBLINK|BLINKALT|DBLINKALT 1|2\n";
 char str_LED_ON[] = "LED ON";
 static void cli_led_on() {
 	if (command_line_size < 8) {
@@ -278,6 +278,28 @@ static void cli_led_tblink() {
 	uint8_t led = (uint8_t)atoi(command_line + 11);
 	set_led_mode(led-1, TRIPLE_BLINK);
 	printf("LED TBLINK %i\n", led);
+}
+
+char str_LED_ALTBLINK[] = "LED ALTBLINK";
+static void cli_led_altblink() {
+	if (command_line_size < 14) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 13);
+	set_led_mode(led-1, BLINK_ALT);
+	printf("LED ALTBLINK %i\n", led);
+}
+
+char str_LED_ALTDBLINK[] = "LED ALTDBLINK";
+static void cli_led_altdblink() {
+	if (command_line_size < 15) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 14);
+	set_led_mode(led-1, DOUBLE_BLINK_ALT);
+	printf("LED ALTDBLINK %i\n", led);
 }
 
 char str_CAR_PLAY[] = "CAR PLAY";
@@ -387,6 +409,8 @@ struct command_struct commands_list[] = {
 	{.text = str_LED_BLINK, .functionPtr = cli_led_blink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
 	{.text = str_LED_DBLINK, .functionPtr = cli_led_dblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
 	{.text = str_LED_TBLINK, .functionPtr = cli_led_tblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},	
+	{.text = str_LED_ALTBLINK, .functionPtr = cli_led_altblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
+	{.text = str_LED_ALTDBLINK, .functionPtr = cli_led_altdblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},	
 	{.text = str_CAR_PLAY, .functionPtr = cli_car_play, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_CAR_STOP, .functionPtr = cli_car_stop, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_VEL_LEFT, .functionPtr = cli_vel_left, .is_a_candidate = 'y', .syntax_hint = str_VEL_syntax},

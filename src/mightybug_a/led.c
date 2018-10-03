@@ -138,6 +138,54 @@ void triple_blink(uint8_t led, uint32_t millis)
 
 
 /*
+ * @brief controls the double blink of led with small blinks
+ *
+ * @param[in] led led number (1 or 2)
+ */
+void double_blink_alternate(uint8_t led, uint32_t millis)
+{
+  if (millis > (led_last_toggle[led]+2*led_half_period[led])) {
+    set_led(led);
+    led_last_toggle[led] = millis;
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+3*led_half_period[led]/5)) {
+    clear_led(led);
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+2*led_half_period[led]/5)) {
+    set_led(led);
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+led_half_period[led]/5)) {
+    clear_led(led);
+    return;
+  }
+}
+
+/*
+ * @brief controls the blink of led with small blink
+ *
+ * @param[in] led led number (1 or 2)
+ */
+void blink_led_alternate(uint8_t led, uint32_t millis)
+{
+  if (millis > (led_last_toggle[led]+2*led_half_period[led])) {
+    set_led(led);
+    led_last_toggle[led] = millis;
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+led_half_period[led]/5)) {
+    clear_led(led);
+    return;
+  }
+}
+
+/*
  * @brief update the state of the leds
  *
  * @param[in] millis milliseconds since start
@@ -160,6 +208,13 @@ void leds_update(uint32_t millis)
         break;
       case TRIPLE_BLINK:
         triple_blink(led, millis);
+        break;
+      case BLINK_ALT:
+        blink_led_alternate(led, millis);
+        break;
+      case DOUBLE_BLINK_ALT:
+        double_blink_alternate(led, millis);
+        break;
     }
   }
 }
