@@ -4,6 +4,8 @@
 #include "setup.h"
 #include <stdio.h>
 
+#define LED1 0
+#define LED2 1
 #define LED_BLINK_PERIOD 2000
 
 typedef enum {OFF, ON, BLINK} LED_MODE;

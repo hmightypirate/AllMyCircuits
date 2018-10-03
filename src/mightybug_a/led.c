@@ -16,8 +16,8 @@ uint32_t led_pin[2] = {LED_PIN, LED2_PIN};
  */
 void set_led_blink_period(uint8_t led, uint16_t period)
 {
-  if (led < 1 || led > 2) return;
-  led_half_period[led-1] = period / 2;
+  if (led > 1) return;
+  led_half_period[led] = period / 2;
 }
 
 /*
@@ -55,8 +55,8 @@ void clear_led(uint8_t led)
 
 void set_led_mode(uint8_t led, LED_MODE mode)
 {
-  if (led < 1 || led > 2) return;
-  led_mode[led-1] = mode;
+  if (led > 1) return;
+  led_mode[led] = mode;
 }
 
 
