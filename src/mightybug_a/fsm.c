@@ -128,7 +128,6 @@ void add_map_prevstate(uint32_t curr_agg_left_ticks, uint32_t curr_agg_right_tic
   if ((curr_mapping_pointer - 1 < MAX_MAP_STATES) &&
       (curr_mapping_pointer - 1 > 0))
     {
-
       mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] += curr_agg_left_ticks;
       mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] += curr_agg_right_ticks;
     }
