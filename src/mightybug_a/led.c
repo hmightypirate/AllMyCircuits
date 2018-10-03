@@ -16,7 +16,7 @@ uint32_t led_pin[2] = {LED_PIN, LED2_PIN};
  */
 void set_led_blink_period(uint8_t led, uint16_t period)
 {
-  if (led > 2) return;
+  if (led < 1 || led > 2) return;
   led_half_period[led-1] = period;
 }
 
@@ -27,9 +27,6 @@ void set_led_blink_period(uint8_t led, uint16_t period)
  */
 void blink_led(uint8_t led, uint32_t millis)
 {
-  if (led < 1 || led > 2) return;
-
-  led--; // 0-based led count
   if (millis > (led_last_toggle[led] + led_half_period[led])) {
     gpio_toggle(led_port[led], led_pin[led]);
     led_last_toggle[led] = millis;
@@ -43,9 +40,6 @@ void blink_led(uint8_t led, uint32_t millis)
  */
 void set_led(uint8_t led)
 {
-  if (led < 1 || led > 2) return;
-
-  led--; // 0-based led count
   gpio_clear(led_port[led], led_pin[led]);
 }
 
@@ -56,25 +50,20 @@ void set_led(uint8_t led)
  */
 void clear_led(uint8_t led)
 {
-  if (led < 1 || led > 2) return;
-
-  led--; // 0-based led count
   gpio_set(led_port[led], led_pin[led]);
 }
 
 void set_led_mode(uint8_t led, LED_MODE mode)
 {
   if (led < 1 || led > 2) return;
-
-  led--;
-  led_mode[led] = mode;
+  led_mode[led-1] = mode;
 }
 
 
 void leds_update(uint32_t millis)
 {
-  for (uint8_t led = 1; led < 3; led++) {
-    switch (led_mode[led-1]) {
+  for (uint8_t led = 0; led < 2; led++) {
+    switch (led_mode[led]) {
       case OFF:
         clear_led(led);
         break;
