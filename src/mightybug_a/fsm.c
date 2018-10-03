@@ -26,7 +26,7 @@ const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  500, 600, 650
+  425, 475, 575
 };
 
 const int16_t pid_nool_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
@@ -36,18 +36,18 @@ const int16_t pid_nool_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_nool_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  400, 300, 300
+  350, 350, 350
 };
 
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  250, 0, 600,
-  250, 0, 600,
-  250, 0, 600
+  350, 0, 600,
+  350, 0, 600,
+  350, 0, 600
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  525, 625, 650
+  450, 500, 525
 };
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)
@@ -128,8 +128,8 @@ void add_map_prevstate(uint32_t curr_agg_left_ticks, uint32_t curr_agg_right_tic
   if ((curr_mapping_pointer - 1 < MAX_MAP_STATES) &&
       (curr_mapping_pointer - 1 > 0))
     {
-      mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] = curr_agg_left_ticks;
-      mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] = curr_agg_right_ticks;
+      mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] += curr_agg_left_ticks;
+      mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] += curr_agg_right_ticks;
     }
 }
 
@@ -773,7 +773,20 @@ void update_target_normal_with_encoders()
 	  diff_acc = get_left_acc() - get_right_acc();
 	}
 
-      reset_target_velocity(vel_maps[current_pidvel_mapping] + STEP_NORMAL_QTY * diff_acc);      
+      int32_t next_vel = vel_maps[current_pidvel_mapping] + STEP_NORMAL_QTY * diff_acc;	
+
+      /*
+      if (next_vel < MIN_VEL_MOTOR_INC_MODE)
+	{
+	  next_vel = MIN_VEL_MOTOR_INC_MODE;
+	}
+      else if (next_vel > MAX_VEL_MOTOR_DEC_MODE)
+	{
+	  next_vel = MAX_VEL_MOTOR_DEC_MODE;
+	}
+      */
+      
+      reset_target_velocity(next_vel);      
     }
   
 }
