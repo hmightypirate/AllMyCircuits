@@ -224,7 +224,7 @@ static void cli_pid_get_kd() {
 	printf("PID KP: %i\n", k_value);
 }
 
-char str_LED_syntax[] = "Syntax: LED ON|OFF|BLINK 1|2\n";
+char str_LED_syntax[] = "Syntax: LED ON|OFF|BLINK|DBLINK|TBLINK 1|2\n";
 char str_LED_ON[] = "LED ON";
 static void cli_led_on() {
 	if (command_line_size < 8) {
@@ -256,6 +256,28 @@ static void cli_led_blink() {
 	uint8_t led = (uint8_t)atoi(command_line + 10);
 	set_led_mode(led-1, BLINK);
 	printf("LED BLINK %i\n", led);
+}
+
+char str_LED_DBLINK[] = "LED DBLINK";
+static void cli_led_dblink() {
+	if (command_line_size < 12) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 11);
+	set_led_mode(led-1, DOUBLE_BLINK);
+	printf("LED DBLINK %i\n", led);
+}
+
+char str_LED_TBLINK[] = "LED TBLINK";
+static void cli_led_tblink() {
+	if (command_line_size < 12) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 11);
+	set_led_mode(led-1, TRIPLE_BLINK);
+	printf("LED TBLINK %i\n", led);
 }
 
 char str_CAR_PLAY[] = "CAR PLAY";
@@ -363,6 +385,8 @@ struct command_struct commands_list[] = {
 	{.text = str_LED_ON, .functionPtr = cli_led_on,.is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
 	{.text = str_LED_OFF, .functionPtr = cli_led_off, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
 	{.text = str_LED_BLINK, .functionPtr = cli_led_blink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
+	{.text = str_LED_DBLINK, .functionPtr = cli_led_dblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
+	{.text = str_LED_TBLINK, .functionPtr = cli_led_tblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},	
 	{.text = str_CAR_PLAY, .functionPtr = cli_car_play, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_CAR_STOP, .functionPtr = cli_car_stop, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_VEL_LEFT, .functionPtr = cli_vel_left, .is_a_candidate = 'y', .syntax_hint = str_VEL_syntax},

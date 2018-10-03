@@ -8,7 +8,7 @@
 #define LED2 1
 #define LED_BLINK_PERIOD 2000
 
-typedef enum {OFF, ON, BLINK} LED_MODE;
+typedef enum {OFF, ON, BLINK, DOUBLE_BLINK, TRIPLE_BLINK} LED_MODE;
 
 //FIXME: it uses the internal led (make it configurable)
 

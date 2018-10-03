@@ -59,6 +59,64 @@ void set_led_mode(uint8_t led, LED_MODE mode)
   led_mode[led] = mode;
 }
 
+void double_blink(uint8_t led, uint32_t millis)
+{
+  if (millis > (led_last_toggle[led]+2*led_half_period[led])) {
+    set_led(led);
+    led_last_toggle[led] = millis;
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+led_half_period[led])) {
+    clear_led(led);
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+2*led_half_period[led]/3)) {
+    set_led(led);
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+led_half_period[led]/3)) {
+    clear_led(led);
+    return;
+  }
+}
+
+
+void triple_blink(uint8_t led, uint32_t millis)
+{
+  if (millis > (led_last_toggle[led]+2*led_half_period[led])) {
+    set_led(led);
+    led_last_toggle[led] = millis;
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+led_half_period[led])) {
+    clear_led(led);
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+4*led_half_period[led]/5)) {
+    set_led(led);
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+3*led_half_period[led]/5)) {
+    clear_led(led);
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+2*led_half_period[led]/5)) {
+    set_led(led);
+    return;
+  }
+
+  if (millis > (led_last_toggle[led]+led_half_period[led]/5)) {
+    clear_led(led);
+    return;
+  }
+}
 
 void leds_update(uint32_t millis)
 {
@@ -73,6 +131,11 @@ void leds_update(uint32_t millis)
       case BLINK:
         blink_led(led, millis);
         break;
+      case DOUBLE_BLINK:
+        double_blink(led, millis);
+        break;
+      case TRIPLE_BLINK:
+        triple_blink(led, millis);
     }
   }
 }
