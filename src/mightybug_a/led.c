@@ -10,14 +10,27 @@ uint32_t led_pin[2] = {LED_PIN, LED2_PIN};
 /*
  * @brief sets the period of the async blink
  *
- * @param[in] async_calls ticks between toggle calls
  * @param[in] led led number (1 or 2)
+ * @param[in] period time of blink repetition
  *
  */
 void set_led_blink_period(uint8_t led, uint16_t period)
 {
   if (led > 1) return;
   led_half_period[led] = period / 2;
+}
+
+/*
+ * @brief sets the led mode (off, on, blink, double_blink, triple_blink)
+ *
+ * @param[in] led led number (1 or 2)
+ * @param[in] mode mode of blink (off, on, blink, double_blink, triple_blink)
+ *
+ */
+void set_led_mode(uint8_t led, LED_MODE mode)
+{
+  if (led > 1) return;
+  led_mode[led] = mode;
 }
 
 /*
@@ -53,12 +66,12 @@ void clear_led(uint8_t led)
   gpio_set(led_port[led], led_pin[led]);
 }
 
-void set_led_mode(uint8_t led, LED_MODE mode)
-{
-  if (led > 1) return;
-  led_mode[led] = mode;
-}
 
+/*
+ * @brief controls the double blink of led
+ *
+ * @param[in] led led number (1 or 2)
+ */
 void double_blink(uint8_t led, uint32_t millis)
 {
   if (millis > (led_last_toggle[led]+2*led_half_period[led])) {
@@ -84,6 +97,11 @@ void double_blink(uint8_t led, uint32_t millis)
 }
 
 
+/*
+ * @brief controls the triple blink of led
+ *
+ * @param[in] led led number (1 or 2)
+ */
 void triple_blink(uint8_t led, uint32_t millis)
 {
   if (millis > (led_last_toggle[led]+2*led_half_period[led])) {
@@ -118,6 +136,12 @@ void triple_blink(uint8_t led, uint32_t millis)
   }
 }
 
+
+/*
+ * @brief update the state of the leds
+ *
+ * @param[in] millis milliseconds since start
+ */
 void leds_update(uint32_t millis)
 {
   for (uint8_t led = 0; led < 2; led++) {
