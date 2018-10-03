@@ -4,6 +4,9 @@ LED_MODE led_mode[2] = {OFF, OFF};
 uint16_t led_half_period[2] = {LED_BLINK_PERIOD / 2, LED_BLINK_PERIOD / 2};
 uint32_t led_last_toggle[2] = {0, 0};
 
+uint32_t led_port[2] = {LED_PORT, LED2_PORT};
+uint32_t led_pin[2] = {LED_PIN, LED2_PIN};
+
 /*
  * @brief sets the period of the async blink
  *
@@ -24,10 +27,12 @@ void set_led_blink_period(uint8_t led, uint16_t period)
  */
 void blink_led(uint8_t led, uint32_t millis)
 {
-  if (millis > (led_last_toggle[led-1] + led_half_period[led-1])) {
-    if (led == 1) gpio_toggle(LED_PORT, LED_PIN);
-    else if (led == 2) gpio_toggle(LED2_PORT, LED2_PIN);
-    led_last_toggle[led-1] = millis;
+  if (led < 1 || led > 2) return;
+
+  led--; // 0-based led count
+  if (millis > (led_last_toggle[led] + led_half_period[led])) {
+    gpio_toggle(led_port[led], led_pin[led]);
+    led_last_toggle[led] = millis;
   }
 }
 
@@ -38,11 +43,10 @@ void blink_led(uint8_t led, uint32_t millis)
  */
 void set_led(uint8_t led)
 {
-  if (led == 1) {
-    gpio_clear(LED_PORT, LED_PIN);
-  } else if (led == 2) {
-    gpio_clear(LED2_PORT, LED2_PIN);    
-  }
+  if (led < 1 || led > 2) return;
+
+  led--; // 0-based led count
+  gpio_clear(led_port[led], led_pin[led]);
 }
 
 /*
@@ -52,17 +56,18 @@ void set_led(uint8_t led)
  */
 void clear_led(uint8_t led)
 {
-  if (led == 1) {
-    gpio_set(LED_PORT, LED_PIN);
-  } else if (led == 2) {
-    gpio_set(LED2_PORT, LED2_PIN);
-  }
+  if (led < 1 || led > 2) return;
+
+  led--; // 0-based led count
+  gpio_set(led_port[led], led_pin[led]);
 }
 
 void set_led_mode(uint8_t led, LED_MODE mode)
 {
-  if (led > 2) return;
-  led_mode[led - 1] = mode;
+  if (led < 1 || led > 2) return;
+
+  led--;
+  led_mode[led] = mode;
 }
 
 
