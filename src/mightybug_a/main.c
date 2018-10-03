@@ -89,8 +89,8 @@ int main(void)
   reset_prop_readings();
 
   /* led: setting async period */
-  set_async_period(LED_ASYNC_PERIOD, 1);
-  set_async_period(LED_ASYNC_PERIOD, 2);
+  set_led_blink_period(1, LED_BLINK_PERIOD);
+  set_led_blink_period(2, LED_BLINK_PERIOD);
 
   /* enable sensors */
   enable_line_sensors();
