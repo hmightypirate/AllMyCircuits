@@ -11,7 +11,6 @@ static uint16_t seq_increase_line_pos = 0;
 //Mapping circuit vars
 mapping_e mapping_circuit;
 uint16_t curr_mapping_pointer = 0;
-uint16_t mapping_repetion_pointer = 0;
 mapstate_e curr_mapstate = NONE;
 uint32_t curr_agg_left_ticks = 0;
 uint32_t curr_agg_right_ticks = 0;
@@ -121,6 +120,8 @@ uint8_t aprox_stline_equal(uint32_t new_stline_ticks,
 
 /*
  * @brief add ticks to previous state
+ *
+ *  NOTE: this is only done during the first mapping
  */
 void add_map_prevstate(uint32_t curr_agg_left_ticks, uint32_t curr_agg_right_ticks)
 {
