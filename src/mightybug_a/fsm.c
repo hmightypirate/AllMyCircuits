@@ -639,7 +639,7 @@ void get_next_running_state(int16_t avg_proportional)
     }
   else if (running_state == RUNNING_STLINE)
     {
-      if (avg_proportional > normal_out_hyst)
+      if (avg_proportional > turbo_out_hyst)
         {
           update_state(GO_TO_NORMAL_EVENT);
         }
