@@ -186,7 +186,7 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
 		  if (aprox_stline_equal(new_stline_ticks, total_stline_ticks))
 		    {
 		      // set the pointer to the circuit repetition
-		      if (mapping_circuit.rep_pointer != -1)
+		      if (mapping_circuit.rep_pointer == -1)
 			{
 			  mapping_circuit.rep_pointer = curr_mapping_pointer;
 			}
