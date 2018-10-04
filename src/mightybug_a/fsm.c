@@ -127,7 +127,8 @@ void add_map_prevstate(uint32_t curr_agg_left_ticks, uint32_t curr_agg_right_tic
 {
 
   if ((curr_mapping_pointer - 1 < MAX_MAP_STATES) &&
-      (curr_mapping_pointer - 1 > 0))
+      (curr_mapping_pointer - 1 > 0) &&
+      (mapping_circuit.rep_pointer == -1)) //only update if we are not repeating again the circuit
     {
       mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] += curr_agg_left_ticks;
       mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] += curr_agg_right_ticks;
@@ -181,11 +182,12 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
 		{
 		  uint32_t total_stline_ticks = mapping_circuit.agg_left_ticks[mapping_circuit.large_stline_pointer] + mapping_circuit.agg_right_ticks[mapping_circuit.large_stline_pointer];
 
-		  uint32_t new_stline_ticks = left_ticks + right_ticks;
+		  // the new line is the current 
+		  uint32_t new_stline_ticks = mapping_circuit.agg_left_ticks[curr_mapping_pointer] + mapping_circuit.agg_right_ticks[curr_mapping_pointer];
 
 		  if (aprox_stline_equal(new_stline_ticks, total_stline_ticks))
 		    {
-		      // set the pointer to the circuit repetition
+		      // set the pointer to the circuit repetition (do only once)
 		      if (mapping_circuit.rep_pointer == -1)
 			{
 			  mapping_circuit.rep_pointer = curr_mapping_pointer;
