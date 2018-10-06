@@ -20,6 +20,9 @@ void clock_setup(void)
   /* Enable USART */
   rcc_periph_clock_enable(RCC_USART1);
 
+  /* Enable DMA */
+	rcc_periph_clock_enable(RCC_DMA1);
+
   /* Enable TIMER for encoder (left encoder) */
   rcc_periph_clock_enable(RCC_LEFT_ENCODER);
   timer_reset(RCC_LEFT_ENCODER);
@@ -66,7 +69,7 @@ void usart_setup(void)
   usart_set_flow_control(USART1, USART_FLOWCONTROL);
   
   /* Enable RX interruptions to usart1_isr() function */
-    usart_enable_rx_interrupt(USART1);
+  usart_enable_rx_interrupt(USART1);
   /* Enable USART */
   usart_enable(USART1);
 }
@@ -347,6 +350,12 @@ void systick_setup(){
 }
 
 
+void dma_setup(){
+	// UART TX on DMA1 Channel 4
+	nvic_set_priority(NVIC_DMA1_CHANNEL4_IRQ, 0);
+	nvic_enable_irq(NVIC_DMA1_CHANNEL4_IRQ);
+}
+
 /* 
  * @brief setup of microcontroller functionality
  */
@@ -367,6 +376,7 @@ void setup_microcontroller(void)
   sensor_setup();
   buzzer_pwm_setup();
   vbatt_setup();
+  dma_setup();
   /* left encoder */ 
   encoder_setup(LEFT_ENCODER_TIMER,
                 LEFT_ENCODER_AFIO,

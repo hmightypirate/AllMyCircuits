@@ -14,7 +14,7 @@
 #include "keypad.h"
 #include "keypad_menu.h"
 #include "telemetry.h"
-
+#include "dma.h"
 
 void music_update(int millis)
 {
@@ -141,6 +141,7 @@ int main(void)
     music_update(current_loop_millisecs);
     keypad_loop(current_loop_millisecs);
     menu_functions(current_loop_millisecs);
+    dma_update();
 
     // loop out of period
     if (current_state == SET_NORMAL_MODE_STATE)

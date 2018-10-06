@@ -16,12 +16,9 @@ bool is_command_received() {
  * _write let use printf to write to serial port
  */
 int _write(int file, char *ptr, int len) {
-	int i;
 
 	if (file == 1) {
-		for (i = 0; i < len; i++)
-			usart_send_blocking(USART1, ptr[i]);
-		return i;
+		write_dma(ptr, len);
 	}
 
 	errno = EIO;
