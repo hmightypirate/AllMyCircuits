@@ -25,7 +25,7 @@ const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  425, 475, 575
+  400, 500, 550
 };
 
 const int16_t pid_nool_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
@@ -46,7 +46,7 @@ const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  450, 500, 525
+  450, 500, 515
 };
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)

@@ -191,10 +191,12 @@ int get_line_position(uint16_t* value)
   /* Zero-center position */
   position = position - (NUM_SENSORS + 1) * SEP_SENSORS/2;
 
+  /*
   if (out_of_line)
     {
       position = (20 * position)/100;
     }
+  */
 
   position = -1 * position;
   
