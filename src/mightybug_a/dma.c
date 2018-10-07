@@ -3,41 +3,36 @@
 #define MY_DMA_NUMBER DMA1
 #define MY_DMA_CHANNEL DMA_CHANNEL4
 
-int dma_finished = 1; //1 when DMA has completely transfer all data and can be used again
+uint8_t dma_finished = 1; //1 when DMA has completely transfer all data and can be used again
 
 uint16_t writePos = 0;
 uint16_t readPos = 0;
 uint8_t dma_buffer[DMA_BUFFER_SIZE];
 uint8_t dma_send_buffer[DMA_BUFFER_SIZE];
 
-
-void write_dma_char(char a)
-{
-    dma_buffer[writePos++] = (uint8_t)a;
-    writePos %= DMA_BUFFER_SIZE;
-}
-
 void write_dma(char *p, int len)
 {
-    for (int i = 0; i < len; i++) {
-        write_dma_char(p[i]);
-    }
+	if (len > DMA_BUFFER_SIZE - writePos) {
+		memcpy(dma_buffer + writePos, p, DMA_BUFFER_SIZE - writePos);
+		memcpy(dma_buffer, p + DMA_BUFFER_SIZE - writePos, len + writePos - DMA_BUFFER_SIZE);
+	} else {
+		memcpy(dma_buffer + writePos, p, len);
+	}
+	writePos = (writePos + len) % DMA_BUFFER_SIZE;
 }
 
-uint16_t is_data_buffered() {
-    //return (writePos - readPos) % DMA_BUFFER_SIZE;
-    if (writePos != readPos) return 1;
-    return 0;
+uint16_t data_buffered_size() {
+	return writePos >= readPos ? writePos - readPos : DMA_BUFFER_SIZE + writePos - readPos;
 }
 
-uint8_t cpy_to_send_buffer() {
-    uint8_t pos;
-    pos = 0;
-    while (readPos != writePos) {
-        dma_send_buffer[pos++] = dma_buffer[readPos++];
-        readPos %= DMA_BUFFER_SIZE;
-    }
-    return pos;
+void cpy_to_send_buffer(uint16_t size) {
+	if (writePos > readPos) {
+		memcpy(dma_send_buffer, dma_buffer + readPos, size);
+	} else {
+		memcpy(dma_send_buffer, dma_buffer + readPos, DMA_BUFFER_SIZE - readPos);
+		memcpy(dma_send_buffer + DMA_BUFFER_SIZE - readPos, dma_buffer, size + readPos - DMA_BUFFER_SIZE);
+	}
+	readPos = (readPos + size) % DMA_BUFFER_SIZE;
 }
 
 void start_dma_transfer(){
@@ -48,8 +43,9 @@ void start_dma_transfer(){
 	dma_set_peripheral_address(MY_DMA_NUMBER, MY_DMA_CHANNEL, (uint32_t)&USART1_DR);
 
 	dma_set_memory_address(MY_DMA_NUMBER, MY_DMA_CHANNEL, (uint32_t)dma_send_buffer);
-	uint8_t data = cpy_to_send_buffer();
-    dma_set_number_of_data(MY_DMA_NUMBER, MY_DMA_CHANNEL, data);
+	uint16_t data_size = data_buffered_size();
+	cpy_to_send_buffer(data_size);
+    dma_set_number_of_data(MY_DMA_NUMBER, MY_DMA_CHANNEL, data_size);
 
 	dma_set_read_from_memory(MY_DMA_NUMBER, MY_DMA_CHANNEL);
 	dma_enable_memory_increment_mode(MY_DMA_NUMBER, MY_DMA_CHANNEL);
@@ -65,7 +61,7 @@ void start_dma_transfer(){
 }
 
 void dma_update() {
-   if (dma_finished && is_data_buffered()) start_dma_transfer();
+   if (dma_finished && data_buffered_size()) start_dma_transfer();
 }
 
 void dma1_channel4_isr(){
@@ -76,6 +72,6 @@ void dma1_channel4_isr(){
 
 	dma_finished = 1;
 
-	if (is_data_buffered()) start_dma_transfer();
+	if (data_buffered_size()) start_dma_transfer();
 
 }
