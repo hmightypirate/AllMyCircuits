@@ -22,7 +22,7 @@
 /* Activate/deactivate special functions */
 #define ENABLE_TURBO_MODE 1
 
-#define ENABLE_NOOL_MODE 1
+#define ENABLE_NOOL_MODE 0
 #define TURBO_PITCH_DEBUG 0  // Disturbing pitch to discern normal/turbo states
 
 /* Delay stop if out of line */
@@ -32,7 +32,7 @@
 /* Hysteresis values for changing state whilst running  */
 #define USE_ENCODERS_FOR_STATE 1
 #define OUT_NORMAL_HYST USE_ENCODERS_FOR_STATE? 2:10  
-#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 4:20 
+#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 3:20 
 #define OUT_NORMAL_NOOL_HYST USE_ENCODERS_FOR_STATE? 27:200
 #define OUT_NOOL_NORMAL_HYST USE_ENCODERS_FOR_STATE? 20:150
 
@@ -49,10 +49,10 @@
 #define MIN_VEL_MOTOR_INC_MODE 250
 #define MAX_VEL_MOTOR_DEC_MODE 950
 #define DEC_NORMAL_QTY 5
-#define STEP_NORMAL_QTY 25 // used by the encoder acc functionality only
+#define STEP_NORMAL_QTY 35 // used by the encoder acc functionality only
 
 /* Pickle configuration */
-#define TURBO_PICKLE 0
+#define TURBO_PICKLE 1
 #define TURBO_PICKLE_IN_CORNERS 0
 #define PICKLE_ENC_DISTANCE 7
 #define PICKLE_TURBO_VEL 200
@@ -62,9 +62,9 @@
 #define MAX_MAP_STATES 100
 #define MIN_TICKS_FOR_MAP 300
 #define DIFF_TICKS_EQUAL 100
-#define OUT_MAPCORNER_STATE 1  // diff in abs encoder ticks
-#define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks
-#define FLAG_MAPPING_REPS 1 // mapping with repetitions
+#define OUT_MAPCORNER_STATE 2  // diff in abs encoder ticks
+#define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks 
+#define FLAG_MAPPING_REPS 0 // mapping with repetitions
 
 
 typedef enum {
