@@ -49,7 +49,7 @@
 #define MIN_VEL_MOTOR_INC_MODE 250
 #define MAX_VEL_MOTOR_DEC_MODE 950
 #define DEC_NORMAL_QTY 5
-#define STEP_NORMAL_QTY 35 // used by the encoder acc functionality only
+#define STEP_NORMAL_QTY 25 // used by the encoder acc functionality only (35 best)
 
 /* Pickle configuration */
 #define TURBO_PICKLE 1
@@ -60,7 +60,7 @@
 /* Mapping variables */
 #define FLAG_CIRCUIT_MAPPING 1
 #define MAX_MAP_STATES 100
-#define MIN_TICKS_FOR_MAP 300
+#define MIN_TICKS_FOR_MAP 400
 #define DIFF_TICKS_EQUAL 100
 #define OUT_MAPCORNER_STATE 2  // diff in abs encoder ticks
 #define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks 
