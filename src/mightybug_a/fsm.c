@@ -25,8 +25,11 @@ const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  400, 500, 550
+  650, 675, 725
+  //600, 650, 700
 };
+
+// Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro corto stripped)
 
 const int16_t pid_nool_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
   400, 0, 600,
@@ -46,7 +49,8 @@ const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  450, 500, 515
+  515, 515, 515
+  //575, 575, 575
 };
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)
@@ -123,7 +127,7 @@ uint8_t aprox_stline_equal(uint32_t new_stline_ticks,
  *
  *  NOTE: this is only done during the first mapping
  */
-void add_map_prevstate(uint32_t curr_agg_left_ticks, uint32_t curr_agg_right_ticks)
+void add_map_prevstate()
 {
 
   if ((curr_mapping_pointer - 1 < MAX_MAP_STATES) &&
@@ -138,7 +142,7 @@ void add_map_prevstate(uint32_t curr_agg_left_ticks, uint32_t curr_agg_right_tic
 /*
  * @brief save the state if it is a new state and get a pointer to the next state
  */
-void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_ticks)
+void update_map_state(mapstate_e state)
 {
 
   /* only do something if it has not exceeded the number of mappings */
@@ -306,12 +310,12 @@ void do_circuit_mapping()
       if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
 	{
 	  //save state
-	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	  update_map_state(curr_mapstate);
 	}
       else
 	{
 	  // TODO add to prev state?, join states if equal
-	  add_map_prevstate(curr_agg_left_ticks, curr_agg_right_ticks);
+	  add_map_prevstate();
 	  curr_agg_left_ticks = 0;
 	  curr_agg_right_ticks = 0;
 	}
@@ -333,12 +337,12 @@ void do_circuit_mapping()
       if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
 	{
 	  //save state
-	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	  update_map_state(curr_mapstate);
 	}
         else
 	  {
 	    // TODO add to prev state?, join states if equal
-	    add_map_prevstate(curr_agg_left_ticks, curr_agg_right_ticks);
+	    add_map_prevstate();
 	    curr_agg_left_ticks = 0;
 	    curr_agg_right_ticks = 0;
 	  }
@@ -353,7 +357,7 @@ void do_circuit_mapping()
       if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
 	{
 	  //save state
-	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	  update_map_state(curr_mapstate);
 	}
       else
 	{
@@ -373,12 +377,12 @@ void do_circuit_mapping()
       if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
 	{
 	  //save state
-	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	  update_map_state(curr_mapstate);
 	}
       else
 	{
 	  // TODO add to prev state?, join states if equal
-	  add_map_prevstate(curr_agg_left_ticks, curr_agg_right_ticks);
+	  add_map_prevstate();
 	  curr_agg_left_ticks = 0;
 	  curr_agg_right_ticks = 0;
 	}
