@@ -344,7 +344,7 @@ static void cli_ver() {
 
 
 // This is all the available commands data as an array of command structures
-#define CLI_COMMANDS_LIST_SIZE 32
+#define CLI_COMMANDS_LIST_SIZE 36
 struct command_struct commands_list[] = {
 	{.text = str_BUZ_ON, .functionPtr = cli_buz_on, .is_a_candidate = 'y', .syntax_hint = str_BUZ_syntax},
 	{.text = str_BUZ_OFF, .functionPtr = cli_buz_off, .is_a_candidate = 'y', .syntax_hint = str_BUZ_syntax},

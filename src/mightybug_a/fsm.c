@@ -11,11 +11,9 @@ static uint16_t seq_increase_line_pos = 0;
 //Mapping circuit vars
 mapping_e mapping_circuit;
 uint16_t curr_mapping_pointer = 0;
-uint16_t mapping_repetion_pointer = 0;
 mapstate_e curr_mapstate = NONE;
 uint32_t curr_agg_left_ticks = 0;
 uint32_t curr_agg_right_ticks = 0;
-uint32_t should_change_map = 0;
 
 
 /* FIXME this should be moved to a *.h */
@@ -27,8 +25,11 @@ const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  500, 600, 650
+  650, 675, 725
+  //600, 650, 700
 };
+
+// Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro corto stripped)
 
 const int16_t pid_nool_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
   400, 0, 600,
@@ -37,18 +38,19 @@ const int16_t pid_nool_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
 };
 
 const int16_t vel_nool_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  400, 300, 300
+  350, 350, 350
 };
 
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  250, 0, 600,
-  250, 0, 600,
-  250, 0, 600
+  350, 0, 600,
+  350, 0, 600,
+  350, 0, 600
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  525, 625, 650
+  515, 515, 515
+  //575, 575, 575
 };
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)
@@ -121,9 +123,26 @@ uint8_t aprox_stline_equal(uint32_t new_stline_ticks,
 }
 
 /*
+ * @brief add ticks to previous state
+ *
+ *  NOTE: this is only done during the first mapping
+ */
+void add_map_prevstate()
+{
+
+  if ((curr_mapping_pointer - 1 < MAX_MAP_STATES) &&
+      (curr_mapping_pointer - 1 > 0) &&
+      (mapping_circuit.rep_pointer == -1)) //only update if we are not repeating again the circuit
+    {
+      mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] += curr_agg_left_ticks;
+      mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] += curr_agg_right_ticks;
+    }
+}
+
+/*
  * @brief save the state if it is a new state and get a pointer to the next state
  */
-void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_ticks)
+void update_map_state(mapstate_e state)
 {
 
   /* only do something if it has not exceeded the number of mappings */
@@ -140,10 +159,20 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
       else
 	{
 	  // reached a new state
-	  mapping_circuit.mapstates[curr_mapping_pointer] = state;
-	  mapping_circuit.agg_left_ticks[curr_mapping_pointer] = curr_agg_left_ticks;
-	  mapping_circuit.agg_right_ticks[curr_mapping_pointer] = curr_agg_right_ticks;
 
+	  // Check if the new state is different than the previous one
+	  if ((curr_mapping_pointer > 0) &&
+	      (state == mapping_circuit.mapstates[curr_mapping_pointer-1]))
+	    {
+	      // we are still in the previous state
+	      curr_mapping_pointer -= 1;
+	    }
+	  
+	  mapping_circuit.mapstates[curr_mapping_pointer] = state;
+	  // adds ticks to the previous state (if it is calculated in several steps)
+	  mapping_circuit.agg_left_ticks[curr_mapping_pointer] += curr_agg_left_ticks;
+	  mapping_circuit.agg_right_ticks[curr_mapping_pointer] += curr_agg_right_ticks;
+	  // search the largest straight line
 	  // have seen this stline before?
 	  if (state == ST_LINE)
 	    {
@@ -156,12 +185,13 @@ void update_map_state(mapstate_e state, uint32_t left_ticks, uint32_t right_tick
 		{
 		  uint32_t total_stline_ticks = mapping_circuit.agg_left_ticks[mapping_circuit.large_stline_pointer] + mapping_circuit.agg_right_ticks[mapping_circuit.large_stline_pointer];
 
-		  uint32_t new_stline_ticks = left_ticks + right_ticks;
+		  // the new line is the current 
+		  uint32_t new_stline_ticks = mapping_circuit.agg_left_ticks[curr_mapping_pointer] + mapping_circuit.agg_right_ticks[curr_mapping_pointer];
 
 		  if (aprox_stline_equal(new_stline_ticks, total_stline_ticks))
 		    {
-		      // set the pointer to the circuit repetition
-		      if (mapping_circuit.rep_pointer != -1)
+		      // set the pointer to the circuit repetition (do only once)
+		      if (mapping_circuit.rep_pointer == -1)
 			{
 			  mapping_circuit.rep_pointer = curr_mapping_pointer;
 			}
@@ -275,28 +305,28 @@ void do_circuit_mapping()
   // Change stline -> corner (any)
   if (curr_mapstate == ST_LINE && diff_encoders > OUT_MAPSTLINE_STATE)
     {
-      should_change_map += 1;
-      if (should_change_map == MAX_CHANGE_MAP_IT)
-	{
-	  
-	  should_change_map = 0;
-	
       
-	  if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
-	    {
-	      //save state
-	      update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
-	    }
+      if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
+	{
+	  //save state
+	  update_map_state(curr_mapstate);
+	}
+      else
+	{
+	  // TODO add to prev state?, join states if equal
+	  add_map_prevstate();
+	  curr_agg_left_ticks = 0;
+	  curr_agg_right_ticks = 0;
+	}
      
-	  // a corner, update only the state
-	  if (left_ticks > right_ticks)
-	    {
-	      curr_mapstate = RIGHT_CORNER;
-	    }
-	  else
-	    {
-	      curr_mapstate = LEFT_CORNER;
-	    }
+      // a corner, update only the state
+      if (left_ticks > right_ticks)
+	{
+	  curr_mapstate = RIGHT_CORNER;
+	}
+      else
+	{
+	  curr_mapstate = LEFT_CORNER;
 	}
     }
   
@@ -306,49 +336,58 @@ void do_circuit_mapping()
       if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
 	{
 	  //save state
-	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	  update_map_state(curr_mapstate);
 	}
-     
+        else
+	  {
+	    // TODO add to prev state?, join states if equal
+	    add_map_prevstate();
+	    curr_agg_left_ticks = 0;
+	    curr_agg_right_ticks = 0;
+	  }
+
       curr_mapstate = ST_LINE;
     }
 
   // change corner (right) -> corner(left)
   else if (curr_mapstate == RIGHT_CORNER && (left_ticks < right_ticks))
     {
-      should_change_map += 1;
-      if (should_change_map == MAX_CHANGE_MAP_IT)
-	{
-	  should_change_map = 0;
 	  
-	  if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
-	    {
-	      //save state
-	      update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
-	    }
-
-	  // update state
-	  curr_mapstate = LEFT_CORNER;
+      if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
+	{
+	  //save state
+	  update_map_state(curr_mapstate);
 	}
-      
+      else
+	{
+	  // TODO add to prev state?, join states if equal
+	  add_map_prevstate(curr_agg_left_ticks, curr_agg_right_ticks);
+	  curr_agg_left_ticks = 0;
+	  curr_agg_right_ticks = 0;
+	}
+
+      // update state
+      curr_mapstate = LEFT_CORNER;
     }
   // change corner (left) -> corner (right)
   else if (curr_mapstate == LEFT_CORNER && (right_ticks < left_ticks))
     {
-      should_change_map += 1;
-      if (should_change_map == MAX_CHANGE_MAP_IT)
-	{
-	  should_change_map = 0;
-
       
       if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
 	{
 	  //save state
-	  update_map_state(curr_mapstate, curr_agg_left_ticks, curr_agg_right_ticks);
+	  update_map_state(curr_mapstate);
+	}
+      else
+	{
+	  // TODO add to prev state?, join states if equal
+	  add_map_prevstate();
+	  curr_agg_left_ticks = 0;
+	  curr_agg_right_ticks = 0;
 	}
 
       // update state
       curr_mapstate = RIGHT_CORNER;
-	}
     }
       
   // Aggregate ticks
@@ -739,7 +778,20 @@ void update_target_normal_with_encoders()
 	  diff_acc = get_left_acc() - get_right_acc();
 	}
 
-      reset_target_velocity(vel_maps[current_pidvel_mapping] + STEP_NORMAL_QTY * diff_acc);      
+      int32_t next_vel = vel_maps[current_pidvel_mapping] + STEP_NORMAL_QTY * diff_acc;	
+
+      /*
+      if (next_vel < MIN_VEL_MOTOR_INC_MODE)
+	{
+	  next_vel = MIN_VEL_MOTOR_INC_MODE;
+	}
+      else if (next_vel > MAX_VEL_MOTOR_DEC_MODE)
+	{
+	  next_vel = MAX_VEL_MOTOR_DEC_MODE;
+	}
+      */
+      
+      reset_target_velocity(next_vel);      
     }
   
 }

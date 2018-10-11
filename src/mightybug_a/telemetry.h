@@ -1,6 +1,6 @@
 #include "cli.h"
 
-#define TELEMETRY 1
+#define TELEMETRY 0
 #define SHOW_MILLIS 1
 #define SHOW_POSITION 1
 #define SHOW_K_P 0
