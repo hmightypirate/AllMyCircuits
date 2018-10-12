@@ -2,7 +2,7 @@
 
 static state_e current_state = CALLIBRATION_STATE;
 static rnstate_e running_state = RUNNING_NORMAL;
-uint32_t running_loop_millisecs = 0;
+uint32_t running_loop_millisecs = 0; //Used for antiwheelie
 
 // Variables for handling target velocity in normal mode
 static uint16_t seq_decrease_line_pos = 0;
@@ -793,7 +793,27 @@ void update_target_normal_with_encoders()
       */
       
       reset_target_velocity(next_vel);      
-    }
-  
+    }  
 }
 
+/*
+ * @brief change velocity to avoid wheelie at start
+ */
+void set_vel_antiwheelie(uint32_t current_loop_millisecs)
+{
+  if ((current_loop_millisecs - running_loop_millisecs) < MAX_VEL_WHEELIE_START)
+    {
+      reset_target_velocity(MAX_VEL_WHEELIE_START);
+    }
+  else
+    {
+      if (running_state == RUNNING_STLINE)
+	{
+	  reset_target_velocity(vel_turbo_maps[current_pidvel_mapping]);
+	}
+      else if (running_state == RUNNING_NOOL)
+	{
+	  reset_target_velocity(vel_nool_maps[current_pidvel_mapping]);
+	}
+    }
+}

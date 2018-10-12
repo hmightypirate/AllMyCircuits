@@ -66,6 +66,10 @@
 #define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks 
 #define FLAG_MAPPING_REPS 0 // mapping with repetitions
 
+/* anti-wheelie at start variables */
+#define FLAG_ANTI_WHEELIE_START 1
+#define MAX_VEL_WHEELIE_START 350
+#define MAX_DURATION_WHEELIE_START 500
 
 typedef enum {
   IDLE_STATE,

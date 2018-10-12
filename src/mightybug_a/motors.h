@@ -39,5 +39,6 @@ void set_target_as_nool(void);
 int get_last_left_vel(void);
 int get_last_right_vel(void);
 
+void set_vel_antiwheelie(uint32_t current_loop_millisecs);
 
 #endif /* __MOTORS_H */
