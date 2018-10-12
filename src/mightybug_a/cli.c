@@ -224,41 +224,82 @@ static void cli_pid_get_kd() {
 	printf("PID KP: %i\n", k_value);
 }
 
-char str_LED_syntax[] = "Syntax: LED ON|OFF|BLINK 1|2\n";
-char str_LED1_ON[] = "LED ON 1";
+char str_LED_syntax[] = "Syntax: LED ON|OFF|BLINK|DBLINK|TBLINK|BLINKALT|DBLINKALT 1|2\n";
+char str_LED_ON[] = "LED ON";
 static void cli_led_on() {
-	set_led();
-	printf("LED ON 1\n");
+	if (command_line_size < 8) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 7);
+	set_led_mode(led-1, ON);
+	printf("LED ON %i\n", led);
 }
 
-char str_LED1_OFF[] = "LED OFF 1";
+char str_LED_OFF[] = "LED OFF";
 static void cli_led_off() {
-	clear_led();
-	printf("LED OFF 1\n");
+	if (command_line_size < 9) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 8);
+	set_led_mode(led-1, OFF);
+	printf("LED OFF %i\n", led);
 }
 
-char str_LED1_BLINK[] = "LED BLINK 1";
+char str_LED_BLINK[] = "LED BLINK";
 static void cli_led_blink() {
-	async_blink();
-	printf("LED BLINK 1\n");
+	if (command_line_size < 11) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 10);
+	set_led_mode(led-1, BLINK);
+	printf("LED BLINK %i\n", led);
 }
 
-char str_LED2_ON[] = "LED ON 2";
-static void cli_led2_on() {
-	set_led2();
-	printf("LED ON 2\n");
+char str_LED_DBLINK[] = "LED DBLINK";
+static void cli_led_dblink() {
+	if (command_line_size < 12) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 11);
+	set_led_mode(led-1, DOUBLE_BLINK);
+	printf("LED DBLINK %i\n", led);
 }
 
-char str_LED2_OFF[] = "LED OFF 2";
-static void cli_led2_off() {
-	clear_led2();
-	printf("LED OFF 2\n");
+char str_LED_TBLINK[] = "LED TBLINK";
+static void cli_led_tblink() {
+	if (command_line_size < 12) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 11);
+	set_led_mode(led-1, TRIPLE_BLINK);
+	printf("LED TBLINK %i\n", led);
 }
 
-char str_LED2_BLINK[] = "LED BLINK 2";
-static void cli_led2_blink() {
-	async_blink2();
-	printf("LED BLINK 2\n");
+char str_LED_ALTBLINK[] = "LED ALTBLINK";
+static void cli_led_altblink() {
+	if (command_line_size < 14) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 13);
+	set_led_mode(led-1, BLINK_ALT);
+	printf("LED ALTBLINK %i\n", led);
+}
+
+char str_LED_ALTDBLINK[] = "LED ALTDBLINK";
+static void cli_led_altdblink() {
+	if (command_line_size < 15) {
+		printf(str_LED_syntax);
+		return;
+	}
+	uint8_t led = (uint8_t)atoi(command_line + 14);
+	set_led_mode(led-1, DOUBLE_BLINK_ALT);
+	printf("LED ALTDBLINK %i\n", led);
 }
 
 char str_CAR_PLAY[] = "CAR PLAY";
@@ -341,7 +382,7 @@ static void cli_ver() {
 
 
 // This is all the available commands data as an array of command structures
-#define CLI_COMMANDS_LIST_SIZE 36
+#define CLI_COMMANDS_LIST_SIZE 37
 struct command_struct commands_list[] = {
 	{.text = str_BUZ_ON, .functionPtr = cli_buz_on, .is_a_candidate = 'y', .syntax_hint = str_BUZ_syntax},
 	{.text = str_BUZ_OFF, .functionPtr = cli_buz_off, .is_a_candidate = 'y', .syntax_hint = str_BUZ_syntax},
@@ -363,12 +404,13 @@ struct command_struct commands_list[] = {
 	{.text = str_PID_GET_KP, .functionPtr = cli_pid_get_kp, .is_a_candidate = 'y', .syntax_hint = str_PID_syntax},
 	{.text = str_PID_GET_KI, .functionPtr = cli_pid_get_ki, .is_a_candidate = 'y', .syntax_hint = str_PID_syntax},
 	{.text = str_PID_GET_KD, .functionPtr = cli_pid_get_kd, .is_a_candidate = 'y', .syntax_hint = str_PID_syntax},
-	{.text = str_LED1_ON, .functionPtr = cli_led_on,.is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
-	{.text = str_LED1_OFF, .functionPtr = cli_led_off, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
-	{.text = str_LED1_BLINK, .functionPtr = cli_led_blink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
-	{.text = str_LED2_ON, .functionPtr = cli_led2_on,.is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
-	{.text = str_LED2_OFF, .functionPtr = cli_led2_off, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
-	{.text = str_LED2_BLINK, .functionPtr = cli_led2_blink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},	
+	{.text = str_LED_ON, .functionPtr = cli_led_on,.is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
+	{.text = str_LED_OFF, .functionPtr = cli_led_off, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
+	{.text = str_LED_BLINK, .functionPtr = cli_led_blink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
+	{.text = str_LED_DBLINK, .functionPtr = cli_led_dblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
+	{.text = str_LED_TBLINK, .functionPtr = cli_led_tblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},	
+	{.text = str_LED_ALTBLINK, .functionPtr = cli_led_altblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},
+	{.text = str_LED_ALTDBLINK, .functionPtr = cli_led_altdblink, .is_a_candidate = 'y', .syntax_hint = str_LED_syntax},	
 	{.text = str_CAR_PLAY, .functionPtr = cli_car_play, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_CAR_STOP, .functionPtr = cli_car_stop, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_VEL_LEFT, .functionPtr = cli_vel_left, .is_a_candidate = 'y', .syntax_hint = str_VEL_syntax},

@@ -89,7 +89,8 @@ int main(void)
   reset_prop_readings();
 
   /* led: setting async period */
-  set_async_period(LED_ASYNC_PERIOD);
+  set_led_blink_period(LED1, LED_BLINK_PERIOD);
+  set_led_blink_period(LED2, LED_BLINK_PERIOD);
 
   /* enable sensors */
   enable_line_sensors();
@@ -114,7 +115,7 @@ int main(void)
       reset_circuit_mapping();
     }
   
-  clear_led();
+  set_led_mode(LED1, OFF);
 
   uint32_t last_loop_execution_ms = 0;
   uint32_t sync_iterations = 0;
@@ -142,6 +143,7 @@ int main(void)
     keypad_loop(current_loop_millisecs);
     menu_functions(current_loop_millisecs);
     dma_update();
+    leds_update(current_loop_millisecs);
 
     // loop out of period
     if (current_state == SET_NORMAL_MODE_STATE)
@@ -188,7 +190,7 @@ int main(void)
         /* stop motors during calibration */
         stop_motors();
          /* led is on during callibration */
-        set_led();
+        set_led_mode(LED1, ON);
 
       } else if (current_state == IDLE_STATE) {
 
@@ -198,7 +200,7 @@ int main(void)
         stop_motors();
 
         /* Clear led during idle state */
-        clear_led();
+        set_led_mode(LED1, OFF);
         
       } else if (current_state == NO_BATTERY_STATE) {
             
@@ -209,7 +211,7 @@ int main(void)
         stop_motors();
             
         /* Led off */
-        clear_led();
+        set_led_mode(LED1, OFF);
 
       } else if (current_state == DELAYED_START_STATE)
         {
@@ -226,7 +228,7 @@ int main(void)
             }
 
           /* Led on */
-          set_led();
+          set_led_mode(LED1, ON);
         }
       else if (current_state == PIDANDVEL_MAPPING_STATE)
         {
@@ -241,7 +243,7 @@ int main(void)
               pull_enable_jukebox();
             }
 
-          set_led();
+          set_led_mode(LED1, ON);
         }
       else if (current_state == PIDANDVEL_CHANGE_STATE)
         {
@@ -322,7 +324,7 @@ int main(void)
           stop_motors();
                 
           // led off
-          clear_led();
+          set_led_mode(LED1, OFF);
 
           // Send car to callibration if reached the end of line
           if (get_all_inline())
@@ -335,7 +337,7 @@ int main(void)
           motor_control(error);
                 
           // blinking: normal behaviour
-          async_blink();
+          set_led_mode(LED1, BLINK);
 
 	  // Set the current ms (inline)
 	  if (!is_out_of_line())
