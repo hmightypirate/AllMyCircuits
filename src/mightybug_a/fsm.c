@@ -2,7 +2,7 @@
 
 static state_e current_state = CALLIBRATION_STATE;
 static rnstate_e running_state = RUNNING_NORMAL;
-uint32_t running_loop_millisecs = 0;
+uint32_t running_loop_millisecs = 0; //Used for antiwheelie
 
 // Variables for handling target velocity in normal mode
 static uint16_t seq_decrease_line_pos = 0;
@@ -19,14 +19,15 @@ uint32_t curr_agg_right_ticks = 0;
 /* FIXME this should be moved to a *.h */
 /* pid maps: k_p, k_i, k_d */
 const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  400, 0, 500,
-  400, 0, 500,
-  400, 0, 500
+  200, 0, 300,  //400, 0, 500
+  200, 0, 300,
+  200, 0, 300
 };
 
 const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  650, 675, 725
-  //600, 650, 700
+  //650, 675, 725
+  //600, 650, 700 // mapping 1st test
+  700, 750, 780
 };
 
 // Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro corto stripped)
@@ -43,14 +44,16 @@ const int16_t vel_nool_maps[NUMBER_PIDVEL_MAPPINGS] = {
 
 
 const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-  350, 0, 600,
-  350, 0, 600,
-  350, 0, 600
+  200, 0, 300,  //350, 0, 600
+  200, 0, 300,
+  200, 0, 300
 };
 
 const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-  515, 515, 515
-  //575, 575, 575
+  //515, 515, 515
+  //575, 600, 625 //mapping 1st test
+  625, 650, 675
+  
 };
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)
@@ -779,7 +782,18 @@ void update_target_normal_with_encoders()
 	  diff_acc = get_left_acc() - get_right_acc();
 	}
 
-      int32_t next_vel = vel_maps[current_pidvel_mapping] + STEP_NORMAL_QTY * diff_acc;	
+      int32_t step_qty = 0;
+
+      if (diff_acc > 0)
+	{
+	  step_qty = STEP_NORMAL_QTY_DEC;
+	}
+      else
+	{
+	  step_qty = STEP_NORMAL_QTY_INC;
+	}
+      
+      int32_t next_vel = vel_maps[current_pidvel_mapping] + step_qty * diff_acc;	
 
       /*
       if (next_vel < MIN_VEL_MOTOR_INC_MODE)
@@ -793,7 +807,27 @@ void update_target_normal_with_encoders()
       */
       
       reset_target_velocity(next_vel);      
-    }
-  
+    }  
 }
 
+/*
+ * @brief change velocity to avoid wheelie at start
+ */
+void set_vel_antiwheelie(uint32_t current_loop_millisecs)
+{
+  if ((current_loop_millisecs - running_loop_millisecs) < MAX_VEL_WHEELIE_START)
+    {
+      reset_target_velocity(MAX_VEL_WHEELIE_START);
+    }
+  else
+    {
+      if (running_state == RUNNING_STLINE)
+	{
+	  reset_target_velocity(vel_turbo_maps[current_pidvel_mapping]);
+	}
+      else if (running_state == RUNNING_NOOL)
+	{
+	  reset_target_velocity(vel_nool_maps[current_pidvel_mapping]);
+	}
+    }
+}

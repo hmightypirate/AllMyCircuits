@@ -3,6 +3,7 @@
 
 #include "commons.h"
 #include "setup.h"
+#include "fsm.h"
 #include <stdio.h>
 
 /* Number of sensors */

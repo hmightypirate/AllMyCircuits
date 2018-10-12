@@ -49,12 +49,14 @@
 #define MIN_VEL_MOTOR_INC_MODE 250
 #define MAX_VEL_MOTOR_DEC_MODE 950
 #define DEC_NORMAL_QTY 5
-#define STEP_NORMAL_QTY 25 // used by the encoder acc functionality only (35 best)
+#define STEP_NORMAL_QTY_DEC 45 // used by the encoder acc functionality only (35 best)
+#define STEP_NORMAL_QTY_INC 15 //
 
 /* Pickle configuration */
 #define TURBO_PICKLE 1
 #define TURBO_PICKLE_IN_CORNERS 0
-#define PICKLE_ENC_DISTANCE 7
+#define PICKLE_ENC_DISTANCE_DOWN 7
+#define PICKLE_ENC_DISTANCE_UP 3
 #define PICKLE_TURBO_VEL 200
 
 /* Mapping variables */
@@ -66,6 +68,10 @@
 #define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks 
 #define FLAG_MAPPING_REPS 0 // mapping with repetitions
 
+/* anti-wheelie at start variables */
+#define FLAG_ANTI_WHEELIE_START 1
+#define MAX_VEL_WHEELIE_START 350
+#define MAX_DURATION_WHEELIE_START 500
 
 typedef enum {
   IDLE_STATE,
@@ -159,4 +165,5 @@ void reset_mapping_pointer(void);
 void do_circuit_mapping(void);
 mapping_e get_mapping_info(void);
 
+void set_vel_antiwheelie(uint32_t current_loop_millisecs);
 #endif /* __FSM_H */

@@ -191,12 +191,11 @@ int get_line_position(uint16_t* value)
   /* Zero-center position */
   position = position - (NUM_SENSORS + 1) * SEP_SENSORS/2;
 
-  /*
-  if (out_of_line)
+  // modify the position (only if the FLAG DELAY is activated)
+  if ((out_of_line) && FLAG_DELAY_STOP_OUT_OF_LINE)
     {
       position = (20 * position)/100;
     }
-  */
 
   position = -1 * position;
   

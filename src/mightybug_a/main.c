@@ -302,6 +302,13 @@ int main(void)
 		update_target_normal_with_encoders();
 	      }
 	  }
+
+	// Avoid wheelie at start
+
+	if (FLAG_ANTI_WHEELIE_START)
+	  {
+	    set_vel_antiwheelie(current_loop_millisecs);
+	  }
         
         /* pid control */
         int error = 0;
