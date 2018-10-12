@@ -119,7 +119,7 @@ int32_t get_pickle_turbo(int32_t velocity, uint32_t current_enc, state_pickle_e*
     {
       // Do inverse pickle?
 
-      if ((current_enc - target_enc) > PICKLE_ENC_DISTANCE)
+      if ((current_enc - target_enc) > PICKLE_ENC_DISTANCE_DOWN)
         {
           new_velocity = velocity - PICKLE_TURBO_VEL;
 
@@ -130,7 +130,7 @@ int32_t get_pickle_turbo(int32_t velocity, uint32_t current_enc, state_pickle_e*
 
   else
     {
-      if ((target_enc - current_enc) > PICKLE_ENC_DISTANCE)
+      if ((target_enc - current_enc) > PICKLE_ENC_DISTANCE_UP)
         {
           new_velocity = velocity + PICKLE_TURBO_VEL;
 

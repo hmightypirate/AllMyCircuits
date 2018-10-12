@@ -54,7 +54,8 @@
 /* Pickle configuration */
 #define TURBO_PICKLE 1
 #define TURBO_PICKLE_IN_CORNERS 0
-#define PICKLE_ENC_DISTANCE 7
+#define PICKLE_ENC_DISTANCE_DOWN 7
+#define PICKLE_ENC_DISTANCE_UP 3
 #define PICKLE_TURBO_VEL 200
 
 /* Mapping variables */
