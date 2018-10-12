@@ -163,4 +163,5 @@ void reset_mapping_pointer(void);
 void do_circuit_mapping(void);
 mapping_e get_mapping_info(void);
 
+void set_vel_antiwheelie(uint32_t current_loop_millisecs);
 #endif /* __FSM_H */
