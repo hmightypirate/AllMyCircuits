@@ -238,6 +238,9 @@ static int trunc_to_range(int value, int min, int max)
 void set_left_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
+
+  if (FLAG_MAX_VEL_DELAY) get_next_constrained_left_velocity(velocity);
+  
   last_left_vel = velocity;
 
   if (velocity >= 0) {
@@ -255,6 +258,9 @@ void set_left_motor_velocity(int velocity)
 void set_right_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
+
+  if (FLAG_MAX_VEL_DELAY) get_next_constrained_right_velocity(velocity);
+  
   last_right_vel = velocity;
 
   if (velocity >= 0) {
@@ -299,7 +305,9 @@ void motor_control(int control)
     }
       
   set_left_motor_velocity(left_velocity);
-  set_right_motor_velocity(right_velocity); 
+  set_right_motor_velocity(right_velocity);
+
+  if (FLAG_MAX_VEL_DELAY) increase_pointer_vel_delay(last_left_vel, last_right_vel);
 }
   
 

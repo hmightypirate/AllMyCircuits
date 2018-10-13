@@ -73,6 +73,11 @@
 #define MAX_VEL_WHEELIE_START 350
 #define MAX_DURATION_WHEELIE_START 500
 
+/* anti pickle variables */
+#define FLAG_MAX_VEL_DELAY 1
+#define MAX_VEL_DELAY 50
+#define MAX_VEL_DELAY_STEP 200
+
 typedef enum {
   IDLE_STATE,
   CALLIBRATION_STATE,
@@ -136,6 +141,14 @@ typedef struct {
 } mapping_e;
 
 
+typedef struct {
+  int32_t left_motor_vel[MAX_VEL_DELAY];
+  int32_t right_motor_vel[MAX_VEL_DELAY];
+  uint16_t current_pointer;
+  uint16_t total_samples;
+} veldelay_e;
+
+
 state_e get_state(void);
 void set_state(state_e state);
 void update_state(event_e new_event);
@@ -166,4 +179,10 @@ void do_circuit_mapping(void);
 mapping_e get_mapping_info(void);
 
 void set_vel_antiwheelie(uint32_t current_loop_millisecs);
+
+/* Antipickle functions */
+void reset_veldelay(void);
+int32_t get_next_constrained_left_velocity(int32_t vel);
+int32_t get_next_constrained_right_velocity(int32_t vel);
+void increase_pointer_vel_delay(int32_t left_vel, int32_t right_vel);
 #endif /* __FSM_H */

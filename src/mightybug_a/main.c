@@ -114,6 +114,8 @@ int main(void)
     {
       reset_circuit_mapping();
     }
+
+  if (FLAG_MAX_VEL_DELAY) reset_veldelay();
   
   set_led_mode(LED1, OFF);
 
@@ -223,6 +225,8 @@ int main(void)
             {
 	      // Reset pointer (starting from the beginning)
 	      if (FLAG_CIRCUIT_MAPPING) reset_mapping_pointer();
+	      
+	      if (FLAG_MAX_VEL_DELAY) reset_veldelay();
               reset_encoder_ticks();
               update_state(GO_TO_RUN_EVENT);
             }
