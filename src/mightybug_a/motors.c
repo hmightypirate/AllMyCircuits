@@ -307,6 +307,7 @@ void motor_control(int control)
   set_left_motor_velocity(left_velocity);
   set_right_motor_velocity(right_velocity);
 
+  // add real velocities to the vel delay structure
   if (FLAG_MAX_VEL_DELAY) increase_pointer_vel_delay(last_left_vel, last_right_vel);
 }
   

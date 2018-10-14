@@ -76,7 +76,8 @@
 /* anti pickle variables */
 #define FLAG_MAX_VEL_DELAY 1
 #define MAX_VEL_DELAY 50
-#define MAX_VEL_DELAY_STEP 200
+#define MAX_VEL_DELAY_STEP_DOWN 200
+#define MAX_VEL_DELAY_STEP_UP 200
 
 typedef enum {
   IDLE_STATE,

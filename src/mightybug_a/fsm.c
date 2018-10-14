@@ -447,10 +447,10 @@ int32_t get_next_constrained_left_velocity(int32_t vel)
   
   return trunc_to_range(vel,
 			trunc_to_range(veldelay_st.left_motor_vel[next_pointer] -
-				       MAX_VEL_DELAY_STEP,
+				       MAX_VEL_DELAY_STEP_DOWN,
 				       MIN_VEL_MOTOR, MAX_VEL_MOTOR),
 			trunc_to_range(veldelay_st.left_motor_vel[next_pointer] +
-				       MAX_VEL_DELAY_STEP,
+				       MAX_VEL_DELAY_STEP_UP,
 				       MIN_VEL_MOTOR, MAX_VEL_MOTOR));
 }
 
@@ -467,10 +467,10 @@ int32_t get_next_constrained_right_velocity(int32_t vel)
   
   return trunc_to_range(vel,
 			trunc_to_range(veldelay_st.right_motor_vel[next_pointer] -
-				       MAX_VEL_DELAY_STEP,
+				       MAX_VEL_DELAY_STEP_DOWN,
 				       MIN_VEL_MOTOR, MAX_VEL_MOTOR),
 			trunc_to_range(veldelay_st.right_motor_vel[next_pointer] +
-				       MAX_VEL_DELAY_STEP,
+				       MAX_VEL_DELAY_STEP_UP,
 				       MIN_VEL_MOTOR, MAX_VEL_MOTOR));
 }
 
