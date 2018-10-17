@@ -49,13 +49,13 @@
 #define MIN_VEL_MOTOR_INC_MODE 250
 #define MAX_VEL_MOTOR_DEC_MODE 950
 #define DEC_NORMAL_QTY 5
-#define STEP_NORMAL_QTY_DEC 45 // used by the encoder acc functionality only (35 best)
+#define STEP_NORMAL_QTY_DEC 35 // used by the encoder acc functionality only (35 best)
 #define STEP_NORMAL_QTY_INC 15 //
 
 /* Pickle configuration */
 #define TURBO_PICKLE 1
 #define TURBO_PICKLE_IN_CORNERS 0
-#define PICKLE_ENC_DISTANCE_DOWN 7
+#define PICKLE_ENC_DISTANCE_DOWN 700  // No pickle going down
 #define PICKLE_ENC_DISTANCE_UP 3
 #define PICKLE_TURBO_VEL 200
 
@@ -72,6 +72,12 @@
 #define FLAG_ANTI_WHEELIE_START 1
 #define MAX_VEL_WHEELIE_START 350
 #define MAX_DURATION_WHEELIE_START 500
+
+/* anti pickle variables */
+#define FLAG_MAX_VEL_DELAY 0
+#define MAX_VEL_DELAY 20
+#define MAX_VEL_DELAY_STEP_DOWN 10
+#define MAX_VEL_DELAY_STEP_UP 10
 
 typedef enum {
   IDLE_STATE,
@@ -136,6 +142,14 @@ typedef struct {
 } mapping_e;
 
 
+typedef struct {
+  int32_t left_motor_vel[MAX_VEL_DELAY];
+  int32_t right_motor_vel[MAX_VEL_DELAY];
+  uint16_t current_pointer;
+  uint16_t total_samples;
+} veldelay_e;
+
+
 state_e get_state(void);
 void set_state(state_e state);
 void update_state(event_e new_event);
@@ -166,4 +180,10 @@ void do_circuit_mapping(void);
 mapping_e get_mapping_info(void);
 
 void set_vel_antiwheelie(uint32_t current_loop_millisecs);
+
+/* Antipickle functions */
+void reset_veldelay(void);
+int32_t get_next_constrained_left_velocity(int32_t vel);
+int32_t get_next_constrained_right_velocity(int32_t vel);
+void increase_pointer_vel_delay(int32_t left_vel, int32_t right_vel);
 #endif /* __FSM_H */

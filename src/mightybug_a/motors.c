@@ -24,10 +24,10 @@ uint16_t PICKLE_TURBO_TABLE[33] =  {
 
 /* pickle pololu wheels */
 uint16_t PICKLE_TURBO_TABLE[33] =  {
-  0,0,0,9,11,13,15,17,  // 224
-  19,21,23,25,27,29,31,33, // 480
-  35,37,39,41,43,45,47,49, // 736
-  51,53,55,57,59,61,63,65,67,
+  0,0,0,9,11,13,15,17,  // pickle 0 to 224
+  19,21,23,25,27,29,31,33, // pickle 256 to 480
+  35,37,39,41,43,45,47,49, // pickle 512 to 736
+  51,53,55,57,59,61,63,65,67, // pickle 768 to 992
 };
 
 
@@ -238,6 +238,9 @@ static int trunc_to_range(int value, int min, int max)
 void set_left_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
+
+  if (FLAG_MAX_VEL_DELAY) get_next_constrained_left_velocity(velocity);
+  
   last_left_vel = velocity;
 
   if (velocity >= 0) {
@@ -255,6 +258,9 @@ void set_left_motor_velocity(int velocity)
 void set_right_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
+
+  if (FLAG_MAX_VEL_DELAY) get_next_constrained_right_velocity(velocity);
+  
   last_right_vel = velocity;
 
   if (velocity >= 0) {
@@ -299,7 +305,10 @@ void motor_control(int control)
     }
       
   set_left_motor_velocity(left_velocity);
-  set_right_motor_velocity(right_velocity); 
+  set_right_motor_velocity(right_velocity);
+
+  // add real velocities to the vel delay structure
+  if (FLAG_MAX_VEL_DELAY) increase_pointer_vel_delay(last_left_vel, last_right_vel);
 }
   
 
