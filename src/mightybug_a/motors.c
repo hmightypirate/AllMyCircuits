@@ -25,13 +25,9 @@ uint16_t PICKLE_TURBO_TABLE[33] =  {
 /* pickle pololu wheels */
 uint16_t PICKLE_TURBO_TABLE[33] =  {
   0,0,0,9,11,13,15,17,  // pickle 0 to 224
-  //0,0,0,18,22,26,30,34,  // FIXME double
   19,21,23,25,27,29,31,33, // pickle 256 to 480
-  //38,42,46,50,54,58,62,66, //FIXME double
   35,37,39,41,43,45,47,49, // pickle 512 to 736
-  //70,74,78,82,86,90,94,98, //FIXME double
   51,53,55,57,59,61,63,65,67, // pickle 768 to 992
-  //102,106,110,114,118,122,126,130,134, //FIXME double
 };
 
 

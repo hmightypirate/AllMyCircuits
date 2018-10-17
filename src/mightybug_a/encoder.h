@@ -13,10 +13,10 @@
 #define WHEEL_RATIO 100
 
 /* systick measurements */
-#define SYSTICK_MEAS 10 // FIXME 20
+#define SYSTICK_MEAS 10
 
 /* encoder acc. measurements */
-#define ACC_MEAS 10  //FIXME 20
+#define ACC_MEAS 10
 
 /* Weird encoder measures */
 #define WEIRD_ENCODER_MEAS UINT16_MAX/2
