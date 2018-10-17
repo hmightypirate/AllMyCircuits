@@ -49,8 +49,8 @@
 #define MIN_VEL_MOTOR_INC_MODE 250
 #define MAX_VEL_MOTOR_DEC_MODE 950
 #define DEC_NORMAL_QTY 5
-#define STEP_NORMAL_QTY_DEC 25 // used by the encoder acc functionality only (35 best)
-#define STEP_NORMAL_QTY_INC 7 //
+#define STEP_NORMAL_QTY_DEC 35 // used by the encoder acc functionality only (35 best)
+#define STEP_NORMAL_QTY_INC 15 //
 
 /* Pickle configuration */
 #define TURBO_PICKLE 1
