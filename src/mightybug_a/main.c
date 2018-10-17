@@ -118,6 +118,7 @@ int main(void)
   if (FLAG_MAX_VEL_DELAY) reset_veldelay();
   
   set_led_mode(LED1, OFF);
+  set_led_mode(LED2, ON);
 
   uint32_t last_loop_execution_ms = 0;
   uint32_t sync_iterations = 0;
@@ -156,6 +157,7 @@ int main(void)
         set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
         set_running_state(RUNNING_NORMAL);
 
+	set_led_mode(LED2, ON);
 	// reset variables used for special acc/dec in NORMAL mode
 	reset_sequential_readings();
       }
@@ -166,6 +168,7 @@ int main(void)
         reset_pids_turbo();
         set_state(RUNNING_STATE);  //FIXME this assignment is local (and useless)
         set_running_state(RUNNING_STLINE);
+	set_led_mode(LED2, OFF);
       }
     else if (current_state == SET_NOOL_MODE_STATE)
       {
@@ -175,6 +178,7 @@ int main(void)
 	reset_pids_nool();
 	set_state(RUNNING_STATE);
 	set_running_state(RUNNING_NOOL);
+	set_led_mode(LED2, BLINK);
       }
     
     // loop is executed at a fixed period of time
