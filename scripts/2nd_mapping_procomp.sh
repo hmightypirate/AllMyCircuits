@@ -31,3 +31,10 @@ sed -i 's/#define USE_ENCODERS_FOR_INCDEC.*/#define USE_ENCODERS_FOR_INCDEC 1/' 
 sed -i 's/#define STEP_NORMAL_QTY_DEC.*/#define STEP_NORMAL_QTY_DEC 35/' ../src/mightybug_a/fsm.h
 
 sed -i 's/#define STEP_NORMAL_QTY_INC.*/#define STEP_NORMAL_QTY_INC 15/' ../src/mightybug_a/fsm.h 
+
+
+# Antipickle configuration
+sed -i 's/#define FLAG_MAX_VEL_DELAY.*$/#define FLAG_MAX_VEL_DELAY 0/' ../src/mightybug_a/fsm.h
+sed -i 's/#define MAX_VEL_DELAY .*$/#define MAX_VEL_DELAY 30/' ../src/mightybug_a/fsm.h
+sed -i 's/#define MAX_VEL_DELAY_STEP_DOWN.*$/#define MAX_VEL_DELAY_STEP_DOWN  30/' ../src/mightybug_a/fsm.h
+sed -i 's/#define MAX_VEL_DELAY_STEP_UP.*$/#define MAX_VEL_DELAY_STEP_UP  30/' ../src/mightybug_a/fsm.h
