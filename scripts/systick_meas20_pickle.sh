@@ -7,10 +7,10 @@ sed -i 's/#define OUT_TURBO_HYST.*/#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE
 # mappings
 sed -i 's/^.*mapping vel normal/500, 650, 675 \/\/ mapping vel normal/' ../src/mightybug_a/fsm.c 
 
-sed -i 's/^.*mapping vel turbo/500, 650, 675 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
+sed -i 's/^.*mapping vel turbo/480, 512, 544 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
 
 # pickle configuration
-sed -i 's/#define TURBO_PICKLE .*/#define TURBO_PICKLE 1/' ../src/mightybug_a/fsm.h
+sed -i 's/#define TURBO_PICKLE .*/#define TURBO_PICKLE 0/' ../src/mightybug_a/fsm.h
 
 sed -i 's/#define PICKLE_TURBO_VEL.*/#define PICKLE_TURBO_VEL 200/' ../src/mightybug_a/fsm.h
 
