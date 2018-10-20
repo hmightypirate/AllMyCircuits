@@ -5,9 +5,9 @@ sed -i 's/^#define SYSTICK_MEAS.*$/#define SYSTICK_MEAS 20/' ../src/mightybug_a/
 sed -i 's/#define OUT_TURBO_HYST.*/#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 4:20/' ../src/mightybug_a/fsm.h
 
 # mappings
-sed -i 's/^.*mapping vel normal/500, 600, 650 \/\/ mapping vel normal/' ../src/mightybug_a/fsm.c 
+sed -i 's/^.*mapping vel normal/650, 675, 700 \/\/ mapping vel normal/' ../src/mightybug_a/fsm.c 
 
-sed -i 's/^.*mapping vel turbo/480, 512, 500 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
+sed -i 's/^.*mapping vel turbo/575, 600, 625 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
 
 # pickle configuration
 sed -i 's/#define TURBO_PICKLE .*/#define TURBO_PICKLE 1/' ../src/mightybug_a/fsm.h

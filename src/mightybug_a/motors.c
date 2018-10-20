@@ -14,10 +14,10 @@ static state_pickle_e right_turbo_pickle_flag = NO_PICKLE_TURBO;
 
 /* pickle ticks: they depend on the wheels and the encoders measurement period */
 uint16_t PICKLE_TURBO_TABLE[33] =  {
-  0,0,0,9,11,13,15,17,  // pickle 0 to 224
-  19,21,23,25,27,29,31,33, // pickle 256 to 480
-  35,37,39,41,43,45,47,49, // pickle 512 to 736
-  51,53,55,57,59,61,63,65,67, // pickle 768 to 992
+0,0,0,18,20,24,26,30, // pickle 0 to 224
+34,38,42,46,50,54,58,60, // pickle 256 to 480
+66,70,74,78,82,86,90,94, // pickle 512 to 736
+98,102,106,110,114,118,122,126,130,  // pickle 768 to 992
 };
 
 
@@ -227,7 +227,7 @@ void set_left_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
 
-  if (FLAG_MAX_VEL_DELAY)
+  if ((FLAG_MAX_VEL_DELAY) && (velocity > 0))
     {
       velocity = get_next_constrained_left_velocity(velocity);
     }
@@ -250,7 +250,7 @@ void set_right_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
 
-  if (FLAG_MAX_VEL_DELAY) {
+  if ((FLAG_MAX_VEL_DELAY) && (velocity > 0)){
     velocity = get_next_constrained_right_velocity(velocity);
   }
   

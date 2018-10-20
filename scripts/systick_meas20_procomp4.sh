@@ -5,9 +5,9 @@ sed -i 's/^#define SYSTICK_MEAS.*$/#define SYSTICK_MEAS 20/' ../src/mightybug_a/
 sed -i 's/#define OUT_TURBO_HYST.*/#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 4:20/' ../src/mightybug_a/fsm.h
 
 # mappings
-sed -i 's/^.*mapping vel normal/500, 600, 650 \/\/ mapping vel normal/' ../src/mightybug_a/fsm.c 
+sed -i 's/^.*mapping vel normal/725, 750, 775 \/\/ mapping vel normal/' ../src/mightybug_a/fsm.c 
 
-sed -i 's/^.*mapping vel turbo/480, 512, 500 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
+sed -i 's/^.*mapping vel turbo/650, 650, 650 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
 
 # pickle configuration
 sed -i 's/#define TURBO_PICKLE .*/#define TURBO_PICKLE 1/' ../src/mightybug_a/fsm.h
@@ -28,9 +28,9 @@ sed -i 's/#define ENABLE_INCDEC_NORMAL_FLAG.*/#define ENABLE_INCDEC_NORMAL_FLAG 
 
 sed -i 's/#define USE_ENCODERS_FOR_INCDEC.*/#define USE_ENCODERS_FOR_INCDEC 1/' ../src/mightybug_a/fsm.h
 
-sed -i 's/#define STEP_NORMAL_QTY_DEC.*/#define STEP_NORMAL_QTY_DEC 25/' ../src/mightybug_a/fsm.h
+sed -i 's/#define STEP_NORMAL_QTY_DEC.*/#define STEP_NORMAL_QTY_DEC 35/' ../src/mightybug_a/fsm.h
 
-sed -i 's/#define STEP_NORMAL_QTY_INC.*/#define STEP_NORMAL_QTY_INC 8/' ../src/mightybug_a/fsm.h 
+sed -i 's/#define STEP_NORMAL_QTY_INC.*/#define STEP_NORMAL_QTY_INC 4/' ../src/mightybug_a/fsm.h 
 
 
 # Antipickle configuration
