@@ -143,8 +143,7 @@ typedef struct {
 
 
 typedef struct {
-  int32_t left_motor_vel[MAX_VEL_DELAY];
-  int32_t right_motor_vel[MAX_VEL_DELAY];
+  int32_t motor_vel[MAX_VEL_DELAY];
   uint16_t current_pointer;
   uint16_t total_samples;
 } veldelay_e;
@@ -183,7 +182,7 @@ void set_vel_antiwheelie(uint32_t current_loop_millisecs);
 
 /* Antipickle functions */
 void reset_veldelay(void);
-int32_t get_next_constrained_left_velocity(int32_t vel);
-int32_t get_next_constrained_right_velocity(int32_t vel);
-void increase_pointer_vel_delay(int32_t left_vel, int32_t right_vel);
+int32_t get_next_constrained_target_velocity(int32_t vel);
+void increase_pointer_vel_delay(int32_t last_vel);
+
 #endif /* __FSM_H */

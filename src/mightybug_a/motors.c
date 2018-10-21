@@ -226,11 +226,6 @@ static int trunc_to_range(int value, int min, int max)
 void set_left_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
-
-  if ((FLAG_MAX_VEL_DELAY) && (velocity > 0))
-    {
-      velocity = get_next_constrained_left_velocity(velocity);
-    }
   
   last_left_vel = velocity;
 
@@ -249,10 +244,6 @@ void set_left_motor_velocity(int velocity)
 void set_right_motor_velocity(int velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
-
-  if ((FLAG_MAX_VEL_DELAY) && (velocity > 0)){
-    velocity = get_next_constrained_right_velocity(velocity);
-  }
   
   last_right_vel = velocity;
 
@@ -279,10 +270,18 @@ void motor_control(int control)
       // running in straight lines
       control = 0;
     }
-  
-  int32_t left_velocity = target_velocity + control;
-  int32_t right_velocity = target_velocity - control;
 
+
+  int32_t step_target_velocity = target_velocity;
+  if (FLAG_MAX_VEL_DELAY){
+    step_target_velocity = get_next_constrained_target_velocity(target_velocity);
+  }
+
+  int32_t left_velocity = step_target_velocity + control;
+  int32_t right_velocity = step_target_velocity - control;
+
+  
+  
   // aplying pickle
   if ((TURBO_PICKLE && TURBO_PICKLE_IN_CORNERS) ||
       (TURBO_PICKLE && get_running_state() == RUNNING_STLINE))
@@ -301,7 +300,7 @@ void motor_control(int control)
   set_right_motor_velocity(right_velocity);
 
   // add real velocities to the vel delay structure
-  if (FLAG_MAX_VEL_DELAY) increase_pointer_vel_delay(last_left_vel, last_right_vel);
+  if (FLAG_MAX_VEL_DELAY) increase_pointer_vel_delay(step_target_velocity);
 }
   
 
