@@ -50,7 +50,7 @@
 #define MAX_VEL_MOTOR_DEC_MODE 950
 #define DEC_NORMAL_QTY 5
 #define STEP_NORMAL_QTY_DEC 40
-#define STEP_NORMAL_QTY_INC 2
+#define STEP_NORMAL_QTY_INC 8
 
 /* Pickle configuration */
 #define TURBO_PICKLE 1
@@ -74,10 +74,10 @@
 #define MAX_DURATION_WHEELIE_START 500
 
 /* anti pickle variables */
-#define FLAG_MAX_VEL_DELAY 0
+#define FLAG_MAX_VEL_DELAY 1
 #define MAX_VEL_DELAY 20
-#define MAX_VEL_DELAY_STEP_DOWN  100
-#define MAX_VEL_DELAY_STEP_UP  100
+#define MAX_VEL_DELAY_STEP_DOWN  300
+#define MAX_VEL_DELAY_STEP_UP  30
 
 typedef enum {
   IDLE_STATE,
@@ -143,8 +143,7 @@ typedef struct {
 
 
 typedef struct {
-  int32_t left_motor_vel[MAX_VEL_DELAY];
-  int32_t right_motor_vel[MAX_VEL_DELAY];
+  int32_t motor_vel[MAX_VEL_DELAY];
   uint16_t current_pointer;
   uint16_t total_samples;
 } veldelay_e;
@@ -183,7 +182,7 @@ void set_vel_antiwheelie(uint32_t current_loop_millisecs);
 
 /* Antipickle functions */
 void reset_veldelay(void);
-int32_t get_next_constrained_left_velocity(int32_t vel);
-int32_t get_next_constrained_right_velocity(int32_t vel);
-void increase_pointer_vel_delay(int32_t left_vel, int32_t right_vel);
+int32_t get_next_constrained_target_velocity(int32_t vel);
+void increase_pointer_vel_delay(int32_t last_vel);
+
 #endif /* __FSM_H */

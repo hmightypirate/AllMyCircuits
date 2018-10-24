@@ -30,7 +30,7 @@ const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
   //650, 675, 725
   //600, 650, 700 // mapping 1st test
   //700, 750, 780 // mapping 2nd test
-750, 750, 760 // mapping vel normal
+700, 750, 800 // mapping vel normal
 };
 
 // Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro corto stripped)
@@ -56,7 +56,7 @@ const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
   //515, 515, 515
   //575, 600, 625 //mapping 1st test
   //625, 650, 675 //mapping 2nd test
-650, 675, 675 // mapping vel turbo
+650, 675, 750 // mapping vel turbo
 };
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)
@@ -332,7 +332,7 @@ void do_circuit_mapping()
       if (reach_consolidated_state(curr_agg_left_ticks, curr_agg_right_ticks))
 	{
 	  //save state
-	  update_map_state(curr_mapstate);
+  update_map_state(curr_mapstate);
 	}
       else
 	{
@@ -426,8 +426,7 @@ void reset_veldelay(void)
 {
   for (int i=0; i < MAX_VEL_DELAY; i++)
     {
-      veldelay_st.left_motor_vel[i] = 0;
-      veldelay_st.right_motor_vel[i] = 0;
+      veldelay_st.motor_vel[i] = 0;
     }
 
   veldelay_st.current_pointer = 0;
@@ -436,9 +435,9 @@ void reset_veldelay(void)
 
 
 /*
- * @brief obtain the next left velocity
+ * @brief obtain the next constrained target velocity
  */ 
-int32_t get_next_constrained_left_velocity(int32_t vel)
+int32_t get_next_constrained_target_velocity(int32_t vel)
 {
   uint16_t next_pointer = veldelay_st.current_pointer + 1;
   if (next_pointer >= MAX_VEL_DELAY)
@@ -447,38 +446,17 @@ int32_t get_next_constrained_left_velocity(int32_t vel)
     }
   
   return trunc_to_range(vel,
-			trunc_to_range(veldelay_st.left_motor_vel[next_pointer] -
-				       MAX_VEL_DELAY_STEP_DOWN,
-				       MIN_VEL_MOTOR, MAX_VEL_MOTOR),
-			trunc_to_range(veldelay_st.left_motor_vel[next_pointer] +
-				       MAX_VEL_DELAY_STEP_UP,
-				       MIN_VEL_MOTOR, MAX_VEL_MOTOR));
-}
-
-/*
- * @brief obtain the next right velocity
- */ 
-int32_t get_next_constrained_right_velocity(int32_t vel)
-{
-  uint16_t next_pointer = veldelay_st.current_pointer + 1;
-  if (next_pointer >= MAX_VEL_DELAY)
-    {
-      next_pointer = 0;
-    }
-  
-  return trunc_to_range(vel,
-			trunc_to_range(veldelay_st.right_motor_vel[next_pointer] -
-				       MAX_VEL_DELAY_STEP_DOWN,
-				       MIN_VEL_MOTOR, MAX_VEL_MOTOR),
-			trunc_to_range(veldelay_st.right_motor_vel[next_pointer] +
-				       MAX_VEL_DELAY_STEP_UP,
-				       MIN_VEL_MOTOR, MAX_VEL_MOTOR));
+			veldelay_st.motor_vel[next_pointer] -
+			MAX_VEL_DELAY_STEP_DOWN,
+			veldelay_st.motor_vel[next_pointer] +
+			MAX_VEL_DELAY_STEP_UP);
+			
 }
 
 /*
  * @brief increse the pointer in the vel delay struct
  */
-void increase_pointer_vel_delay(int32_t left_vel, int32_t right_vel)
+void increase_pointer_vel_delay(int32_t last_vel)
 {
   veldelay_st.current_pointer += 1;
 
@@ -487,9 +465,8 @@ void increase_pointer_vel_delay(int32_t left_vel, int32_t right_vel)
       veldelay_st.current_pointer = 0;
     }
 
-  veldelay_st.left_motor_vel[veldelay_st.current_pointer] = left_vel;
-  veldelay_st.right_motor_vel[veldelay_st.current_pointer] = right_vel;
-  
+  veldelay_st.motor_vel[veldelay_st.current_pointer] = last_vel;
+
   veldelay_st.total_samples += 1;
 }
 
