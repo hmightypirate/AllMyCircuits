@@ -50,7 +50,7 @@
 #define MAX_VEL_MOTOR_DEC_MODE 950
 #define DEC_NORMAL_QTY 5
 #define STEP_NORMAL_QTY_DEC 40
-#define STEP_NORMAL_QTY_INC 2
+#define STEP_NORMAL_QTY_INC 8
 
 /* Pickle configuration */
 #define TURBO_PICKLE 1
@@ -74,10 +74,10 @@
 #define MAX_DURATION_WHEELIE_START 500
 
 /* anti pickle variables */
-#define FLAG_MAX_VEL_DELAY 0
+#define FLAG_MAX_VEL_DELAY 1
 #define MAX_VEL_DELAY 20
-#define MAX_VEL_DELAY_STEP_DOWN  100
-#define MAX_VEL_DELAY_STEP_UP  100
+#define MAX_VEL_DELAY_STEP_DOWN  300
+#define MAX_VEL_DELAY_STEP_UP  30
 
 typedef enum {
   IDLE_STATE,
