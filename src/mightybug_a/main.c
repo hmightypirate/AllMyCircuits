@@ -136,7 +136,7 @@ int main(void)
     if (current_loop_millisecs % VBATT_SYS_BETWEEN_READS == 0) {
       // Check if battery drained
       if (has_batt_drained()) {
-        update_state(OUT_OF_BATTERY_EVENT); 
+        //update_state(OUT_OF_BATTERY_EVENT); 
       }
     }
 
@@ -249,9 +249,8 @@ int main(void)
               stop_music_play();
               update_state(FORCE_CALLIBRATION_EVENT);
               pull_enable_jukebox();
-            }
-
-          set_led_mode(LED2, ON);
+            }	  
+          
         }
       else if (current_state == PIDANDVEL_CHANGE_STATE)
         {
@@ -261,8 +260,26 @@ int main(void)
           /* sets the ms in mapping state to the current time */
           set_pidvel_map_time(current_loop_millisecs);
 
-          update_state(FORCE_PIDANDVELMAP_EVENT);       
- 
+          update_state(FORCE_PIDANDVELMAP_EVENT);
+
+	  if (get_current_pidvel_map() == 0)
+	    {
+	      set_led_mode(LED1, BLINK);
+	      set_led_mode(LED2, BLINK);
+	    }
+	  else if (get_current_pidvel_map() == 1)
+	    {
+	      set_led_mode(LED1, DOUBLE_BLINK);
+	      set_led_mode(LED2, DOUBLE_BLINK);
+
+	    }
+	  else if (get_current_pidvel_map() == 2)
+	    {
+	      set_led_mode(LED1, TRIPLE_BLINK);
+	      set_led_mode(LED2, TRIPLE_BLINK);
+
+	    }
+	  
       } else {
             
         // Running 
