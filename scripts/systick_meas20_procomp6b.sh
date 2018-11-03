@@ -7,7 +7,7 @@ sed -i 's/#define OUT_TURBO_HYST.*/#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE
 # mappings
 sed -i 's/^.*mapping vel normal/700, 750, 800 \/\/ mapping vel normal/' ../src/mightybug_a/fsm.c 
 
-sed -i 's/^.*mapping vel turbo/650, 675, 750 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
+sed -i 's/^.*mapping vel turbo/650, 675, 700 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
 
 # pickle configuration
 sed -i 's/#define TURBO_PICKLE .*/#define TURBO_PICKLE 1/' ../src/mightybug_a/fsm.h
