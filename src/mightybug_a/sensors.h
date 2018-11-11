@@ -23,7 +23,7 @@
 #define WHITE_MEASURE 0
 
 #define SOFT_CALLIBRATION 1
-#define THRESHOLD_CALIBRATION 500
+#define THRESHOLD_CALIBRATION 200  // 500
 /* Number of sensors that could not be callibrated */
 #define MAX_NUM_NOT_CALLIBRATED_SENSORS 1
 
