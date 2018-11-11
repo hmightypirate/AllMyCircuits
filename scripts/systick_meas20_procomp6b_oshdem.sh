@@ -7,7 +7,7 @@ sed -i 's/#define OUT_TURBO_HYST.*/#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE
 # mappings
 sed -i 's/^.*mapping vel normal/700, 750, 800 \/\/ mapping vel normal/' ../src/mightybug_a/fsm.c 
 
-sed -i 's/^.*mapping vel turbo/650, 675, 750 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
+sed -i 's/^.*mapping vel turbo/650, 675, 700 \/\/ mapping vel turbo/' ../src/mightybug_a/fsm.c 
 
 # pickle configuration
 sed -i 's/#define TURBO_PICKLE .*/#define TURBO_PICKLE 1/' ../src/mightybug_a/fsm.h
@@ -40,5 +40,5 @@ sed -i 's/#define MAX_VEL_DELAY_STEP_DOWN.*$/#define MAX_VEL_DELAY_STEP_DOWN  30
 sed -i 's/#define MAX_VEL_DELAY_STEP_UP.*$/#define MAX_VEL_DELAY_STEP_UP  30/' ../src/mightybug_a/fsm.h
 
 # stop out of line
-sed -i 's/#define FLAG_DELAY_STOP_OUT_OF_LINE.*$/#define FLAG_DELAY_STOP_OUT_OF_LINE 0/' ../src/mightybug_a/fsm.h
-sed -i 's/#define MS_DELAY_OUT_OF_LINE.*$/#define MS_DELAY_OUT_OF_LINE 1600 \/\/ ms/' ../src/mightybug_a/fsm.h
+sed -i 's/#define FLAG_DELAY_STOP_OUT_OF_LINE.*$/#define FLAG_DELAY_STOP_OUT_OF_LINE 1/' ../src/mightybug_a/fsm.h
+sed -i 's/#define MS_DELAY_OUT_OF_LINE.*$/#define MS_DELAY_OUT_OF_LINE 600 \/\/ ms/' ../src/mightybug_a/fsm.h

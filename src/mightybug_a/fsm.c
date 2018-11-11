@@ -1,6 +1,6 @@
 #include "fsm.h"
 
-static state_e current_state = CALLIBRATION_STATE;
+static state_e current_state = IDLE_STATE;
 static rnstate_e running_state = RUNNING_NORMAL;
 uint32_t running_loop_millisecs = 0; //Used for antiwheelie
 
@@ -30,7 +30,7 @@ const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
   //650, 675, 725
   //600, 650, 700 // mapping 1st test
   //700, 750, 780 // mapping 2nd test
-700, 750, 800 // mapping vel normal
+650, 725, 800 // mapping vel normal
 };
 
 // Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro corto stripped)
@@ -56,7 +56,7 @@ const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
   //515, 515, 515
   //575, 600, 625 //mapping 1st test
   //625, 650, 675 //mapping 2nd test
-650, 675, 750 // mapping vel turbo
+600, 650, 700 // mapping vel turbo
 };
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST;    // going out of pid (position)

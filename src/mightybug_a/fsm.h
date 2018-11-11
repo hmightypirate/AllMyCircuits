@@ -26,8 +26,8 @@
 #define TURBO_PITCH_DEBUG 0  // Disturbing pitch to discern normal/turbo states
 
 /* Delay stop if out of line */
-#define FLAG_DELAY_STOP_OUT_OF_LINE 0
-#define MS_DELAY_OUT_OF_LINE 600 //ms
+#define FLAG_DELAY_STOP_OUT_OF_LINE 1
+#define MS_DELAY_OUT_OF_LINE 1600 // ms
 
 /* Hysteresis values for changing state whilst running  */
 #define USE_ENCODERS_FOR_STATE 1
