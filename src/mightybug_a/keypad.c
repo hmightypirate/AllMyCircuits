@@ -17,7 +17,7 @@ uint16_t button_pin_array[NUM_BUTTONS];
 /*
  * @brief update keypad status in main loop
  */ 
-void keypad_loop(uint32_t current_millis)
+void keypad_loop(void)
 {
   for (int i=0; i<NUM_BUTTONS; i++)
     {
@@ -27,6 +27,7 @@ void keypad_loop(uint32_t current_millis)
        */
       bool reading;
       uint32_t elapsed_time;
+      uint32_t current_millis = get_millisecs_since_start();
 
       reading = gpio_get(button_port_array[i],
                          button_pin_array[i]);

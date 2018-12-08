@@ -2,6 +2,7 @@
 
 uint16_t line_sensor_value[NUM_SENSORS];
 uint32_t sync_iterations = 0;
+uint32_t current_loop_millisecs = 0;
 
 void check_running_state(void)
 {
@@ -23,7 +24,7 @@ void check_running_state(void)
   }
 }
 
-void music_update(int millis)
+void music_update(void)
 {
   state_e current_state = get_state();
 
@@ -31,28 +32,28 @@ void music_update(int millis)
   {
   case CALLIBRATION_STATE:
     jukebox_setcurrent_song(CALLIBRATION_SONG);
-    jukebox_play_in_loop(millis);
+    jukebox_play_in_loop(current_loop_millisecs);
     break;
   case NO_BATTERY_STATE:
     jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
-    jukebox_play_in_loop(millis);
+    jukebox_play_in_loop(current_loop_millisecs);
     break;
   case PIDANDVEL_MAPPING_STATE:
     jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
-    jukebox_play_in_loop(millis);
+    jukebox_play_in_loop(current_loop_millisecs);
     break;
   case RUNNING_STATE:
     if (TURBO_PITCH_DEBUG)
     {
       check_running_state();
-      jukebox_play_in_loop(millis);
+      jukebox_play_in_loop(current_loop_millisecs);
     }
     break;
   default:
     if (is_out_of_line())
     {
       jukebox_setcurrent_song(OUT_OF_LINE_SONG);
-      jukebox_play_in_loop(millis);
+      jukebox_play_in_loop(current_loop_millisecs);
     }
     else
     {
@@ -95,12 +96,12 @@ void out_of_battery_state(void)
   set_led_mode(LED2, OFF);
 }
 
-void delayed_start_state(uint32_t current_millis)
+void delayed_start_state(void)
 {
   /* Stop motors */
   stop_motors();
 
-  if (current_millis - get_delay_start_time() > DELAYED_START_MS)
+  if (current_loop_millisecs - get_delay_start_time() > DELAYED_START_MS)
   {
     // Reset pointer (starting from the beginning)
     if (FLAG_CIRCUIT_MAPPING)
@@ -116,11 +117,11 @@ void delayed_start_state(uint32_t current_millis)
   set_led_mode(LED2, ON);
 }
 
-void pid_and_vel_mapping_state(uint32_t current_millis)
+void pid_and_vel_mapping_state(void)
 {
   /* stop motors */
   stop_motors();
-  if (current_millis - get_pidvel_map_time() > DELAYED_PIDVEL_CHANGE_MS)
+  if (current_loop_millisecs - get_pidvel_map_time() > DELAYED_PIDVEL_CHANGE_MS)
   {
     // Return to callibration if
     stop_music_play();
@@ -129,13 +130,13 @@ void pid_and_vel_mapping_state(uint32_t current_millis)
   }
 }
 
-void pid_and_vel_change_state(uint32_t current_millis)
+void pid_and_vel_change_state(void)
 {
   //change the mapping
   select_next_pidvel_map();
 
   /* sets the ms in mapping state to the current time */
-  set_pidvel_map_time(current_millis);
+  set_pidvel_map_time(current_loop_millisecs);
 
   update_state(FORCE_PIDANDVELMAP_EVENT);
 
@@ -156,7 +157,7 @@ void pid_and_vel_change_state(uint32_t current_millis)
   }
 }
 
-void running_state(uint32_t current_millis)
+void running_state(void)
 {
   sync_iterations += 1;
   
@@ -209,7 +210,7 @@ void running_state(uint32_t current_millis)
 
   if (FLAG_ANTI_WHEELIE_START)
   {
-    set_vel_antiwheelie(current_millis);
+    set_vel_antiwheelie(current_loop_millisecs);
   }
 
   /* pid control */
@@ -227,8 +228,8 @@ void running_state(uint32_t current_millis)
   if ((is_out_of_line() && !DEBUG_INERTIA_TEST &&
        (!FLAG_DELAY_STOP_OUT_OF_LINE ||
         (FLAG_DELAY_STOP_OUT_OF_LINE &&
-         exceeds_time_out_of_line(current_millis)))) ||
-      (DEBUG_INERTIA_TEST && (current_millis - get_running_ms() > DEBUG_INERTIA_TIME_MS)))
+         exceeds_time_out_of_line(current_loop_millisecs)))) ||
+      (DEBUG_INERTIA_TEST && (current_loop_millisecs - get_running_ms() > DEBUG_INERTIA_TIME_MS)))
   {
     // stop the motors if out of line
     stop_motors();
@@ -253,7 +254,7 @@ void running_state(uint32_t current_millis)
     // Set the current ms (inline)
     if (!is_out_of_line())
     {
-      update_ms_inline(current_millis);
+      update_ms_inline(current_loop_millisecs);
     }
 
     // Do circuit mapping
@@ -268,7 +269,7 @@ void running_state(uint32_t current_millis)
 
   if (TELEMETRY)
   {
-    print_telemetry(current_millis);
+    print_telemetry(current_loop_millisecs);
   }
 }
 
@@ -347,22 +348,22 @@ int main(void)
 
   while (1)
   {
-    uint32_t current_loop_millisecs = get_millisecs_since_start();
+    current_loop_millisecs = get_millisecs_since_start();
 
     if (is_command_received())
     {
       execute_command();
     }
 
-    check_battery(current_loop_millisecs);
+    check_battery();
 
     state_e current_state = get_state();
 
-    music_update(current_loop_millisecs);
-    keypad_loop(current_loop_millisecs);
-    menu_functions(current_loop_millisecs);
+    music_update();
+    keypad_loop();
+    menu_functions();
     dma_update();
-    leds_update(current_loop_millisecs);
+    leds_update();
 
     check_state_out_of_sync(current_state);
 
@@ -385,17 +386,17 @@ int main(void)
         out_of_battery_state();
         break;
       case DELAYED_START_STATE:
-        delayed_start_state(current_loop_millisecs);
+        delayed_start_state();
         break;
       case PIDANDVEL_MAPPING_STATE:
-        pid_and_vel_mapping_state(current_loop_millisecs);
+        pid_and_vel_mapping_state();
         break;
       case PIDANDVEL_CHANGE_STATE:
-        pid_and_vel_change_state(current_loop_millisecs);
+        pid_and_vel_change_state();
         break;
       default:
         read_line_sensors(line_sensor_value);
-        running_state(current_loop_millisecs);
+        running_state();
       }
     }
 
@@ -439,7 +440,7 @@ void check_state_out_of_sync(state_e current_state)
   }
 }
 
-void check_battery(uint32_t current_loop_millisecs)
+void check_battery(void)
 {
   /* should read battery? 
        battery measurement could have a different period than sensor/pid reads

@@ -1,8 +1,10 @@
 #include "keypad_menu.h"
 
 
-void menu_functions(uint32_t current_millis)
+void menu_functions(void)
 {
+  uint32_t current_millis = get_millisecs_since_start();
+  
   // Button delayed start (falling edge)
   if (!get_button(BUTTON_START) &&
       get_edge_detection(BUTTON_START))

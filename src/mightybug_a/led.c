@@ -187,11 +187,11 @@ void blink_led_alternate(uint8_t led, uint32_t millis)
 
 /*
  * @brief update the state of the leds
- *
- * @param[in] millis milliseconds since start
  */
-void leds_update(uint32_t millis)
+void leds_update(void)
 {
+  uint32_t millis = get_millisecs_since_start();
+  
   for (uint8_t led = 0; led < 2; led++) {
     switch (led_mode[led]) {
       case OFF:
