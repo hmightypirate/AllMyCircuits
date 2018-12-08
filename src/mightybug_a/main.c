@@ -158,6 +158,8 @@ void pid_and_vel_change_state(uint32_t current_millis)
 
 void running_state(uint32_t current_millis)
 {
+  sync_iterations += 1;
+  
   // Running
   int proportional = get_line_position(line_sensor_value);
 
@@ -269,19 +271,34 @@ void running_state(uint32_t current_millis)
     print_telemetry(current_millis);
   }
 }
+
+void setup_keypad(void)
+{
+  uint32_t button_port_array[NUM_BUTTONS] = {(uint32_t)BUTTON0_PORT,
+                                             (uint32_t)BUTTON1_PORT,
+                                             (uint32_t)BUTTON2_PORT};
+  uint16_t button_pin_array[NUM_BUTTONS] = {(uint16_t)BUTTON0_PIN,
+                                            (uint16_t)BUTTON1_PIN,
+                                            (uint16_t)BUTTON2_PIN};
+  keypad_setup(get_millisecs_since_start(),
+               button_port_array,
+               button_pin_array);
+}
+
+void check_state_out_of_sync(state_e);
+void check_battery();
+
 /*
  * @brief Initial setup and main loop
  */
 int main(void)
 {
-  /* setup microcontroller */
+
   setup_microcontroller();
 
   /* reset motors and pid to the current mapping */
   force_mapping_to_current();
 
-  /* reset sensors */
-  //FIXME: better do some callibration
   if (!SOFT_CALLIBRATION)
   {
     hard_reset_sensors();
@@ -302,6 +319,9 @@ int main(void)
   set_led_blink_period(LED1, LED_BLINK_PERIOD);
   set_led_blink_period(LED2, LED_BLINK_PERIOD);
 
+  set_led_mode(LED1, ON);
+  set_led_mode(LED2, OFF);
+
   /* enable sensors */
   enable_line_sensors();
 
@@ -309,15 +329,7 @@ int main(void)
   jukebox_setup();
 
   /* Setup keypad */
-  uint32_t button_port_array[NUM_BUTTONS] = {(uint32_t)BUTTON0_PORT,
-                                             (uint32_t)BUTTON1_PORT,
-                                             (uint32_t)BUTTON2_PORT};
-  uint16_t button_pin_array[NUM_BUTTONS] = {(uint16_t)BUTTON0_PIN,
-                                            (uint16_t)BUTTON1_PIN,
-                                            (uint16_t)BUTTON2_PIN};
-  keypad_setup(get_millisecs_since_start(),
-               button_port_array,
-               button_pin_array);
+  setup_keypad();
 
   if (FLAG_CIRCUIT_MAPPING)
   {
@@ -326,9 +338,6 @@ int main(void)
 
   if (FLAG_MAX_VEL_DELAY)
     reset_veldelay();
-
-  set_led_mode(LED1, ON);
-  set_led_mode(LED2, OFF);
 
   ////////////////////////////////////////////////////////////////////////
   // MAIN LOOP
@@ -339,24 +348,13 @@ int main(void)
   while (1)
   {
     uint32_t current_loop_millisecs = get_millisecs_since_start();
-    sync_iterations += 1;
 
     if (is_command_received())
     {
       execute_command();
     }
 
-    /* should read battery? 
-       battery measurement could have a different period than sensor/pid reads
-     */
-    if (current_loop_millisecs % VBATT_SYS_BETWEEN_READS == 0)
-    {
-      // Check if battery drained
-      if (has_batt_drained())
-      {
-        //update_state(OUT_OF_BATTERY_EVENT);
-      }
-    }
+    check_battery(current_loop_millisecs);
 
     state_e current_state = get_state();
 
@@ -366,51 +364,18 @@ int main(void)
     dma_update();
     leds_update(current_loop_millisecs);
 
-    // loop out of period
-    if (current_state == SET_NORMAL_MODE_STATE)
-    {
-      set_target_as_normal();
-      /* change pid normal */
-      reset_pids_normal();
-      set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
-      set_running_state(RUNNING_NORMAL);
+    check_state_out_of_sync(current_state);
 
-      set_led_mode(LED1, ON);
-      // reset variables used for special acc/dec in NORMAL mode
-      reset_sequential_readings();
-    }
-    else if (current_state == SET_TURBO_MODE_STATE)
-    {
-      set_target_as_turbo();
-      /* change pid consts */
-      reset_pids_turbo();
-      set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
-      set_running_state(RUNNING_STLINE);
-      set_led_mode(LED1, OFF);
-    }
-    else if (current_state == SET_NOOL_MODE_STATE)
-    {
-      set_target_as_nool();
-
-      /* change pid consts */
-      reset_pids_nool();
-      set_state(RUNNING_STATE);
-      set_running_state(RUNNING_NOOL);
-      set_led_mode(LED1, BLINK);
-    }
-
-    // loop is executed at a fixed period of time
+    // inner loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS)
     {
 
       last_loop_execution_ms = current_loop_millisecs;
 
-      /* read data from sensors */
-      read_line_sensors(line_sensor_value);
-
       switch (current_state)
       {
       case CALLIBRATION_STATE:
+        read_line_sensors(line_sensor_value);
         calibration_state();
         break;
       case IDLE_STATE:
@@ -429,10 +394,62 @@ int main(void)
         pid_and_vel_change_state(current_loop_millisecs);
         break;
       default:
+        read_line_sensors(line_sensor_value);
         running_state(current_loop_millisecs);
       }
     }
 
     return 0;
+  }
+}
+
+void check_state_out_of_sync(state_e current_state)
+{
+  // loop out of period
+  if (current_state == SET_NORMAL_MODE_STATE)
+  {
+    set_target_as_normal();
+    /* change pid normal */
+    reset_pids_normal();
+    set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
+    set_running_state(RUNNING_NORMAL);
+
+    set_led_mode(LED1, ON);
+    // reset variables used for special acc/dec in NORMAL mode
+    reset_sequential_readings();
+  }
+  else if (current_state == SET_TURBO_MODE_STATE)
+  {
+    set_target_as_turbo();
+    /* change pid consts */
+    reset_pids_turbo();
+    set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
+    set_running_state(RUNNING_STLINE);
+    set_led_mode(LED1, OFF);
+  }
+  else if (current_state == SET_NOOL_MODE_STATE)
+  {
+    set_target_as_nool();
+
+    /* change pid consts */
+    reset_pids_nool();
+    set_state(RUNNING_STATE);
+    set_running_state(RUNNING_NOOL);
+    set_led_mode(LED1, BLINK);
+  }
+}
+
+void check_battery(uint32_t current_loop_millisecs)
+{
+  /* should read battery? 
+       battery measurement could have a different period than sensor/pid reads
+     */
+  if (current_loop_millisecs % VBATT_SYS_BETWEEN_READS == 0)
+  {
+    // Check if battery drained
+    if (has_batt_drained())
+    {
+      //update_state(OUT_OF_BATTERY_EVENT);
+    }
   }
 }
