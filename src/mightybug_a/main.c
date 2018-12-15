@@ -348,7 +348,7 @@ int main(void)
   // MAIN LOOP
   ////////////////////////////////////////////////////////////////////////
 
-  uint32_t last_loop_execution_ms = 0;
+  uint32_t last_loop_millisecs = 0;
 
   while (1)
   {
@@ -372,10 +372,10 @@ int main(void)
     check_state_out_of_sync(current_state);
 
     // inner loop is executed at a fixed period of time
-    if ((current_loop_millisecs - last_loop_execution_ms) >= TIME_BETWEEN_LOOP_ITS)
+    if ((current_loop_millisecs - last_loop_millisecs) >= TIME_BETWEEN_LOOP_ITS)
     {
 
-      last_loop_execution_ms = current_loop_millisecs;
+      last_loop_millisecs = current_loop_millisecs;
 
       switch (current_state)
       {
