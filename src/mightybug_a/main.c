@@ -65,6 +65,8 @@ void music_update(void)
 
 void calibration_state(void)
 {
+  read_line_sensors(line_sensor_value);
+
   calibrate_sensors(line_sensor_value);
 
   /* stop motors during calibration */
@@ -161,6 +163,8 @@ void running_state(void)
 {
   sync_iterations += 1;
   
+  read_line_sensors(line_sensor_value);
+
   // Running
   int proportional = get_line_position(line_sensor_value);
 
@@ -376,7 +380,6 @@ int main(void)
       switch (current_state)
       {
       case CALLIBRATION_STATE:
-        read_line_sensors(line_sensor_value);
         calibration_state();
         break;
       case IDLE_STATE:
@@ -395,7 +398,6 @@ int main(void)
         pid_and_vel_change_state();
         break;
       default:
-        read_line_sensors(line_sensor_value);
         running_state();
       }
     }
