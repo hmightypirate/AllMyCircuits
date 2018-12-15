@@ -290,18 +290,25 @@ void setup_keypad(void)
                button_pin_array);
 }
 
-void check_state_out_of_sync(state_e);
-void check_battery();
-void execute_state(state_e state);
-
-/*
- * @brief Initial setup and main loop
- */
-int main(void)
+void check_command(void)
 {
+  if (is_command_received())
+  {
+    execute_command();
+  }
+}
 
-  setup_microcontroller();
+void update_modules(void)
+{
+  music_update();
+  keypad_loop();
+  menu_functions();
+  dma_update();
+  leds_update();
+}
 
+void set_car_default_parameters(void)
+{
   /* reset motors and pid to the current mapping */
   force_mapping_to_current();
 
@@ -321,6 +328,17 @@ int main(void)
   /* reset readings for turbo calculation */
   reset_prop_readings();
 
+  if (FLAG_CIRCUIT_MAPPING)
+  {
+    reset_circuit_mapping();
+  }
+
+  if (FLAG_MAX_VEL_DELAY)
+    reset_veldelay();
+}
+
+void setup_modules()
+{
   /* led: setting async period */
   set_led_blink_period(LED1, LED_BLINK_PERIOD);
   set_led_blink_period(LED2, LED_BLINK_PERIOD);
@@ -336,41 +354,34 @@ int main(void)
 
   /* Setup keypad */
   setup_keypad();
+}
 
-  if (FLAG_CIRCUIT_MAPPING)
-  {
-    reset_circuit_mapping();
-  }
+void check_state_out_of_sync(state_e);
+void check_battery(void);
+void execute_state(state_e state);
 
-  if (FLAG_MAX_VEL_DELAY)
-    reset_veldelay();
-
-  ////////////////////////////////////////////////////////////////////////
-  // MAIN LOOP
-  ////////////////////////////////////////////////////////////////////////
-
+/*
+ * @brief Initial setup and main loop
+ */
+int main(void)
+{
   uint32_t last_loop_millisecs = 0;
 
-  while (1)
+  setup_microcontroller();
+  set_car_default_parameters();
+  setup_modules();
+
+  while (true)
   {
     current_loop_millisecs = get_millisecs_since_start();
 
-    if (is_command_received())
-    {
-      execute_command();
-    }
-
+    check_command();
     check_battery();
 
     state_e current_state = get_state();
-
-    music_update();
-    keypad_loop();
-    menu_functions();
-    dma_update();
-    leds_update();
-
     check_state_out_of_sync(current_state);
+
+    update_modules();
 
     // inner loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_millisecs) >= FIXED_LOOP_TIME)
