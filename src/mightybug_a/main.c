@@ -162,7 +162,7 @@ void pid_and_vel_change_state(void)
 void running_state(void)
 {
   sync_iterations += 1;
-  
+
   read_line_sensors(line_sensor_value);
 
   // Running
@@ -292,6 +292,7 @@ void setup_keypad(void)
 
 void check_state_out_of_sync(state_e);
 void check_battery();
+void execute_state(state_e state);
 
 /*
  * @brief Initial setup and main loop
@@ -374,35 +375,38 @@ int main(void)
     // inner loop is executed at a fixed period of time
     if ((current_loop_millisecs - last_loop_millisecs) >= TIME_BETWEEN_LOOP_ITS)
     {
-
       last_loop_millisecs = current_loop_millisecs;
-
-      switch (current_state)
-      {
-      case CALLIBRATION_STATE:
-        calibration_state();
-        break;
-      case IDLE_STATE:
-        idle_state();
-        break;
-      case NO_BATTERY_STATE:
-        out_of_battery_state();
-        break;
-      case DELAYED_START_STATE:
-        delayed_start_state();
-        break;
-      case PIDANDVEL_MAPPING_STATE:
-        pid_and_vel_mapping_state();
-        break;
-      case PIDANDVEL_CHANGE_STATE:
-        pid_and_vel_change_state();
-        break;
-      default:
-        running_state();
-      }
+      execute_state(current_state);
     }
 
     return 0;
+  }
+}
+
+void execute_state(state_e state)
+{
+  switch (state)
+  {
+  case CALLIBRATION_STATE:
+    calibration_state();
+    break;
+  case IDLE_STATE:
+    idle_state();
+    break;
+  case NO_BATTERY_STATE:
+    out_of_battery_state();
+    break;
+  case DELAYED_START_STATE:
+    delayed_start_state();
+    break;
+  case PIDANDVEL_MAPPING_STATE:
+    pid_and_vel_mapping_state();
+    break;
+  case PIDANDVEL_CHANGE_STATE:
+    pid_and_vel_change_state();
+    break;
+  default:
+    running_state();
   }
 }
 
