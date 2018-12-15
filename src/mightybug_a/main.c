@@ -373,7 +373,7 @@ int main(void)
     check_state_out_of_sync(current_state);
 
     // inner loop is executed at a fixed period of time
-    if ((current_loop_millisecs - last_loop_millisecs) >= TIME_BETWEEN_LOOP_ITS)
+    if ((current_loop_millisecs - last_loop_millisecs) >= FIXED_LOOP_TIME)
     {
       last_loop_millisecs = current_loop_millisecs;
       execute_state(current_state);

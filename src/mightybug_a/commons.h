@@ -7,10 +7,8 @@
 #define OUT_OF_LINE_SONG SONG_INDIANAJONES_ORDER
 #define OUT_OF_BATTERY_SONG SONG_EUROPE_ORDER
 
-/* ticks to wait in (systick ticks) before executing a reading/pid 
-   execution)
-*/
-#define TIME_BETWEEN_LOOP_ITS 1
+/* milliseconds to wait before next execution loop */
+#define FIXED_LOOP_TIME 1
 
 /** 
  * Maximum PWM period (max velocity)
