@@ -459,13 +459,13 @@ void check_state_out_of_sync(state_e current_state)
 
 void check_battery(void)
 {
-  /* should read battery? 
-       battery measurement could have a different period than sensor/pid reads
-     */
-  if (current_loop_millisecs % VBATT_SYS_BETWEEN_READS == 0)
+  /*
+    battery measurement every VBATT_TIME_BETWEEN_READS milliseconds
+  */
+  if (current_loop_millisecs % VBATT_TIME_BETWEEN_READS == 0)
   {
     // Check if battery drained
-    if (has_batt_drained())
+    if (is_vbatt_drained())
     {
       //update_state(OUT_OF_BATTERY_EVENT);
     }
