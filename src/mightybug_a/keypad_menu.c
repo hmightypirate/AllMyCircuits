@@ -39,7 +39,7 @@ void menu_functions(void)
     }
 
   // setting all the edges to false
-  unset_edge(BUTTON_START);
-  unset_edge(BUTTON_PIDANDVEL_MAPPING);
-  unset_edge(BUTTON_BUZZER);
+  clear_edge_detected(BUTTON_START);
+  clear_edge_detected(BUTTON_PIDANDVEL_MAPPING);
+  clear_edge_detected(BUTTON_BUZZER);
 }

@@ -279,15 +279,7 @@ void running_state(void)
 
 void setup_keypad(void)
 {
-  uint32_t button_port_array[NUM_BUTTONS] = {(uint32_t)BUTTON0_PORT,
-                                             (uint32_t)BUTTON1_PORT,
-                                             (uint32_t)BUTTON2_PORT};
-  uint16_t button_pin_array[NUM_BUTTONS] = {(uint16_t)BUTTON0_PIN,
-                                            (uint16_t)BUTTON1_PIN,
-                                            (uint16_t)BUTTON2_PIN};
-  keypad_setup(get_millisecs_since_start(),
-               button_port_array,
-               button_pin_array);
+  keypad_setup(get_millisecs_since_start());
 }
 
 void check_command(void)
