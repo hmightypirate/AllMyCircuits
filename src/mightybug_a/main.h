@@ -12,6 +12,5 @@
 #include "vbatt.h"
 #include "commons.h"
 #include "keypad.h"
-#include "keypad_menu.h"
 #include "telemetry.h"
 #include "dma.h"
