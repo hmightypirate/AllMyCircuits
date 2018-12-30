@@ -72,7 +72,7 @@ void calibration_state(void)
   /* stop motors during calibration */
   stop_motors();
   /* led is on during callibration */
-  set_led_mode(LED2, ON);
+  set_led_mode(LED_2, ON);
 }
 
 void idle_state(void)
@@ -83,7 +83,7 @@ void idle_state(void)
   stop_motors();
 
   /* Clear led during idle state */
-  set_led_mode(LED2, OFF);
+  set_led_mode(LED_2, OFF);
 }
 
 void out_of_battery_state(void)
@@ -95,7 +95,7 @@ void out_of_battery_state(void)
   stop_motors();
 
   /* Led off */
-  set_led_mode(LED2, OFF);
+  set_led_mode(LED_2, OFF);
 }
 
 void delayed_start_state(void)
@@ -116,7 +116,7 @@ void delayed_start_state(void)
   }
 
   /* Led on */
-  set_led_mode(LED2, ON);
+  set_led_mode(LED_2, ON);
 }
 
 void pid_and_vel_mapping_state(void)
@@ -144,18 +144,18 @@ void pid_and_vel_change_state(void)
 
   if (get_current_pidvel_map() == 0)
   {
-    set_led_mode(LED1, BLINK);
-    set_led_mode(LED2, BLINK);
+    set_led_mode(LED_1, BLINK);
+    set_led_mode(LED_2, BLINK);
   }
   else if (get_current_pidvel_map() == 1)
   {
-    set_led_mode(LED1, DOUBLE_BLINK);
-    set_led_mode(LED2, DOUBLE_BLINK);
+    set_led_mode(LED_1, DOUBLE_BLINK);
+    set_led_mode(LED_2, DOUBLE_BLINK);
   }
   else if (get_current_pidvel_map() == 2)
   {
-    set_led_mode(LED1, TRIPLE_BLINK);
-    set_led_mode(LED2, TRIPLE_BLINK);
+    set_led_mode(LED_1, TRIPLE_BLINK);
+    set_led_mode(LED_2, TRIPLE_BLINK);
   }
 }
 
@@ -239,7 +239,7 @@ void running_state(void)
     stop_motors();
 
     // led off
-    set_led_mode(LED2, OFF);
+    set_led_mode(LED_2, OFF);
 
     // Send car to callibration if reached the end of line
     if (get_all_inline())
@@ -253,7 +253,7 @@ void running_state(void)
     motor_control(error);
 
     // blinking: normal behaviour
-    set_led_mode(LED2, BLINK);
+    set_led_mode(LED_2, BLINK);
 
     // Set the current ms (inline)
     if (!is_out_of_line())
@@ -332,11 +332,11 @@ void set_car_default_parameters(void)
 void setup_modules()
 {
   /* led: setting async period */
-  set_led_blink_period(LED1, LED_BLINK_PERIOD);
-  set_led_blink_period(LED2, LED_BLINK_PERIOD);
+  set_led_blink_period(LED_1, LED_BLINK_PERIOD_DEFAULT);
+  set_led_blink_period(LED_2, LED_BLINK_PERIOD_DEFAULT);
 
-  set_led_mode(LED1, ON);
-  set_led_mode(LED2, OFF);
+  set_led_mode(LED_1, ON);
+  set_led_mode(LED_2, OFF);
 
   /* enable sensors */
   enable_line_sensors();
@@ -424,7 +424,7 @@ void check_state_out_of_sync(state_e current_state)
     set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
     set_running_state(RUNNING_NORMAL);
 
-    set_led_mode(LED1, ON);
+    set_led_mode(LED_1, ON);
     // reset variables used for special acc/dec in NORMAL mode
     reset_sequential_readings();
   }
@@ -435,7 +435,7 @@ void check_state_out_of_sync(state_e current_state)
     reset_pids_turbo();
     set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
     set_running_state(RUNNING_STLINE);
-    set_led_mode(LED1, OFF);
+    set_led_mode(LED_1, OFF);
   }
   else if (current_state == SET_NOOL_MODE_STATE)
   {
@@ -445,7 +445,7 @@ void check_state_out_of_sync(state_e current_state)
     reset_pids_nool();
     set_state(RUNNING_STATE);
     set_running_state(RUNNING_NOOL);
-    set_led_mode(LED1, BLINK);
+    set_led_mode(LED_1, BLINK);
   }
 }
 

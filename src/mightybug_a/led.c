@@ -1,7 +1,7 @@
 #include "led.h"
 
-LED_MODE led_mode[2] = {OFF, OFF};
-uint16_t led_half_period[2] = {LED_BLINK_PERIOD / 2, LED_BLINK_PERIOD / 2};
+led_mode_t led_mode[2] = {OFF, OFF};
+uint16_t led_half_period[2] = {LED_BLINK_PERIOD_DEFAULT / 2, LED_BLINK_PERIOD_DEFAULT / 2};
 uint32_t led_last_toggle[2] = {0, 0};
 
 uint32_t led_port[2] = {LED_PORT, LED2_PORT};
@@ -27,7 +27,7 @@ void set_led_blink_period(uint8_t led, uint16_t period)
  * @param[in] mode mode of blink (off, on, blink, double_blink, triple_blink)
  *
  */
-void set_led_mode(uint8_t led, LED_MODE mode)
+void set_led_mode(uint8_t led, led_mode_t mode)
 {
   if (led > 1) return;
   led_mode[led] = mode;
