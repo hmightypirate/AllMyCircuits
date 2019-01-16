@@ -1,10 +1,10 @@
 #ifndef __PID_H
 #define __PID_H
 
-#include <stdio.h>
+#include <stdint.h>
 
 #define MAX_INTEGRAL 100
-#define MAX_PID_ERROR 2000 //FIXME Value was 2000
+#define MAX_PID_ERROR 2000
 #define PID_CONTROL_DIVISOR 100
 
 
@@ -13,8 +13,6 @@
 */
 #define TIME_BETWEEN_STORE_POS 1
 #define NUMBER_POS_READINGS 5
-#define AVG_READINGS_POS 25 // 25 works in mightybuga (alpha version)
-
 
 #define DIFF_ERROR_STACK 20
 #define FLAG_USE_DIFF_STACK 1

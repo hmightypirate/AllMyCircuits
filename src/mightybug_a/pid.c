@@ -126,11 +126,7 @@ void set_new_stack_error(int32_t error)
   last_error_stack[current_stack_idx] = (int16_t) error;
 
   current_stack_idx += 1;
-
-  if (current_stack_idx == DIFF_ERROR_STACK)
-    {
-      current_stack_idx = 0;
-    }
+  current_stack_idx %= DIFF_ERROR_STACK;
 }
   
 /*
