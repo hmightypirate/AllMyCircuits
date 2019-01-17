@@ -110,7 +110,7 @@ static void cli_mtr_set() {
 		return;
 	}
 	int velocity = atoi(command_line + 8);
-	reset_target_velocity(velocity);
+	set_target_velocity(velocity);
 	printf("%i\n", get_target_velocity());
 }
 
@@ -122,14 +122,14 @@ static void cli_mtr_get() {
 char str_MTR_INC[] = "MTR INC";
 static void cli_mtr_inc() {
 	int velocity = get_target_velocity() + VELOCITY_STEP;
-	reset_target_velocity(velocity);
+	set_target_velocity(velocity);
 	printf("%i\n", velocity);
 }
 
 char str_MTR_DEC[] = "MTR DEC";
 static void cli_mtr_dec() {
 	int velocity = get_target_velocity() - VELOCITY_STEP;
-	reset_target_velocity(velocity);
+	set_target_velocity(velocity);
 	printf("%i\n", velocity);
 }
 

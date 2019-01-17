@@ -185,4 +185,9 @@ void reset_veldelay(void);
 int32_t get_next_constrained_target_velocity(int32_t vel);
 void increase_pointer_vel_delay(int32_t last_vel);
 
+/* Target velocity modes */
+void set_target_as_turbo(void);
+void set_target_as_normal(void);
+void set_target_as_nool(void);
+
 #endif /* __FSM_H */
