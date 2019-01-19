@@ -42,16 +42,13 @@ void update_ms_inline(uint32_t current_ms)
  */
 uint8_t exceeds_time_out_of_line(uint32_t current_ms)
 {
-  if ((current_ms - last_ms_inline) > MS_DELAY_OUT_OF_LINE)
-  {
-    return 1;
-  }
-  else
-    return 0;
+  return (current_ms - last_ms_inline) > MS_DELAY_OUT_OF_LINE;
 }
 
 /*
  * @brief get the ms the car entered the running state
+ * 
+ * Used only to check in main if end debug inertia test
  */
 uint32_t get_running_ms()
 {
@@ -155,6 +152,8 @@ void update_state(event_e new_event)
 
 /*
  * @brief sets the time entering a pid/vel mapping state
+ * 
+
  */
 void set_pidvel_map_time(uint32_t current_time)
 {
@@ -163,6 +162,8 @@ void set_pidvel_map_time(uint32_t current_time)
 
 /*
  * @brief obtain the time entering a pid/vel mapping state
+ * 
+ * Used to wait x seconds before enable changing pidvel map again
  */
 uint32_t get_pidvel_map_time(void)
 {
@@ -171,12 +172,16 @@ uint32_t get_pidvel_map_time(void)
 
 /*
  * @brief modify the delay start time
+ * 
+ * Used to wait x seconds before running
  */
 void set_delay_start_time(uint32_t delay)
 {
   delay_start_ms = delay;
 }
 
+
+// Used to wait x seconds before running
 uint32_t get_delay_start_time()
 {
   return delay_start_ms;
@@ -218,12 +223,6 @@ void select_next_pidvel_map()
 {
   current_pidvel_mapping = (current_pidvel_mapping + 1) % MAX_MAPPINGS;
 
-  force_mapping_to_current();
-}
-
-void force_mapping_to_current()
-{
-  /* reset pids normal */
   reset_pids_normal();
 }
 
