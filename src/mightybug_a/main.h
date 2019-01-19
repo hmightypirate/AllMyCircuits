@@ -14,3 +14,4 @@
 #include "keypad.h"
 #include "telemetry.h"
 #include "dma.h"
+#include "mapping.h"

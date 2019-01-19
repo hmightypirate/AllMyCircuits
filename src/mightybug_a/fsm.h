@@ -55,25 +55,13 @@
 #define PICKLE_ENC_DISTANCE_UP 3
 #define PICKLE_TURBO_VEL 200
 
-/* Mapping variables */
-#define FLAG_CIRCUIT_MAPPING 1
-#define MAX_MAP_STATES 100
-#define MIN_TICKS_FOR_MAP 400
-#define DIFF_TICKS_EQUAL 100
-#define OUT_MAPCORNER_STATE 2  // diff in abs encoder ticks
-#define OUT_MAPSTLINE_STATE 4  // diff in abs encoder ticks 
-#define FLAG_MAPPING_REPS 0 // mapping with repetitions
+
 
 /* anti-wheelie at start variables */
 #define FLAG_ANTI_WHEELIE_START 1
 #define MAX_VEL_WHEELIE_START 350
 #define MAX_DURATION_WHEELIE_START 500
 
-/* anti pickle variables */
-#define FLAG_MAX_VEL_DELAY 1
-#define MAX_VEL_DELAY 20
-#define MAX_VEL_DELAY_STEP_DOWN  300
-#define MAX_VEL_DELAY_STEP_UP  30
 
 typedef enum {
   IDLE_STATE,
@@ -119,31 +107,6 @@ typedef enum {
   MAX_RUNNING_STATES
 } rnstate_e;
 
-typedef enum {
-  NONE,
-  LEFT_CORNER,
-  RIGHT_CORNER,
-  ST_LINE,
-  MAX_MAP_EVENTS
-} mapstate_e;
-
-
-typedef struct {
-  int32_t agg_left_ticks[MAX_MAP_STATES];
-  int32_t agg_right_ticks[MAX_MAP_STATES];
-  mapstate_e mapstates[MAX_MAP_STATES];
-  int16_t large_stline_pointer;
-  int16_t rep_pointer;
-  
-} mapping_e;
-
-
-typedef struct {
-  int32_t motor_vel[MAX_VEL_DELAY];
-  uint16_t current_pointer;
-  uint16_t total_samples;
-} veldelay_e;
-
 
 state_e get_state(void);
 void set_state(state_e state);
@@ -169,10 +132,6 @@ void update_sequential_readings(int16_t new_proportional, int16_t past_proportio
 void reset_sequential_readings(void);
 void update_target_normal();
 void update_target_normal_with_encoders();
-void reset_circuit_mapping(void);
-void reset_mapping_pointer(void);
-void do_circuit_mapping(void);
-mapping_e get_mapping_info(void);
 
 void set_vel_antiwheelie(uint32_t current_loop_millisecs);
 

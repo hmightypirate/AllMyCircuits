@@ -6,6 +6,7 @@
 #include "pid.h"
 #include "encoder.h"
 #include "fsm.h"
+#include "mapping.h"
 
 // TODO: More intuitive names
 #define RIGHT_MOTOR_PWM_ANTIPHASE 1

@@ -16,6 +16,7 @@
 #include "vbatt.h"
 #include "encoder.h"
 #include "dma.h"
+#include "mapping.h"
 
 bool is_command_received(void);
 void execute_command(void);
