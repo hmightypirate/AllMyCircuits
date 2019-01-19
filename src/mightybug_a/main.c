@@ -50,6 +50,7 @@ void music_update(void)
     }
     break;
   default:
+    // Possible bug here: never reach this code because allways enters in RUNNING_STATE
     if (is_out_of_line())
     {
       jukebox_setcurrent_song(OUT_OF_LINE_SONG);
@@ -166,15 +167,15 @@ void running_state(void)
   read_line_sensors(line_sensor_value);
 
   // Running
-  int proportional = get_line_position(line_sensor_value);
+  int error = get_line_position(line_sensor_value);
 
-  // update proportional sequence
-  update_sequential_readings(proportional, get_proportional());
+  // update error sequence
+  update_sequential_readings(error, get_last_error());
 
   // Meas turbo mode
   if (sync_iterations % TIME_BETWEEN_STORE_POS == 0)
   {
-    set_new_reading(proportional);
+    set_new_reading(error);
 
     if (!USE_ENCODERS_FOR_STATE)
     {
@@ -183,9 +184,9 @@ void running_state(void)
       if (is_enable_avg_readings())
       {
         // Obtain the average number of readings
-        int16_t avg_proportional = get_avg_abs_readings();
+        int16_t avg_error = get_avg_abs_readings();
 
-        get_next_running_state(avg_proportional);
+        get_next_running_state(avg_error);
       }
     }
     else
@@ -218,8 +219,8 @@ void running_state(void)
   }
 
   /* pid control */
-  int error = 0;
-  error = pid(proportional);
+  int control = 0;
+  control = pid(error);
 
   /* motor control 
 
@@ -250,7 +251,7 @@ void running_state(void)
   else
   {
 
-    motor_control(error);
+    motor_control(control);
 
     // blinking: normal behaviour
     set_led_mode(LED_2, BLINK);
@@ -301,8 +302,7 @@ void update_modules(void)
 
 void set_car_default_parameters(void)
 {
-  /* reset motors and pid to the current mapping */
-  force_mapping_to_current();
+  reset_pids_normal();
 
   if (!SOFT_CALLIBRATION)
   {

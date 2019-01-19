@@ -32,6 +32,8 @@ int get_proportional(void);
 int get_integral(void);
 int get_derivative(void);
 
+int16_t get_last_error(void);
+
 // TURBO MODE
 void reset_prop_readings();
 void set_new_reading(uint16_t proportional);
