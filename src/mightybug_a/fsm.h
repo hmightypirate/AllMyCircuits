@@ -7,17 +7,13 @@
 #include "cron.h"
 #include "motors.h"
 #include "libjukebox.h"
+#include "configs.h"
 
 /* delay before the car starts running in DELAYED_START_STATE */
 #define DELAYED_START_MS  5000
 
 /* delays applied when trying to change a pid/vel mapping */
 #define DELAYED_PIDVEL_CHANGE_MS 5000
-
-/* Number of mappings for pid and vel */
-#define MAX_MAPPINGS 3
-#define NUMBER_PIDVEL_MAPPINGS 3
-#define INITIAL_PIDVEL_MAPPING 0
 
 /* Activate/deactivate special functions */
 #define ENABLE_TURBO_MODE 1

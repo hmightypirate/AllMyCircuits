@@ -18,42 +18,7 @@ uint32_t curr_agg_right_ticks = 0;
 //vel delay features
 veldelay_e veldelay_st;
 
-/* FIXME this should be moved to a *.h */
-/* pid maps: k_p, k_i, k_d */
-const int16_t pid_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-    200, 0, 300, //400, 0, 500
-    200, 0, 300,
-    200, 0, 300};
 
-const int16_t vel_maps[NUMBER_PIDVEL_MAPPINGS] = {
-    //650, 675, 725
-    //600, 650, 700 // mapping 1st test
-    //700, 750, 780 // mapping 2nd test
-    650, 725, 800 // mapping vel normal
-};
-
-// Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro corto stripped)
-
-const int16_t pid_nool_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-    400, 0, 600,
-    400, 0, 600,
-    400, 0, 600};
-
-const int16_t vel_nool_maps[NUMBER_PIDVEL_MAPPINGS] = {
-    350, 350, 350 // mapping vel nool
-};
-
-const int16_t pid_turbo_maps[NUMBER_PIDVEL_MAPPINGS * 3] = {
-    200, 0, 300, //350, 0, 600
-    200, 0, 300,
-    200, 0, 300};
-
-const int16_t vel_turbo_maps[NUMBER_PIDVEL_MAPPINGS] = {
-    //515, 515, 515
-    //575, 600, 625 //mapping 1st test
-    //625, 650, 675 //mapping 2nd test
-    600, 650, 700 // mapping vel turbo
-};
 
 const int16_t normal_out_hyst = OUT_NORMAL_HYST; // going out of pid (position)
 const int16_t turbo_out_hyst = OUT_TURBO_HYST;   // going out of turbo (position)
@@ -61,8 +26,7 @@ const int16_t turbo_out_hyst = OUT_TURBO_HYST;   // going out of turbo (position
 const int16_t normal_nool_out_hyst = OUT_NORMAL_NOOL_HYST;
 const int16_t nool_normal_out_hyst = OUT_NOOL_NORMAL_HYST;
 
-const uint8_t map_songs[MAX_MAPPINGS] = {
-    SONG_ONE_BEAT_ORDER, SONG_TWO_BEAT_ORDER, SONG_THREE_BEAT_ORDER};
+
 
 uint32_t delay_start_ms = 0;
 uint32_t pidvel_map_ms = 0;
@@ -644,7 +608,7 @@ void set_running_state(rnstate_e state)
  */
 void select_next_pidvel_map()
 {
-  current_pidvel_mapping = (current_pidvel_mapping + 1) % NUMBER_PIDVEL_MAPPINGS;
+  current_pidvel_mapping = (current_pidvel_mapping + 1) % MAX_MAPPINGS;
 
   force_mapping_to_current();
 }
