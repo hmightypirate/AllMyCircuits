@@ -16,7 +16,7 @@ veldelay_e veldelay_st;
 /*
  * @brief helper function to truncate a value between min and max
  */
-static int trunc_to_range(int value, int min, int max)
+static int32_t trunc_to_range(int32_t value, int32_t min, int32_t max)
 {
   int trunc_value = value;
 
@@ -357,10 +357,7 @@ void reset_veldelay(void)
 int32_t get_next_constrained_target_velocity(int32_t vel)
 {
   uint16_t next_pointer = veldelay_st.current_pointer + 1;
-  if (next_pointer >= MAX_VEL_DELAY)
-  {
-    next_pointer = 0;
-  }
+  next_pointer = veldelay_st.current_pointer %= MAX_VEL_DELAY;
 
   return trunc_to_range(vel,
                         veldelay_st.motor_vel[next_pointer] -
@@ -375,11 +372,7 @@ int32_t get_next_constrained_target_velocity(int32_t vel)
 void increase_pointer_vel_delay(int32_t last_vel)
 {
   veldelay_st.current_pointer += 1;
-
-  if (veldelay_st.current_pointer >= MAX_VEL_DELAY)
-  {
-    veldelay_st.current_pointer = 0;
-  }
+  veldelay_st.current_pointer %= MAX_VEL_DELAY;
 
   veldelay_st.motor_vel[veldelay_st.current_pointer] = last_vel;
 
