@@ -1,5 +1,5 @@
 
-sed -i 's/^#define SYSTICK_MEAS.*$/#define SYSTICK_MEAS 20/' ../src/mightybug_a/encoder.h
+sed -i 's/^#define ENCODER_BUFFER_LEN.*$/#define ENCODER_BUFFER_LEN 20/' ../src/mightybug_a/encoder.h
 
 # turbo state
 sed -i 's/#define OUT_TURBO_HYST.*/#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 4:20/' ../src/mightybug_a/fsm.h

@@ -12,8 +12,8 @@
 /* to obtain measure in mm/s */
 #define WHEEL_RATIO 100
 
-/* systick measurements */
-#define SYSTICK_MEAS 20
+/* encoder history measurements lenght */
+#define ENCODER_BUFFER_LEN 20
 
 /* encoder acc. measurements */
 #define ACC_MEAS 10

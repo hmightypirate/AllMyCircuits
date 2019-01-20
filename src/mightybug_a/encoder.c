@@ -1,7 +1,7 @@
 #include "encoder.h"
 
-static volatile uint32_t left_encoder_array[SYSTICK_MEAS];
-static volatile uint32_t right_encoder_array[SYSTICK_MEAS];
+static volatile uint32_t left_encoder_array[ENCODER_BUFFER_LEN];
+static volatile uint32_t right_encoder_array[ENCODER_BUFFER_LEN];
 
 static volatile int32_t left_encoder_acc_array[ACC_MEAS];
 static volatile int32_t right_encoder_acc_array[ACC_MEAS];
@@ -70,7 +70,7 @@ int32_t get_sum_acc_array(volatile int32_t *p_encoder)
 uint32_t get_sum_encoder_array(volatile uint32_t *p_encoder)
 {
   uint32_t sum = 0;
-  for (int i = 0; i < SYSTICK_MEAS; i++)
+  for (int i = 0; i < ENCODER_BUFFER_LEN; i++)
   {
     sum += p_encoder[i];
   }
@@ -145,7 +145,7 @@ static uint32_t encoder_measurement(uint32_t value)
 
 void reset_encoder_ticks(void)
 {
-  for (int i = 0; i < SYSTICK_MEAS; i++)
+  for (int i = 0; i < ENCODER_BUFFER_LEN; i++)
   {
     left_encoder_array[i] = 0;
     right_encoder_array[i] = 0;
@@ -205,7 +205,7 @@ void update_encoder_ticks()
 
   // Update current_tick
   encoder_array_index += 1;
-  encoder_array_index %= SYSTICK_MEAS;
+  encoder_array_index %= ENCODER_BUFFER_LEN;
 }
 
 /*
@@ -215,7 +215,7 @@ uint16_t get_last_meas_pointer()
 {
   if (encoder_array_index == 0)
   {
-    return SYSTICK_MEAS - 1;
+    return ENCODER_BUFFER_LEN - 1;
   }
   else
   {
