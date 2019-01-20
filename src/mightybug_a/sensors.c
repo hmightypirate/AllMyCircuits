@@ -336,6 +336,5 @@ uint8_t get_all_inline(void)
  */
 void reset_all_inline(void)
 {
-  started_calibration = 0;
   detected_all_inline = 0;
 }
