@@ -4,6 +4,38 @@ uint16_t line_sensor_value[NUM_SENSORS];
 uint32_t sync_iterations = 0;
 uint32_t current_loop_millisecs = 0;
 
+
+void check_rn_state(void)
+{
+  rnstate_e running_state = get_running_state();
+
+  switch (running_state)
+  {
+  case RUNNING_STLINE:
+    set_target_as_turbo();
+    reset_pids_turbo();
+    set_led_mode(LED_1, OFF);
+    break;
+  case RUNNING_NORMAL:
+    set_target_as_normal();
+    reset_pids_normal();
+    set_led_mode(LED_1, ON);
+    // reset variables used for special acc/dec in NORMAL mode
+    reset_sequential_readings();
+    break;
+  case RUNNING_NOOL:
+    set_target_as_nool();
+    reset_pids_nool();
+    set_led_mode(LED_1, BLINK);
+    break;
+  default:
+    set_target_as_normal();
+    reset_pids_normal();
+    set_led_mode(LED_1, ON);
+  }
+}
+
+
 void check_running_state(void)
 {
   rnstate_e running_state = get_running_state();
@@ -195,6 +227,8 @@ void running_state(void)
     }
   }
 
+  check_rn_state();
+
   // Accelerate/Break in NORMAL mode
   if (!USE_ENCODERS_FOR_INCDEC)
   {
@@ -348,43 +382,6 @@ void setup_modules()
   setup_keypad();
 }
 
-void check_state_out_of_sync(state_e);
-void check_battery(void);
-void execute_state(state_e state);
-
-/*
- * @brief Initial setup and main loop
- */
-int main(void)
-{
-  uint32_t last_loop_millisecs = 0;
-
-  setup_microcontroller();
-  set_car_default_parameters();
-  setup_modules();
-
-  while (true)
-  {
-    current_loop_millisecs = get_millisecs_since_start();
-
-    check_command();
-    check_battery();
-
-    state_e current_state = get_state();
-    check_state_out_of_sync(current_state);
-
-    update_modules();
-
-    // inner loop is executed at a fixed period of time
-    if ((current_loop_millisecs - last_loop_millisecs) >= FIXED_LOOP_TIME)
-    {
-      last_loop_millisecs = current_loop_millisecs;
-      execute_state(current_state);
-    }
-
-    return 0;
-  }
-}
 
 void execute_state(state_e state)
 {
@@ -413,41 +410,6 @@ void execute_state(state_e state)
   }
 }
 
-void check_state_out_of_sync(state_e current_state)
-{
-  // loop out of period
-  if (current_state == SET_NORMAL_MODE_STATE)
-  {
-    set_target_as_normal();
-    /* change pid normal */
-    reset_pids_normal();
-    set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
-    set_running_state(RUNNING_NORMAL);
-
-    set_led_mode(LED_1, ON);
-    // reset variables used for special acc/dec in NORMAL mode
-    reset_sequential_readings();
-  }
-  else if (current_state == SET_TURBO_MODE_STATE)
-  {
-    set_target_as_turbo();
-    /* change pid consts */
-    reset_pids_turbo();
-    set_state(RUNNING_STATE); //FIXME this assignment is local (and useless)
-    set_running_state(RUNNING_STLINE);
-    set_led_mode(LED_1, OFF);
-  }
-  else if (current_state == SET_NOOL_MODE_STATE)
-  {
-    set_target_as_nool();
-
-    /* change pid consts */
-    reset_pids_nool();
-    set_state(RUNNING_STATE);
-    set_running_state(RUNNING_NOOL);
-    set_led_mode(LED_1, BLINK);
-  }
-}
 
 void check_battery(void)
 {
@@ -462,4 +424,37 @@ void check_battery(void)
       //update_state(OUT_OF_BATTERY_EVENT);
     }
   }
+}
+
+
+
+/*
+ * @brief Initial setup and main loop
+ */
+int main(void)
+{
+  uint32_t last_loop_millisecs = 0;
+
+  setup_microcontroller();
+  set_car_default_parameters();
+  setup_modules();
+
+  while (true)
+  {
+    current_loop_millisecs = get_millisecs_since_start();
+
+    check_command();
+    check_battery();
+    update_modules();
+
+    // inner loop is executed at a fixed period of time
+    if ((current_loop_millisecs - last_loop_millisecs) >= FIXED_LOOP_TIME)
+    {
+      last_loop_millisecs = current_loop_millisecs;
+      execute_state(get_state());
+    }
+  }
+
+  return 0;
+
 }

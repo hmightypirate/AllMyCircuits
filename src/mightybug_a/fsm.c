@@ -29,6 +29,25 @@ uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
 uint32_t last_ms_inline = 0;
 
+
+void update_running_state(rnevent_e rnevent)
+{
+  // loop out of period
+  if (rnevent == SET_NORMAL_MODE_STATE)
+  {
+    set_running_state(RUNNING_NORMAL);
+  }
+  else if (rnevent == SET_TURBO_MODE_STATE)
+  {
+    set_running_state(RUNNING_STLINE);
+  }
+  else if (rnevent == SET_NOOL_MODE_STATE)
+  {
+    set_running_state(RUNNING_NOOL);
+  }
+}
+
+
 /*
  * @brief gets the current ms inline
  */
@@ -133,19 +152,6 @@ void update_state(event_e new_event)
     else if (new_event == FORCE_IDLE_EVENT)
     {
       current_state = IDLE_STATE;
-    }
-    else if (new_event == GO_TO_TURBO_EVENT && ENABLE_TURBO_MODE)
-    {
-      // resets the time in corner
-      current_state = SET_TURBO_MODE_STATE;
-    }
-    else if (new_event == GO_TO_NORMAL_EVENT && ENABLE_TURBO_MODE)
-    {
-      current_state = SET_NORMAL_MODE_STATE;
-    }
-    else if (new_event == GO_TO_NOOL_EVENT && ENABLE_NOOL_MODE)
-    {
-      current_state = SET_NOOL_MODE_STATE;
     }
   }
 }
@@ -286,27 +292,27 @@ void get_next_running_state(int16_t avg_proportional)
 
   if (running_state == RUNNING_NORMAL)
   {
-    if (avg_proportional < normal_out_hyst)
+    if (ENABLE_TURBO_MODE && (avg_proportional < normal_out_hyst))
     {
-      update_state(GO_TO_TURBO_EVENT);
+      update_running_state(SET_TURBO_MODE_STATE);
     }
-    else if (avg_proportional > normal_nool_out_hyst)
+    else if (ENABLE_NOOL_MODE && (avg_proportional > normal_nool_out_hyst))
     {
-      update_state(GO_TO_NOOL_EVENT);
+      update_running_state(SET_NOOL_MODE_STATE);
     }
   }
   else if (running_state == RUNNING_STLINE)
   {
     if (avg_proportional > turbo_out_hyst)
     {
-      update_state(GO_TO_NORMAL_EVENT);
+      update_running_state(SET_NORMAL_MODE_STATE);
     }
   }
   else if (running_state == RUNNING_NOOL)
   {
     if (avg_proportional < nool_normal_out_hyst)
     {
-      update_state(GO_TO_NORMAL_EVENT);
+      update_running_state(SET_NORMAL_MODE_STATE);
     }
   }
 }
