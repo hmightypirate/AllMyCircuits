@@ -62,8 +62,8 @@ void music_update(void)
 
   switch (current_state)
   {
-  case CALLIBRATION_STATE:
-    jukebox_setcurrent_song(CALLIBRATION_SONG);
+  case CALIBRATION_STATE:
+    jukebox_setcurrent_song(CALIBRATION_SONG);
     jukebox_play_in_loop(current_loop_millisecs);
     break;
   case NO_BATTERY_STATE:
@@ -104,13 +104,13 @@ void calibration_state(void)
 
   /* stop motors during calibration */
   stop_motors();
-  /* led is on during callibration */
+  /* led is on during calibration */
   set_led_mode(LED_2, ON);
 }
 
 void idle_state(void)
 {
-  /* reset out of line measurements, resets callibration */
+  /* reset out of line measurements, resets calibration */
   reset_all_inline();
   reset_calibration_values();
   stop_motors();
@@ -158,9 +158,9 @@ void pid_and_vel_mapping_state(void)
   stop_motors();
   if (current_loop_millisecs - get_pidvel_map_time() > DELAYED_PIDVEL_CHANGE_MS)
   {
-    // Return to callibration if
+    // Return to calibration if
     stop_music_play();
-    update_state(FORCE_CALLIBRATION_EVENT);
+    update_state(FORCE_CALIBRATION_EVENT);
     pull_enable_jukebox();
   }
 }
@@ -276,7 +276,7 @@ void running_state(void)
     // led off
     set_led_mode(LED_2, OFF);
 
-    // Send car to callibration if reached the end of line
+    // Send car to calibration if reached the end of line
     if (get_all_inline())
     {
       update_state(FORCE_IDLE_EVENT);
@@ -338,13 +338,13 @@ void set_car_default_parameters(void)
 {
   reset_pids_normal();
 
-  if (!SOFT_CALLIBRATION)
+  if (!SOFT_CALIBRATION)
   {
     hard_reset_sensors();
   }
   else
   {
-    /* reset callibration values (needed for callibration) */
+    /* reset calibration values (needed for calibration) */
     reset_calibration_values();
   }
 
@@ -387,7 +387,7 @@ void execute_state(state_e state)
 {
   switch (state)
   {
-  case CALLIBRATION_STATE:
+  case CALIBRATION_STATE:
     calibration_state();
     break;
   case IDLE_STATE:

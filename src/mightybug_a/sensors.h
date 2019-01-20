@@ -22,12 +22,12 @@
 #define BLACK_MEASURE 2000
 #define WHITE_MEASURE 0
 
-#define SOFT_CALLIBRATION 1
+#define SOFT_CALIBRATION 1
 #define THRESHOLD_CALIBRATION 200  // 500
 /* Number of sensors that could not be callibrated */
 #define MAX_NUM_NOT_CALLIBRATED_SENSORS 1
 
-/* extra delay between callibration calls in NOP operations */
+/* extra delay between calibration calls in NOP operations */
 #define DELAY_CALIBRATION_CALLS 300
 
 /* if 1 the car stops after finding an horizontal line -> all sensors detect line */

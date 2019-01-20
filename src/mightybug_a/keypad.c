@@ -104,7 +104,7 @@ void menu_functions(void)
   /*
   if (button_pressed(BUTTON_START))
     {
-      update_state(FORCE_CALLIBRATION_EVENT);
+      update_state(FORCE_CALIBRATION_EVENT);
     }
   */
 

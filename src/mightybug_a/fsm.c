@@ -81,9 +81,9 @@ void update_state(event_e new_event)
 {
   if (current_state != NO_BATTERY_STATE)
   {
-    if (new_event == FORCE_CALLIBRATION_EVENT)
+    if (new_event == FORCE_CALIBRATION_EVENT)
     {
-      current_state = CALLIBRATION_STATE;
+      current_state = CALIBRATION_STATE;
     }
     else if (new_event == GO_TO_RUN_EVENT)
     {
@@ -101,8 +101,8 @@ void update_state(event_e new_event)
     }
     else if (new_event == GO_TO_DELAYED_START_EVENT)
     {
-      /* if in callibration -> go to delay start  */
-      if (current_state == CALLIBRATION_STATE)
+      /* if in calibration -> go to delay start  */
+      if (current_state == CALIBRATION_STATE)
       {
         if (get_calibrated_sensors_count() >= NUM_SENSORS -
                                                   MAX_NUM_NOT_CALLIBRATED_SENSORS)
@@ -115,14 +115,14 @@ void update_state(event_e new_event)
       {
         current_state = IDLE_STATE;
       }
-      /* if in any other state -> go to callibration state */
+      /* if in any other state -> go to calibration state */
       else
       {
-        current_state = CALLIBRATION_STATE;
+        current_state = CALIBRATION_STATE;
       }
     }
     else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
-             (current_state == CALLIBRATION_STATE))
+             (current_state == CALIBRATION_STATE))
     {
       push_enable_jukebox();
       enable_jukebox();
@@ -138,7 +138,7 @@ void update_state(event_e new_event)
       current_state = PIDANDVEL_MAPPING_STATE;
     }
     else if ((new_event == NEXT_BUZZER_EVENT) &&
-             (current_state == CALLIBRATION_STATE))
+             (current_state == CALIBRATION_STATE))
     {
       if (is_jukebox_enabled())
       {

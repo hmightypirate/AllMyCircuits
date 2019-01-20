@@ -165,7 +165,7 @@ static void cli_fsm_run() {
 
 char str_FSM_CAL[] = "FSM CAL";
 static void cli_fsm_cal() {
-	update_state(FORCE_CALLIBRATION_EVENT);
+	update_state(FORCE_CALIBRATION_EVENT);
 	printf("CALIBRATE\n");
 }
 

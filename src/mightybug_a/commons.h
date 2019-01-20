@@ -3,7 +3,7 @@
 
 #include "jukebox_songs.h"
 
-#define CALLIBRATION_SONG SONG_SUPERMAN_ORDER
+#define CALIBRATION_SONG SONG_SUPERMAN_ORDER
 #define OUT_OF_LINE_SONG SONG_INDIANAJONES_ORDER
 #define OUT_OF_BATTERY_SONG SONG_EUROPE_ORDER
 
@@ -24,7 +24,7 @@
  */ 
 #define VELOCITY_STEP 10
 
-//#define DELAY(x) for (i=0; i < DELAY_CALLIBRATION_CALLS; i++) __asm__("nop");
+//#define DELAY(x) for (i=0; i < DELAY_CALIBRATION_CALLS; i++) __asm__("nop");
 
 
 
