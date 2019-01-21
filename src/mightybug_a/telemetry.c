@@ -11,12 +11,12 @@ void print_telemetry(int millis)
     if (SHOW_P_VALUE) printf("%d,", get_proportional());
     if (SHOW_I_VALUE) printf("%d,", get_integral());
     if (SHOW_D_VALUE) printf("%d,", get_derivative());
-    if (SHOW_LEFT_PWM) printf("%d,", get_last_left_vel());
-    if (SHOW_RIGHT_PWM) printf("%d,", get_last_right_vel());
+    if (SHOW_LEFT_PWM) printf("%d,", (int)get_last_left_vel());
+    if (SHOW_RIGHT_PWM) printf("%d,", (int)get_last_right_vel());
     if (SHOW_LEFT_ENCODER) printf("%u,", (unsigned int)get_left_encoder_ticks());
     if (SHOW_RIGHT_ENCODER) printf("%u,", (unsigned int)get_right_encoder_ticks());
     if (SHOW_LEFT_ACC) printf("%d,", (int)get_left_acc());
     if (SHOW_RIGHT_ACC) printf("%d,", (int)get_right_acc());
-    if (SHOW_TARGET_VEL) printf("%d,", get_target_velocity());
+    if (SHOW_TARGET_VEL) printf("%d,", (int)get_target_velocity());
     printf("\n");
 }
