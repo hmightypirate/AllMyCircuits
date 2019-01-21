@@ -134,11 +134,6 @@ void update_target_normal_with_encoders();
 
 void set_vel_antiwheelie(uint32_t current_loop_millisecs);
 
-/* Antipickle functions */
-void reset_veldelay(void);
-int32_t get_next_constrained_target_velocity(int32_t vel);
-void increase_pointer_vel_delay(int32_t last_vel);
-
 /* Target velocity modes */
 void set_target_as_turbo(void);
 void set_target_as_normal(void);

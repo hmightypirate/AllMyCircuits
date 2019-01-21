@@ -1,10 +1,13 @@
 #include "motors.h"
 
-static int target_velocity = 0;
+static int32_t target_velocity = 0;
 
 /* storing last velocities for debug */
-static int last_left_vel = 0;
-static int last_right_vel = 0;
+static int32_t last_left_vel = 0;
+static int32_t last_right_vel = 0;
+
+//vel delay features
+veldelay_e veldelay_st;
 
 /* pickle ticks: they depend on the wheels and the encoders measurement period */
 uint16_t PICKLE_TURBO_TABLE[33] = {
@@ -15,11 +18,26 @@ uint16_t PICKLE_TURBO_TABLE[33] = {
 };
 
 /*
+ * @brief helper function to truncate a value between min and max
+ */
+static int32_t trunc_to_range(int32_t value, int32_t min, int32_t max)
+{
+  int32_t trunc_value = value;
+
+  if (value < min)
+    trunc_value = min;
+  else if (value > max)
+    trunc_value = max;
+
+  return trunc_value;
+}
+
+/*
  * @brief set the state of left motor
  * 
  * @param[in] may be FORWARD or BACKWARD
  */
-void set_left_motor_state(char state)
+void set_left_motor_state(uint8_t state)
 {
   if (state == FORWARD)
   {
@@ -38,7 +56,7 @@ void set_left_motor_state(char state)
  * 
  * @param[in] may be FORWARD or BACKWARD
  */
-void set_right_motor_state(char state)
+void set_right_motor_state(uint8_t state)
 {
   if (state == FORWARD)
   {
@@ -57,7 +75,7 @@ void set_right_motor_state(char state)
  * 
  * @param[in] an integer between 0 and 1023
  */
-void set_left_motor_pwm(int value)
+void set_left_motor_pwm(int32_t value)
 {
   if (LEFT_MOTOR_PWM_ANTIPHASE)
     value = MAX_PWM_VALUE - value;
@@ -69,7 +87,7 @@ void set_left_motor_pwm(int value)
  * 
  * @param[in] an integer between 0 and 1023
  */
-void set_right_motor_pwm(int value)
+void set_right_motor_pwm(int32_t value)
 {
   if (RIGHT_MOTOR_PWM_ANTIPHASE)
     value = MAX_PWM_VALUE - value;
@@ -123,42 +141,70 @@ int32_t get_pickle_turbo(int32_t velocity, uint32_t current_enc)
 }
 
 /*
+ * @brief reset the mapping 
+ */
+void reset_veldelay(void)
+{
+  for (uint8_t i = 0; i < MAX_VEL_DELAY; i++)
+  {
+    veldelay_st.motor_vel[i] = 0;
+  }
+
+  veldelay_st.current_pointer = 0;
+  veldelay_st.total_samples = 0;
+}
+
+/*
+ * @brief obtain the next constrained target velocity
+ */
+int32_t get_next_constrained_target_velocity(int32_t velocity)
+{
+  uint16_t next_pointer = veldelay_st.current_pointer + 1;
+  next_pointer %= MAX_VEL_DELAY;
+
+  return trunc_to_range(velocity,
+                        veldelay_st.motor_vel[next_pointer] -
+                            MAX_VEL_DELAY_STEP_DOWN,
+                        veldelay_st.motor_vel[next_pointer] +
+                            MAX_VEL_DELAY_STEP_UP);
+}
+
+/*
+ * @brief increse the pointer in the vel delay struct
+ */
+void increase_pointer_vel_delay(int32_t last_velocity)
+{
+  veldelay_st.current_pointer += 1;
+  veldelay_st.current_pointer %= MAX_VEL_DELAY;
+
+  veldelay_st.motor_vel[veldelay_st.current_pointer] = last_velocity;
+
+  veldelay_st.total_samples += 1;
+}
+
+
+/*
  * @brief resets target velocity to a given value (also de normal velocity)
  *
  * @param[in] target_vel initial target velocity
  */
-void set_target_velocity(int target_vel)
+void set_target_velocity(int32_t velocity)
 {
-  target_velocity = target_vel;
+  target_velocity = velocity;
 }
 
 /*
  * @brief get current target velocity
  */
-int get_target_velocity(void)
+int32_t get_target_velocity(void)
 {
   return target_velocity;
 }
 
 /*
- * @brief helper function to truncate a value between min and max
- */
-static int trunc_to_range(int value, int min, int max)
-{
-  int trunc_value = value;
-
-  if (value < min)
-    trunc_value = min;
-  else if (value > max)
-    trunc_value = max;
-
-  return trunc_value;
-}
-
-/*
  * @brief set left motor velocity
  */
-void set_left_motor_velocity(int velocity)
+void set_left_motor_velocity(int32_t velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
 
@@ -179,7 +225,7 @@ void set_left_motor_velocity(int velocity)
 /*
  * @brief set right motor velocity
  */
-void set_right_motor_velocity(int velocity)
+void set_right_motor_velocity(int32_t velocity)
 {
   velocity = trunc_to_range(velocity, MIN_VEL_MOTOR, MAX_VEL_MOTOR);
 
@@ -202,7 +248,7 @@ void set_right_motor_velocity(int velocity)
  *
  * @param[in] control from pid
  */
-void motor_control(int control)
+void motor_control(int32_t control)
 {
   control = trunc_to_range(control, -MAX_PID_ERROR, MAX_PID_ERROR);
 
@@ -255,7 +301,7 @@ void stop_motors()
 /*
  * @brief get last left velocity
  */
-int get_last_left_vel()
+int32_t get_last_left_vel()
 {
   return last_left_vel;
 }
@@ -263,7 +309,7 @@ int get_last_left_vel()
 /*
  * @brief get last right velocity
  */
-int get_last_right_vel()
+int32_t get_last_right_vel()
 {
   return last_right_vel;
 }

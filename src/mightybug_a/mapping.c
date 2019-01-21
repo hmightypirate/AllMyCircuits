@@ -7,27 +7,6 @@ mapstate_e curr_mapstate = NONE;
 uint32_t curr_agg_left_ticks = 0;
 uint32_t curr_agg_right_ticks = 0;
 
-//vel delay features
-veldelay_e veldelay_st;
-
-
-
-
-/*
- * @brief helper function to truncate a value between min and max
- */
-static int32_t trunc_to_range(int32_t value, int32_t min, int32_t max)
-{
-  int trunc_value = value;
-
-  if (value < min)
-    trunc_value = min;
-  else if (value > max)
-    trunc_value = max;
-
-  return trunc_value;
-}
-
 /* 
  * @brief get mapping state
  */
@@ -337,45 +316,5 @@ void do_circuit_mapping()
   curr_agg_right_ticks += last_right_ticks;
 }
 
-/*
- * @brief reset the mapping 
- */
-void reset_veldelay(void)
-{
-  for (int i = 0; i < MAX_VEL_DELAY; i++)
-  {
-    veldelay_st.motor_vel[i] = 0;
-  }
 
-  veldelay_st.current_pointer = 0;
-  veldelay_st.total_samples = 0;
-}
-
-/*
- * @brief obtain the next constrained target velocity
- */
-int32_t get_next_constrained_target_velocity(int32_t vel)
-{
-  uint16_t next_pointer = veldelay_st.current_pointer + 1;
-  next_pointer = next_pointer %= MAX_VEL_DELAY;
-
-  return trunc_to_range(vel,
-                        veldelay_st.motor_vel[next_pointer] -
-                            MAX_VEL_DELAY_STEP_DOWN,
-                        veldelay_st.motor_vel[next_pointer] +
-                            MAX_VEL_DELAY_STEP_UP);
-}
-
-/*
- * @brief increse the pointer in the vel delay struct
- */
-void increase_pointer_vel_delay(int32_t last_vel)
-{
-  veldelay_st.current_pointer += 1;
-  veldelay_st.current_pointer %= MAX_VEL_DELAY;
-
-  veldelay_st.motor_vel[veldelay_st.current_pointer] = last_vel;
-
-  veldelay_st.total_samples += 1;
-}
 
