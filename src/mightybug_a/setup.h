@@ -120,12 +120,12 @@ Both motors are controlled with one timer
 
 /* Keypad */
 #define NUM_BUTTONS 3
-#define BUTTON0_PORT GPIOC
-#define BUTTON0_PIN GPIO14
 #define BUTTON1_PORT GPIOC
-#define BUTTON1_PIN GPIO15
-#define BUTTON2_PORT GPIOB
-#define BUTTON2_PIN GPIO13
+#define BUTTON1_PIN GPIO14
+#define BUTTON2_PORT GPIOC
+#define BUTTON2_PIN GPIO15
+#define BUTTON3_PORT GPIOB
+#define BUTTON3_PIN GPIO13
 
 
 void setup_microcontroller(void);

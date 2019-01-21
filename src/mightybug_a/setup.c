@@ -317,14 +317,14 @@ void gpio_setup(void)
                 BATTERY_PIN);
 
   /* KEYPAD */
-  gpio_set_mode(BUTTON0_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
-                BUTTON0_PIN);
-
   gpio_set_mode(BUTTON1_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                 BUTTON1_PIN);
 
   gpio_set_mode(BUTTON2_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                 BUTTON2_PIN);
+
+  gpio_set_mode(BUTTON3_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
+                BUTTON3_PIN);
 }
 
 

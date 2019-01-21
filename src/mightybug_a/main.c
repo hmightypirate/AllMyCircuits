@@ -5,6 +5,40 @@ uint32_t sync_iterations = 0;
 uint32_t current_loop_millisecs = 0;
 
 
+void menu_functions(void)
+{
+  uint32_t millis = get_millisecs_since_start();
+
+  // Button delayed start (falling edge)
+  if (button_released(BUTTON1))
+  {
+    set_delay_start_time(millis);
+    update_state(GO_TO_DELAYED_START_EVENT);
+  }
+
+  // Button delayed start: Resetting state (rising edge)
+  /*
+  if (button_pressed(BUTTON1))
+    {
+      update_state(FORCE_CALIBRATION_EVENT);
+    }
+  */
+
+  // Pid and vel mapping (rising edge)
+  if (button_pressed(BUTTON2))
+  {
+    set_pidvel_map_time(millis);
+    update_state(NEXT_PIDANDVELMAP_EVENT);
+  }
+
+  // Buzzer on/off mapping (rising edge)
+  if (button_pressed(BUTTON3))
+  {
+    update_state(NEXT_BUZZER_EVENT);
+  }
+
+}
+
 void check_rn_state(void)
 {
   rnstate_e running_state = get_running_state();
@@ -328,7 +362,7 @@ void check_command(void)
 void update_modules(void)
 {
   music_update();
-  keypad_loop();
+  keypad_update();
   menu_functions();
   dma_update();
   leds_update();

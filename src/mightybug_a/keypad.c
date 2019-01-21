@@ -10,13 +10,13 @@ bool button_edge_detected[NUM_BUTTONS];
 /* Timestamps of the last measured edges (rising or falling) for each button */
 uint32_t button_edge_ts[NUM_BUTTONS];
 
-uint32_t button_port_array[NUM_BUTTONS] = {BUTTON0_PORT, BUTTON1_PORT, BUTTON2_PORT};
-uint16_t button_pin_array[NUM_BUTTONS] = {BUTTON0_PIN, BUTTON1_PIN, BUTTON2_PIN};
+uint32_t button_port_array[NUM_BUTTONS] = {BUTTON1_PORT, BUTTON2_PORT, BUTTON3_PORT};
+uint16_t button_pin_array[NUM_BUTTONS] = {BUTTON1_PIN, BUTTON2_PIN, BUTTON3_PIN};
 
 /*
  * @brief update keypad status in main loop
  */
-void keypad_loop(void)
+void keypad_update(void)
 {
   for (int i = 0; i < NUM_BUTTONS; i++)
   {
@@ -38,14 +38,6 @@ void keypad_loop(void)
       button_edge_detected[i] = true;
     }
   }
-}
-
-/*
- * @brief sets edge detection of a button to false
- */
-void clear_edge_detected(uint8_t id_button)
-{
-  button_edge_detected[id_button] = false;
 }
 
 /*
@@ -81,48 +73,20 @@ bool get_edge_detection(uint8_t id_button)
 
 bool button_released(uint8_t id_button)
 {
-  return (get_edge_detection(id_button) && !get_button(id_button));
+  if (get_edge_detection(id_button) && !get_button(id_button))
+  {
+    button_edge_detected[id_button] = false;
+    return true;
+  }
+  return false;
 }
 
 bool button_pressed(uint8_t id_button)
 {
-  return (get_edge_detection(id_button) && get_button(id_button));
-}
-
-void menu_functions(void)
-{
-  uint32_t millis = get_millisecs_since_start();
-
-  // Button delayed start (falling edge)
-  if (button_released(BUTTON_START))
+  if (get_edge_detection(id_button) && get_button(id_button))
   {
-    set_delay_start_time(millis);
-    update_state(GO_TO_DELAYED_START_EVENT);
+    button_edge_detected[id_button] = false;
+    return true;
   }
-
-  // Button delayed start: Resetting state (rising edge)
-  /*
-  if (button_pressed(BUTTON_START))
-    {
-      update_state(FORCE_CALIBRATION_EVENT);
-    }
-  */
-
-  // Pid and vel mapping (rising edge)
-  if (button_pressed(BUTTON_PIDANDVEL_MAPPING))
-  {
-    set_pidvel_map_time(millis);
-    update_state(NEXT_PIDANDVELMAP_EVENT);
-  }
-
-  // Buzzer on/off mapping (rising edge)
-  if (button_pressed(BUTTON_BUZZER))
-  {
-    update_state(NEXT_BUZZER_EVENT);
-  }
-
-  // setting all the edges to false
-  clear_edge_detected(BUTTON_START);
-  clear_edge_detected(BUTTON_PIDANDVEL_MAPPING);
-  clear_edge_detected(BUTTON_BUZZER);
+  return false;
 }
