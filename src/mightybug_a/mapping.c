@@ -357,7 +357,7 @@ void reset_veldelay(void)
 int32_t get_next_constrained_target_velocity(int32_t vel)
 {
   uint16_t next_pointer = veldelay_st.current_pointer + 1;
-  next_pointer = veldelay_st.current_pointer %= MAX_VEL_DELAY;
+  next_pointer = next_pointer %= MAX_VEL_DELAY;
 
   return trunc_to_range(vel,
                         veldelay_st.motor_vel[next_pointer] -
