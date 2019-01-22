@@ -172,18 +172,9 @@ void reset_circuit_mapping()
   reset_mapping_pointer();
 }
 
-uint8_t reach_consolidated_state(uint32_t agg_left_ticks,
-                                 uint32_t agg_right_ticks)
+uint8_t reach_consolidated_state(uint32_t agg_left_ticks, uint32_t agg_right_ticks)
 {
-  if ((agg_left_ticks > MIN_TICKS_FOR_MAP) ||
-      (agg_right_ticks > MIN_TICKS_FOR_MAP))
-  {
-    return 1;
-  }
-  else
-  {
-    return 0;
-  }
+  return ((agg_left_ticks > MIN_TICKS_FOR_MAP) || (agg_right_ticks > MIN_TICKS_FOR_MAP));
 }
 
 /*
