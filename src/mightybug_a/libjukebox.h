@@ -17,6 +17,7 @@ void disable_jukebox();
 uint8_t is_jukebox_enabled(void);
 void push_enable_jukebox();
 void pull_enable_jukebox();
+void toggle_sound(void);
   
 
 #endif /* __LIBJUKEBOX_H */
