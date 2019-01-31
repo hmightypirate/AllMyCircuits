@@ -5,36 +5,21 @@ uint32_t sync_iterations = 0;
 uint32_t current_loop_millisecs = 0;
 
 
-void menu_functions(void)
+void keypad_events(void)
 {
-  uint32_t millis = get_millisecs_since_start();
-
-  // Button delayed start (falling edge)
   if (button_released(BUTTON1))
   {
-    set_delay_start_time(millis);
-    update_state(GO_TO_DELAYED_START_EVENT);
+    update_state(BUTTON1_RELEASED_EVENT);
   }
 
-  // Button delayed start: Resetting state (rising edge)
-  /*
-  if (button_pressed(BUTTON1))
-    {
-      update_state(FORCE_CALIBRATION_EVENT);
-    }
-  */
-
-  // Pid and vel mapping (rising edge)
   if (button_pressed(BUTTON2))
   {
-    set_pidvel_map_time(millis);
-    update_state(NEXT_PIDANDVELMAP_EVENT);
+    update_state(BUTTON2_PRESSED_EVENT);
   }
 
-  // Buzzer on/off mapping (rising edge)
   if (button_pressed(BUTTON3))
   {
-    update_state(NEXT_BUZZER_EVENT);
+    update_state(BUTTON3_PRESSED_EVENT);
   }
 
 }
@@ -70,7 +55,7 @@ void check_rn_state(void)
 }
 
 
-void check_running_state(void)
+void check_running_sound_state(void)
 {
   rnstate_e running_state = get_running_state();
 
@@ -97,26 +82,16 @@ void music_update(void)
   switch (current_state)
   {
   case CALIBRATION_STATE:
-    jukebox_setcurrent_song(CALIBRATION_SONG);
-    jukebox_play_in_loop(current_loop_millisecs);
-    break;
-  case NO_BATTERY_STATE:
-    jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
-    jukebox_play_in_loop(current_loop_millisecs);
-    break;
-  case PIDANDVEL_MAPPING_STATE:
-    jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
+  case OUT_OF_BATTERY_STATE:
+  case INFO_MAP_STATE:
     jukebox_play_in_loop(current_loop_millisecs);
     break;
   case RUNNING_STATE:
     if (TURBO_PITCH_DEBUG)
     {
-      check_running_state();
+      check_running_sound_state();
       jukebox_play_in_loop(current_loop_millisecs);
     }
-    break;
-  default:
-    // Possible bug here: never reach this code because allways enters in RUNNING_STATE
     if (is_out_of_line())
     {
       jukebox_setcurrent_song(OUT_OF_LINE_SONG);
@@ -127,6 +102,8 @@ void music_update(void)
       // Running or delayed run states
       stop_music_play();
     }
+    break;
+  default:;
   }
 }
 
@@ -140,6 +117,8 @@ void calibration_state(void)
   stop_motors();
   /* led is on during calibration */
   set_led_mode(LED_2, ON);
+
+  jukebox_setcurrent_song(CALIBRATION_SONG);
 }
 
 void idle_state(void)
@@ -163,6 +142,8 @@ void out_of_battery_state(void)
 
   /* Led off */
   set_led_mode(LED_2, OFF);
+
+  jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
 }
 
 void delayed_start_state(void)
@@ -179,35 +160,17 @@ void delayed_start_state(void)
     if (FLAG_MAX_VEL_DELAY)
       reset_veldelay();
     reset_encoder_ticks();
-    update_state(GO_TO_RUN_EVENT);
+    update_state(DELAYED_START_TIMEOUT_EVENT);
   }
 
   /* Led on */
   set_led_mode(LED_2, ON);
 }
 
-void pid_and_vel_mapping_state(void)
+void info_map_state(void)
 {
   /* stop motors */
   stop_motors();
-  if (current_loop_millisecs - get_pidvel_map_time() > DELAYED_PIDVEL_CHANGE_MS)
-  {
-    // Return to calibration if
-    stop_music_play();
-    update_state(FORCE_CALIBRATION_EVENT);
-    pull_enable_jukebox();
-  }
-}
-
-void pid_and_vel_change_state(void)
-{
-  //change the mapping
-  select_next_pidvel_map();
-
-  /* sets the ms in mapping state to the current time */
-  set_pidvel_map_time(current_loop_millisecs);
-
-  update_state(FORCE_PIDANDVELMAP_EVENT);
 
   if (get_current_pidvel_map() == 0)
   {
@@ -224,6 +187,22 @@ void pid_and_vel_change_state(void)
     set_led_mode(LED_1, TRIPLE_BLINK);
     set_led_mode(LED_2, TRIPLE_BLINK);
   }
+
+  jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
+
+  if (current_loop_millisecs - get_pidvel_map_time() > DELAYED_PIDVEL_CHANGE_MS)
+  {
+    stop_music_play();
+    pull_enable_jukebox();
+    update_state(CHANGE_MAP_TIMEOUT_EVENT);
+  }
+}
+
+void change_map_state(void)
+{
+  select_next_pidvel_map();
+  set_pidvel_map_time(current_loop_millisecs);
+  update_state(CHANGED_MAP_EVENT);
 }
 
 void running_state(void)
@@ -313,7 +292,7 @@ void running_state(void)
     // Send car to calibration if reached the end of line
     if (get_all_inline())
     {
-      update_state(FORCE_IDLE_EVENT);
+      update_state(ALL_SENSORS_IN_LINE_EVENT);
     }
   }
   else
@@ -363,7 +342,7 @@ void update_modules(void)
 {
   music_update();
   keypad_update();
-  menu_functions();
+  keypad_events();
   dma_update();
   leds_update();
 }
@@ -421,24 +400,26 @@ void execute_state(state_e state)
 {
   switch (state)
   {
+  case RUNNING_STATE:
+    running_state();
+    break;
   case CALIBRATION_STATE:
     calibration_state();
     break;
   case IDLE_STATE:
     idle_state();
     break;
-  case NO_BATTERY_STATE:
+  case OUT_OF_BATTERY_STATE:
     out_of_battery_state();
     break;
   case DELAYED_START_STATE:
     delayed_start_state();
     break;
-  case PIDANDVEL_MAPPING_STATE:
-    pid_and_vel_mapping_state();
+  case CHANGE_MAP_STATE:
+    change_map_state();
     break;
-  case PIDANDVEL_CHANGE_STATE:
-    pid_and_vel_change_state();
-    break;
+  case INFO_MAP_STATE:
+    info_map_state();
   default:
     running_state();
   }
@@ -447,15 +428,11 @@ void execute_state(state_e state)
 
 void check_battery(void)
 {
-  /*
-    battery measurement every VBATT_TIME_BETWEEN_READS milliseconds
-  */
   if (current_loop_millisecs % VBATT_TIME_BETWEEN_READS == 0)
   {
-    // Check if battery drained
     if (is_vbatt_drained())
     {
-      //update_state(OUT_OF_BATTERY_EVENT);
+      update_state(OUT_OF_BATTERY_EVENT);
     }
   }
 }

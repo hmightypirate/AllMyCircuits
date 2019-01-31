@@ -8,27 +8,17 @@ uint32_t running_loop_millisecs = 0; //Used for antiwheelie
 static uint16_t seq_decrease_line_pos = 0;
 static uint16_t seq_increase_line_pos = 0;
 
-
-
-
-
-
-
 const int16_t normal_out_hyst = OUT_NORMAL_HYST; // going out of pid (position)
 const int16_t turbo_out_hyst = OUT_TURBO_HYST;   // going out of turbo (position)
 
 const int16_t normal_nool_out_hyst = OUT_NORMAL_NOOL_HYST;
 const int16_t nool_normal_out_hyst = OUT_NOOL_NORMAL_HYST;
 
-
-
 uint32_t delay_start_ms = 0;
 uint32_t pidvel_map_ms = 0;
 uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
-
 uint32_t last_ms_inline = 0;
-
 
 void update_running_state(rnevent_e rnevent)
 {
@@ -46,7 +36,6 @@ void update_running_state(rnevent_e rnevent)
     set_running_state(RUNNING_NOOL);
   }
 }
-
 
 /*
  * @brief gets the current ms inline
@@ -74,92 +63,79 @@ uint32_t get_running_ms()
   return running_loop_millisecs;
 }
 
-/*
- * @brief extremely simple finite state machine
- */
-void update_state(event_e new_event)
+void update_state(event_e event)
 {
-  if (current_state != NO_BATTERY_STATE)
+  if (current_state == OUT_OF_BATTERY_STATE)
+    return;
+
+  switch (event)
   {
-    if (new_event == FORCE_CALIBRATION_EVENT)
+  case OUT_OF_BATTERY_EVENT:
+    current_state = OUT_OF_BATTERY_STATE;
+    break;
+  case ALL_SENSORS_IN_LINE_EVENT:
+    current_state = IDLE_STATE;
+    break;
+  case DELAYED_START_TIMEOUT_EVENT:
+    // Set the ms at the start of the running state
+    running_loop_millisecs = get_millisecs_since_start();
+    current_state = RUNNING_STATE;
+    break;
+  case BUTTON1_PRESSED_EVENT:
+    break;
+  case BUTTON1_RELEASED_EVENT:
+    switch (current_state)
     {
-      current_state = CALIBRATION_STATE;
-    }
-    else if (new_event == GO_TO_RUN_EVENT)
-    {
+    case CALIBRATION_STATE:
       if (get_calibrated_sensors_count() >= NUM_SENSORS -
                                                 MAX_NUM_NOT_CALLIBRATED_SENSORS)
       {
-        current_state = RUNNING_STATE;
-        // Set the ms at the start of the running state
-        running_loop_millisecs = get_millisecs_since_start();
+        set_delay_start_time(get_millisecs_since_start());
+        current_state = DELAYED_START_STATE;
       }
+      break;
+    case RUNNING_STATE:
+      current_state = IDLE_STATE;
+      break;
+    case IDLE_STATE:
+      current_state = CALIBRATION_STATE;
+    default:;
     }
-    else if (new_event == OUT_OF_BATTERY_EVENT)
+    break;
+  case BUTTON2_PRESSED_EVENT:
+    if (current_state == CALIBRATION_STATE)
     {
-      current_state = NO_BATTERY_STATE;
-    }
-    else if (new_event == GO_TO_DELAYED_START_EVENT)
-    {
-      /* if in calibration -> go to delay start  */
-      if (current_state == CALIBRATION_STATE)
-      {
-        if (get_calibrated_sensors_count() >= NUM_SENSORS -
-                                                  MAX_NUM_NOT_CALLIBRATED_SENSORS)
-        {
-          current_state = DELAYED_START_STATE;
-        }
-      }
-      /* if running -> go to idle state */
-      else if (current_state == RUNNING_STATE)
-      {
-        current_state = IDLE_STATE;
-      }
-      /* if in any other state -> go to calibration state */
-      else
-      {
-        current_state = CALIBRATION_STATE;
-      }
-    }
-    else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
-             (current_state == CALIBRATION_STATE))
-    {
+      current_state = INFO_MAP_STATE;
       push_enable_jukebox();
       enable_jukebox();
-      current_state = PIDANDVEL_MAPPING_STATE;
     }
-    else if ((new_event == NEXT_PIDANDVELMAP_EVENT) &&
-             (current_state == PIDANDVEL_MAPPING_STATE))
+    else if (current_state == INFO_MAP_STATE)
     {
-      current_state = PIDANDVEL_CHANGE_STATE;
+      current_state = CHANGE_MAP_STATE;
     }
-    else if (new_event == FORCE_PIDANDVELMAP_EVENT)
+    break;
+  case BUTTON2_RELEASED_EVENT:
+    break;
+  case BUTTON3_PRESSED_EVENT:
+    if ((current_state == IDLE_STATE) || (current_state == CALIBRATION_STATE))
     {
-      current_state = PIDANDVEL_MAPPING_STATE;
+      toggle_sound();
     }
-    else if ((new_event == NEXT_BUZZER_EVENT) &&
-             (current_state == CALIBRATION_STATE))
-    {
-      if (is_jukebox_enabled())
-      {
-        disable_jukebox();
-      }
-      else
-      {
-        enable_jukebox();
-      }
-    }
-    else if (new_event == FORCE_IDLE_EVENT)
-    {
-      current_state = IDLE_STATE;
-    }
+    break;
+  case BUTTON3_RELEASED_EVENT:
+    break;
+  case FORCE_CALIBRATION_EVENT:
+    current_state = CALIBRATION_STATE;
+  case CHANGE_MAP_TIMEOUT_EVENT:
+    current_state = INFO_MAP_STATE;
+  default:
+    current_state = IDLE_STATE;
   }
 }
 
 /*
  * @brief sets the time entering a pid/vel mapping state
  * 
-
  */
 void set_pidvel_map_time(uint32_t current_time)
 {
@@ -185,7 +161,6 @@ void set_delay_start_time(uint32_t delay)
 {
   delay_start_ms = delay;
 }
-
 
 // Used to wait x seconds before running
 uint32_t get_delay_start_time()
