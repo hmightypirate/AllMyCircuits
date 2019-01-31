@@ -19,7 +19,4 @@ bool button_released(uint8_t id_button);
 #define BUTTON2 1
 #define BUTTON3 2
 
-void menu_functions(void);
-
-
 #endif /* __KEYPAD_H */
