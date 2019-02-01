@@ -11,7 +11,7 @@ void jukebox_setcurrent_song(int order);
 void jukebox_play_current(void);
 void jukebox_play_next(void);
 int is_jukebox_playing(void);
-void jukebox_play_in_loop(uint32_t current_millisecs);
+void jukebox_update(uint32_t current_millisecs);
 void enable_jukebox();
 void disable_jukebox();
 uint8_t is_jukebox_enabled(void);

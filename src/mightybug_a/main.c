@@ -77,34 +77,20 @@ void check_running_sound_state(void)
 
 void music_update(void)
 {
-  state_e current_state = get_state();
-
-  switch (current_state)
+  if (get_state() == RUNNING_STATE)
   {
-  case CALIBRATION_STATE:
-  case OUT_OF_BATTERY_STATE:
-  case INFO_MAP_STATE:
-    jukebox_play_in_loop(current_loop_millisecs);
-    break;
-  case RUNNING_STATE:
-    if (TURBO_PITCH_DEBUG)
-    {
-      check_running_sound_state();
-      jukebox_play_in_loop(current_loop_millisecs);
-    }
     if (is_out_of_line())
     {
       jukebox_setcurrent_song(OUT_OF_LINE_SONG);
-      jukebox_play_in_loop(current_loop_millisecs);
     }
     else
     {
-      // Running or delayed run states
-      stop_music_play();
+      if (TURBO_PITCH_DEBUG) check_running_sound_state();
+      else jukebox_setcurrent_song(NO_SONG);
     }
-    break;
-  default:;
   }
+
+  jukebox_update(current_loop_millisecs);
 }
 
 void calibration_state(void)

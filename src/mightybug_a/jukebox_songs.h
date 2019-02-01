@@ -18,6 +18,7 @@ struct Song {
 struct Song jukebox_song_list[JUKEBOX_SONGS_TOTAL_SONGS];
 
 /* Check the example buzzer_jukebox for a more commplete list of songs */
+#define NO_SONG -1
 
 #define SONG_EUROPE_ORDER 0
 #define SONG_LEN_EUROPE 97

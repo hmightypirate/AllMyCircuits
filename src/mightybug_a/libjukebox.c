@@ -49,11 +49,19 @@ int is_jukebox_playing()
 /*
  * @brief play current song in loop
  */
-void jukebox_play_in_loop(uint32_t current_millisecs)
+void jukebox_update(uint32_t current_millisecs)
 {
 
   if (!enable_jukebox_signal)
+  {
     return;
+  }
+
+  if (current_song == NO_SONG)
+  {
+    stop_music_play();
+    return;
+  }
 
   /* we are not playing */
   if (!is_jukebox_playing())
