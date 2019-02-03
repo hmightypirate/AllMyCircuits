@@ -121,10 +121,9 @@ typedef enum {
 state_e get_state(void);
 void set_state(state_e state);
 void update_state(event_e new_event);
+
 void set_delay_start_time(uint32_t delay);
 uint32_t get_delay_start_time();
-void set_pidvel_map_time(uint32_t current_time);
-uint32_t get_pidvel_map_time(void);
 void select_next_pidvel_map(void);
 uint8_t get_current_pidvel_map(void);
 uint8_t get_map_song(uint8_t id_map);

@@ -15,7 +15,6 @@ const int16_t normal_nool_out_hyst = OUT_NORMAL_NOOL_HYST;
 const int16_t nool_normal_out_hyst = OUT_NOOL_NORMAL_HYST;
 
 uint32_t delay_start_ms = 0;
-uint32_t pidvel_map_ms = 0;
 uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
 uint32_t last_ms_inline = 0;
@@ -131,25 +130,6 @@ void update_state(event_e event)
   default:
     current_state = IDLE_STATE;
   }
-}
-
-/*
- * @brief sets the time entering a pid/vel mapping state
- * 
- */
-void set_pidvel_map_time(uint32_t current_time)
-{
-  pidvel_map_ms = current_time;
-}
-
-/*
- * @brief obtain the time entering a pid/vel mapping state
- * 
- * Used to wait x seconds before enable changing pidvel map again
- */
-uint32_t get_pidvel_map_time(void)
-{
-  return pidvel_map_ms;
 }
 
 /*

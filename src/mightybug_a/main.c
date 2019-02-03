@@ -4,6 +4,10 @@ uint16_t line_sensor_value[NUM_SENSORS];
 uint32_t sync_iterations = 0;
 uint32_t current_loop_millisecs = 0;
 
+uint32_t pidvel_map_ms = 0;
+
+void set_pidvel_map_time(uint32_t current_time);
+uint32_t get_pidvel_map_time(void);
 
 void keypad_events(void)
 {
@@ -21,14 +25,13 @@ void keypad_events(void)
   {
     update_state(BUTTON3_PRESSED_EVENT);
   }
-
 }
 
 void check_rn_state(void)
 {
   rnstate_e running_state = get_running_state();
 
-  if (!is_out_of_line()) 
+  if (!is_out_of_line())
   {
     jukebox_setcurrent_song(NO_SONG);
   }
@@ -38,13 +41,15 @@ void check_rn_state(void)
   case RUNNING_STLINE:
     set_target_as_turbo();
     reset_pids_turbo();
-    if (TURBO_PITCH_DEBUG) jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+    if (TURBO_PITCH_DEBUG)
+      jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
     set_led_mode(LED_1, OFF);
     break;
   case RUNNING_NORMAL:
     set_target_as_normal();
     reset_pids_normal();
-    if (TURBO_PITCH_DEBUG) jukebox_setcurrent_song(TENOR_BEAT_ORDER);
+    if (TURBO_PITCH_DEBUG)
+      jukebox_setcurrent_song(TENOR_BEAT_ORDER);
     set_led_mode(LED_1, ON);
     // reset variables used for special acc/dec in NORMAL mode
     reset_sequential_readings();
@@ -52,13 +57,15 @@ void check_rn_state(void)
   case RUNNING_NOOL:
     set_target_as_nool();
     reset_pids_nool();
-    if (TURBO_PITCH_DEBUG) jukebox_setcurrent_song(BASS_BEAT_ORDER);
+    if (TURBO_PITCH_DEBUG)
+      jukebox_setcurrent_song(BASS_BEAT_ORDER);
     set_led_mode(LED_1, BLINK);
     break;
   default:
     set_target_as_normal();
     reset_pids_normal();
-    if (TURBO_PITCH_DEBUG) jukebox_setcurrent_song(SONG_TWO_BEAT_ORDER);
+    if (TURBO_PITCH_DEBUG)
+      jukebox_setcurrent_song(SONG_TWO_BEAT_ORDER);
     set_led_mode(LED_1, ON);
   }
 
@@ -67,7 +74,6 @@ void check_rn_state(void)
     jukebox_setcurrent_song(OUT_OF_LINE_SONG);
   }
 }
-
 
 void music_update(void)
 {
@@ -172,19 +178,8 @@ void change_map_state(void)
   update_state(CHANGED_MAP_EVENT);
 }
 
-void running_state(void)
+void select_running_state(int error)
 {
-  sync_iterations += 1;
-
-  read_line_sensors(line_sensor_value);
-
-  // Running
-  int error = get_line_position(line_sensor_value);
-
-  // update error sequence
-  update_sequential_readings(error, get_last_error());
-
-  // Meas turbo mode
   if (sync_iterations % TIME_BETWEEN_STORE_POS == 0)
   {
     set_new_reading(error);
@@ -206,10 +201,10 @@ void running_state(void)
       get_next_running_state(get_abs_diff_encoders());
     }
   }
+}
 
-  check_rn_state();
-
-  // Accelerate/Break in NORMAL mode
+void acceleartion_and_brake_control(void)
+{
   if (!USE_ENCODERS_FOR_INCDEC)
   {
     if ((ENABLE_INCDEC_NORMAL_FLAG) && (sync_iterations % ITS_INCDEC_NORMAL == 0))
@@ -225,17 +220,50 @@ void running_state(void)
     }
   }
 
-  // Avoid wheelie at start
-
   if (FLAG_ANTI_WHEELIE_START)
   {
     set_vel_antiwheelie(current_loop_millisecs);
   }
+}
 
-  /* pid control */
-  int control = 0;
-  control = pid(error);
+void stop_state()
+{
+  // stop the motors if out of line
+  stop_motors();
 
+  // led off
+  set_led_mode(LED_2, OFF);
+
+  // Send car to calibration if reached the end of line
+  if (get_all_inline())
+  {
+    update_state(ALL_SENSORS_IN_LINE_EVENT);
+  }
+}
+
+void just_run_state(int control)
+{
+
+  motor_control(control);
+
+  // blinking: normal behaviour
+  set_led_mode(LED_2, BLINK);
+
+  // Set the current ms (inline)
+  if (!is_out_of_line())
+  {
+    update_ms_inline(current_loop_millisecs);
+  }
+
+  // Do circuit mapping
+  if (FLAG_CIRCUIT_MAPPING)
+  {
+    do_circuit_mapping();
+  }
+}
+
+bool stop_conditions(void)
+{
   /* motor control 
 
 	          stops if:
@@ -243,44 +271,45 @@ void running_state(void)
 	          2) is out of line and has exceeded the maximum time allowed
 	          3) the time of an inertia test is over
 
-	      */
-  if ((is_out_of_line() && !DEBUG_INERTIA_TEST &&
-       (!FLAG_DELAY_STOP_OUT_OF_LINE ||
-        (FLAG_DELAY_STOP_OUT_OF_LINE &&
-         exceeds_time_out_of_line(current_loop_millisecs)))) ||
-      (DEBUG_INERTIA_TEST && (current_loop_millisecs - get_running_ms() > DEBUG_INERTIA_TIME_MS)))
+	*/
+
+  return ((is_out_of_line() && !DEBUG_INERTIA_TEST &&
+           (!FLAG_DELAY_STOP_OUT_OF_LINE ||
+            (FLAG_DELAY_STOP_OUT_OF_LINE &&
+             exceeds_time_out_of_line(current_loop_millisecs)))) ||
+          (DEBUG_INERTIA_TEST && (current_loop_millisecs - get_running_ms() > DEBUG_INERTIA_TIME_MS)));
+}
+
+void running_state(void)
+{
+  sync_iterations += 1;
+
+  read_line_sensors(line_sensor_value);
+
+  // Running
+  int error = get_line_position(line_sensor_value);
+
+  // update consecutive iterations increasing or decreasing error
+  update_sequential_readings(error, get_last_error());
+
+  // check with encoders or line position if we are in st_line or not
+  select_running_state(error);
+  // set running parameters according to running state (music, leds, velocities, ...)
+  check_rn_state();
+
+  // Accelerate/Break in NORMAL mode and antiwheelie
+  acceleartion_and_brake_control();
+
+  if (stop_conditions())
   {
-    // stop the motors if out of line
-    stop_motors();
-
-    // led off
-    set_led_mode(LED_2, OFF);
-
-    // Send car to calibration if reached the end of line
-    if (get_all_inline())
-    {
-      update_state(ALL_SENSORS_IN_LINE_EVENT);
-    }
+    stop_state();
   }
   else
   {
-
-    motor_control(control);
-
-    // blinking: normal behaviour
-    set_led_mode(LED_2, BLINK);
-
-    // Set the current ms (inline)
-    if (!is_out_of_line())
-    {
-      update_ms_inline(current_loop_millisecs);
-    }
-
-    // Do circuit mapping
-    if (FLAG_CIRCUIT_MAPPING)
-    {
-      do_circuit_mapping();
-    }
+    /* pid control */
+    int control = 0;
+    control = pid(error);
+    just_run_state(control);
   }
 
   // update encoders velocity
@@ -294,7 +323,7 @@ void running_state(void)
 
 void setup_keypad(void)
 {
-  keypad_setup(get_millisecs_since_start());
+  keypad_setup(current_loop_millisecs);
 }
 
 void check_command(void)
@@ -362,7 +391,6 @@ void setup_modules()
   setup_keypad();
 }
 
-
 void execute_state(state_e state)
 {
   switch (state)
@@ -392,7 +420,6 @@ void execute_state(state_e state)
   }
 }
 
-
 void check_battery(void)
 {
   if (current_loop_millisecs % VBATT_TIME_BETWEEN_READS == 0)
@@ -404,7 +431,24 @@ void check_battery(void)
   }
 }
 
+/*
+ * @brief sets the time entering a pid/vel mapping state
+ * 
+ */
+void set_pidvel_map_time(uint32_t current_time)
+{
+  pidvel_map_ms = current_time;
+}
 
+/*
+ * @brief obtain the time entering a pid/vel mapping state
+ * 
+ * Used to wait x seconds before enable changing pidvel map again
+ */
+uint32_t get_pidvel_map_time(void)
+{
+  return pidvel_map_ms;
+}
 
 /*
  * @brief Initial setup and main loop
@@ -434,5 +478,4 @@ int main(void)
   }
 
   return 0;
-
 }
