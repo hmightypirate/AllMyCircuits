@@ -28,16 +28,23 @@ void check_rn_state(void)
 {
   rnstate_e running_state = get_running_state();
 
+  if (!is_out_of_line()) 
+  {
+    jukebox_setcurrent_song(NO_SONG);
+  }
+
   switch (running_state)
   {
   case RUNNING_STLINE:
     set_target_as_turbo();
     reset_pids_turbo();
+    if (TURBO_PITCH_DEBUG) jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
     set_led_mode(LED_1, OFF);
     break;
   case RUNNING_NORMAL:
     set_target_as_normal();
     reset_pids_normal();
+    if (TURBO_PITCH_DEBUG) jukebox_setcurrent_song(TENOR_BEAT_ORDER);
     set_led_mode(LED_1, ON);
     // reset variables used for special acc/dec in NORMAL mode
     reset_sequential_readings();
@@ -45,51 +52,25 @@ void check_rn_state(void)
   case RUNNING_NOOL:
     set_target_as_nool();
     reset_pids_nool();
+    if (TURBO_PITCH_DEBUG) jukebox_setcurrent_song(BASS_BEAT_ORDER);
     set_led_mode(LED_1, BLINK);
     break;
   default:
     set_target_as_normal();
     reset_pids_normal();
+    if (TURBO_PITCH_DEBUG) jukebox_setcurrent_song(SONG_TWO_BEAT_ORDER);
     set_led_mode(LED_1, ON);
   }
-}
 
-
-void check_running_sound_state(void)
-{
-  rnstate_e running_state = get_running_state();
-
-  switch (running_state)
+  if (is_out_of_line())
   {
-  case RUNNING_STLINE:
-    jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
-    break;
-  case RUNNING_NORMAL:
-    jukebox_setcurrent_song(TENOR_BEAT_ORDER);
-    break;
-  case RUNNING_NOOL:
-    jukebox_setcurrent_song(BASS_BEAT_ORDER);
-    break;
-  default:
-    jukebox_setcurrent_song(SONG_TWO_BEAT_ORDER);
+    jukebox_setcurrent_song(OUT_OF_LINE_SONG);
   }
 }
+
 
 void music_update(void)
 {
-  if (get_state() == RUNNING_STATE)
-  {
-    if (is_out_of_line())
-    {
-      jukebox_setcurrent_song(OUT_OF_LINE_SONG);
-    }
-    else
-    {
-      if (TURBO_PITCH_DEBUG) check_running_sound_state();
-      else jukebox_setcurrent_song(NO_SONG);
-    }
-  }
-
   jukebox_update(current_loop_millisecs);
 }
 
