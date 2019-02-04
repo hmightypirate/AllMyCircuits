@@ -27,9 +27,6 @@
 /* Number of sensors that could not be callibrated */
 #define MAX_NUM_NOT_CALLIBRATED_SENSORS 1
 
-/* extra delay between calibration calls in NOP operations */
-#define DELAY_CALIBRATION_CALLS 300
-
 /* if 1 the car stops after finding an horizontal line -> all sensors detect line */
 #define FINISH_ALL_INLINE 0
 

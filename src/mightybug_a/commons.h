@@ -24,8 +24,4 @@
  */ 
 #define VELOCITY_STEP 10
 
-//#define DELAY(x) for (i=0; i < DELAY_CALIBRATION_CALLS; i++) __asm__("nop");
-
-
-
 #endif /* __COMMONS_H */
