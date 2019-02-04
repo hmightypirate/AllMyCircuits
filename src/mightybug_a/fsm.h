@@ -125,23 +125,15 @@ void update_state(event_e new_event);
 
 void set_delay_start_time(uint32_t delay);
 uint32_t get_delay_start_time();
-uint8_t get_map_song(uint8_t id_map);
 void get_next_running_state(int16_t avg_proportional);
 rnstate_e get_running_state();
 uint32_t get_running_ms();
 void set_running_state(rnstate_e state);
-void update_ms_inline(uint32_t current_ms);
-uint8_t exceeds_time_out_of_line(uint32_t current_ms);
 void update_sequential_readings(int16_t new_proportional, int16_t past_proportional);
 void reset_sequential_readings(void);
 void update_target_normal();
 void update_target_normal_with_encoders();
 
 void set_vel_antiwheelie(uint32_t current_loop_millisecs);
-
-/* Target velocity modes */
-void set_target_as_turbo(void);
-void set_target_as_normal(void);
-void set_target_as_nool(void);
 
 #endif /* __FSM_H */

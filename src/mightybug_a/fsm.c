@@ -16,8 +16,6 @@ const int16_t nool_normal_out_hyst = OUT_NOOL_NORMAL_HYST;
 
 uint32_t delay_start_ms = 0;
 
-uint32_t last_ms_inline = 0;
-
 void update_running_state(rnevent_e rnevent)
 {
   // loop out of period
@@ -33,22 +31,6 @@ void update_running_state(rnevent_e rnevent)
   {
     set_running_state(RUNNING_NOOL);
   }
-}
-
-/*
- * @brief gets the current ms inline
- */
-void update_ms_inline(uint32_t current_ms)
-{
-  last_ms_inline = current_ms;
-}
-
-/*
- * @brief checks if the car has exceeded the time out of line
- */
-uint8_t exceeds_time_out_of_line(uint32_t current_ms)
-{
-  return (current_ms - last_ms_inline) > MS_DELAY_OUT_OF_LINE;
 }
 
 /*
@@ -174,16 +156,6 @@ rnstate_e get_running_state()
 void set_running_state(rnstate_e state)
 {
   running_state = state;
-}
-
-/*
- * @brief get current map song
- * 
- * @note at least must be id map songs + 1
- */
-uint8_t get_map_song(uint8_t id_map)
-{
-  return map_songs[id_map];
 }
 
 /*
@@ -352,31 +324,4 @@ void set_vel_antiwheelie(uint32_t current_loop_millisecs)
       set_target_velocity(vel_nool_maps[get_current_pidvel_map()]);
     }
   }
-}
-
-/* 
- * @brief resets current target velocity with the turbo velocity
- *
- */
-void set_target_as_turbo(void)
-{
-  set_target_velocity(vel_turbo_maps[get_current_pidvel_map()]);
-}
-
-/* 
- * @brief resets current target velocity with the velocity in corners
- *
- */
-void set_target_as_nool(void)
-{
-  set_target_velocity(vel_nool_maps[get_current_pidvel_map()]);
-}
-
-/* 
- * @brief resets current target velocity with the normal velocity
- *
- */
-void set_target_as_normal(void)
-{
-  set_target_velocity(vel_maps[get_current_pidvel_map()]);
 }

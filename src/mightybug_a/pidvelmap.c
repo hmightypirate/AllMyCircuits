@@ -50,3 +50,41 @@ uint8_t get_current_pidvel_map()
 {
   return current_pidvel_mapping;
 }
+
+
+/* 
+ * @brief resets current target velocity with the turbo velocity
+ *
+ */
+void set_target_as_turbo(void)
+{
+  set_target_velocity(vel_turbo_maps[get_current_pidvel_map()]);
+}
+
+/* 
+ * @brief resets current target velocity with the velocity in corners
+ *
+ */
+void set_target_as_nool(void)
+{
+  set_target_velocity(vel_nool_maps[get_current_pidvel_map()]);
+}
+
+/* 
+ * @brief resets current target velocity with the normal velocity
+ *
+ */
+void set_target_as_normal(void)
+{
+  set_target_velocity(vel_maps[get_current_pidvel_map()]);
+}
+
+/*
+ * @brief get current map song
+ * 
+ * @note at least must be id map songs + 1
+ */
+uint8_t get_map_song(uint8_t id_map)
+{
+  return map_songs[id_map];
+}

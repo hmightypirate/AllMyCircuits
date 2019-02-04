@@ -9,6 +9,24 @@ uint32_t pidvel_map_ms = 0;
 void set_pidvel_map_time(uint32_t current_time);
 uint32_t get_pidvel_map_time(void);
 
+uint32_t last_ms_inline = 0;
+
+/*
+ * @brief gets the current ms inline
+ */
+void update_ms_inline(uint32_t current_ms)
+{
+  last_ms_inline = current_ms;
+}
+
+/*
+ * @brief checks if the car has exceeded the time out of line
+ */
+uint8_t exceeds_time_out_of_line(uint32_t current_ms)
+{
+  return (current_ms - last_ms_inline) > MS_DELAY_OUT_OF_LINE;
+}
+
 void keypad_events(void)
 {
   if (button_released(BUTTON1))
