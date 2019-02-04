@@ -1,6 +1,8 @@
 #ifndef __CONFIGS_H__
 #define __CONFIGS_H__
 
+#include "jukebox_songs.h"
+
 /* Number of mappings for pid and vel */
 #define MAX_MAPPINGS 3
 #define INITIAL_PIDVEL_MAPPING 0

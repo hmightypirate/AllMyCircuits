@@ -15,7 +15,6 @@ const int16_t normal_nool_out_hyst = OUT_NORMAL_NOOL_HYST;
 const int16_t nool_normal_out_hyst = OUT_NOOL_NORMAL_HYST;
 
 uint32_t delay_start_ms = 0;
-uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
 
 uint32_t last_ms_inline = 0;
 
@@ -177,57 +176,6 @@ void set_running_state(rnstate_e state)
   running_state = state;
 }
 
-/* 
- * @brief obtain next pid/vel mapping
- */
-void select_next_pidvel_map()
-{
-  current_pidvel_mapping = (current_pidvel_mapping + 1) % MAX_MAPPINGS;
-
-  reset_pids_normal();
-}
-
-/* 
- * @brief change the pid consts to the normal mapping
-*/
-void reset_pids_normal()
-{
-  /* change the pid consts */
-  set_kp(pid_maps[current_pidvel_mapping * 3]);
-  set_ki(pid_maps[current_pidvel_mapping * 3 + 1]);
-  set_kd(pid_maps[current_pidvel_mapping * 3 + 2]);
-}
-
-/* 
- * @brief change the pid consts to the turbo mapping
-*/
-void reset_pids_turbo()
-{
-  /* change the pid consts */
-  set_kp(pid_turbo_maps[current_pidvel_mapping * 3]);
-  set_ki(pid_turbo_maps[current_pidvel_mapping * 3 + 1]);
-  set_kd(pid_turbo_maps[current_pidvel_mapping * 3 + 2]);
-}
-
-/* 
- * @brief change the pid consts to the nool mapping
-*/
-void reset_pids_nool()
-{
-  /* change the pid consts */
-  set_kp(pid_nool_maps[current_pidvel_mapping * 3]);
-  set_ki(pid_nool_maps[current_pidvel_mapping * 3 + 1]);
-  set_kd(pid_nool_maps[current_pidvel_mapping * 3 + 2]);
-}
-
-/*
- * @brief return the current pid mapping
- */
-uint8_t get_current_pidvel_map()
-{
-  return current_pidvel_mapping;
-}
-
 /*
  * @brief get current map song
  * 
@@ -367,7 +315,7 @@ void update_target_normal_with_encoders()
       step_qty = STEP_NORMAL_QTY_DEC;
     }
 
-    int32_t next_vel = vel_maps[current_pidvel_mapping] + step_qty * diff_acc;
+    int32_t next_vel = vel_maps[get_current_pidvel_map()] + step_qty * diff_acc;
 
     /*
       if (next_vel < MIN_VEL_MOTOR_INC_MODE)
@@ -397,11 +345,11 @@ void set_vel_antiwheelie(uint32_t current_loop_millisecs)
   {
     if (running_state == RUNNING_STLINE)
     {
-      set_target_velocity(vel_turbo_maps[current_pidvel_mapping]);
+      set_target_velocity(vel_turbo_maps[get_current_pidvel_map()]);
     }
     else if (running_state == RUNNING_NOOL)
     {
-      set_target_velocity(vel_nool_maps[current_pidvel_mapping]);
+      set_target_velocity(vel_nool_maps[get_current_pidvel_map()]);
     }
   }
 }
@@ -412,7 +360,7 @@ void set_vel_antiwheelie(uint32_t current_loop_millisecs)
  */
 void set_target_as_turbo(void)
 {
-  set_target_velocity(vel_turbo_maps[current_pidvel_mapping]);
+  set_target_velocity(vel_turbo_maps[get_current_pidvel_map()]);
 }
 
 /* 
@@ -421,7 +369,7 @@ void set_target_as_turbo(void)
  */
 void set_target_as_nool(void)
 {
-  set_target_velocity(vel_nool_maps[current_pidvel_mapping]);
+  set_target_velocity(vel_nool_maps[get_current_pidvel_map()]);
 }
 
 /* 
@@ -430,5 +378,5 @@ void set_target_as_nool(void)
  */
 void set_target_as_normal(void)
 {
-  set_target_velocity(vel_maps[current_pidvel_mapping]);
+  set_target_velocity(vel_maps[get_current_pidvel_map()]);
 }

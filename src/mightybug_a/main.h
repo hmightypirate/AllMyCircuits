@@ -15,3 +15,4 @@
 #include "telemetry.h"
 #include "dma.h"
 #include "mapping.h"
+#include "pidvelmap.h"

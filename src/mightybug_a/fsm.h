@@ -8,6 +8,7 @@
 #include "motors.h"
 #include "libjukebox.h"
 #include "configs.h"
+#include "pidvelmap.h"
 
 /* delay before the car starts running in DELAYED_START_STATE */
 #define DELAYED_START_MS  5000
@@ -124,12 +125,7 @@ void update_state(event_e new_event);
 
 void set_delay_start_time(uint32_t delay);
 uint32_t get_delay_start_time();
-void select_next_pidvel_map(void);
-uint8_t get_current_pidvel_map(void);
 uint8_t get_map_song(uint8_t id_map);
-void reset_pids_normal(void);
-void reset_pids_turbo(void);
-void reset_pids_nool();
 void get_next_running_state(int16_t avg_proportional);
 rnstate_e get_running_state();
 uint32_t get_running_ms();

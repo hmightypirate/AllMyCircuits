@@ -174,6 +174,7 @@ void info_map_state(void)
 void change_map_state(void)
 {
   select_next_pidvel_map();
+  reset_pids_normal();
   set_pidvel_map_time(current_loop_millisecs);
   update_state(CHANGED_MAP_EVENT);
 }
@@ -377,9 +378,6 @@ void setup_modules()
   /* led: setting async period */
   set_led_blink_period(LED_1, LED_BLINK_PERIOD_DEFAULT);
   set_led_blink_period(LED_2, LED_BLINK_PERIOD_DEFAULT);
-
-  set_led_mode(LED_1, ON);
-  set_led_mode(LED_2, OFF);
 
   /* enable sensors */
   enable_line_sensors();
