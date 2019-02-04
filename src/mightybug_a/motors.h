@@ -22,6 +22,13 @@
 #define DEBUG_INERTIA_TEST 0
 #define DEBUG_INERTIA_TIME_MS 1000
 
+/* Pickle configuration */
+#define TURBO_PICKLE 1
+#define TURBO_PICKLE_IN_CORNERS 0
+#define PICKLE_ENC_DISTANCE_DOWN 700  // No pickle going down
+#define PICKLE_ENC_DISTANCE_UP 3
+#define PICKLE_TURBO_VEL 200
+
 /* anti pickle variables */
 #define FLAG_MAX_VEL_DELAY 1
 #define MAX_VEL_DELAY 20
