@@ -1,7 +1,7 @@
 #ifndef __FSM_H
 #define __FSM_H
 
-#include <inttypes.h>
+#include <stdint.h>
 #include "sensors.h"
 #include "pid.h"
 #include "cron.h"
@@ -123,12 +123,14 @@ state_e get_state(void);
 void set_state(state_e state);
 void update_state(event_e new_event);
 
+rnstate_e get_running_state();
+void set_running_state(rnstate_e state);
+void update_running_state(rnevent_e rnevent);
+
 void set_delay_start_time(uint32_t delay);
 uint32_t get_delay_start_time();
-void get_next_running_state(int16_t avg_proportional);
-rnstate_e get_running_state();
+
 uint32_t get_running_ms();
-void set_running_state(rnstate_e state);
 void update_sequential_readings(int16_t new_proportional, int16_t past_proportional);
 void reset_sequential_readings(void);
 void update_target_normal();

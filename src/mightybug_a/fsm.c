@@ -8,13 +8,33 @@ uint32_t running_loop_millisecs = 0; //Used for antiwheelie
 static uint16_t seq_decrease_line_pos = 0;
 static uint16_t seq_increase_line_pos = 0;
 
-const int16_t normal_out_hyst = OUT_NORMAL_HYST; // going out of pid (position)
-const int16_t turbo_out_hyst = OUT_TURBO_HYST;   // going out of turbo (position)
-
-const int16_t normal_nool_out_hyst = OUT_NORMAL_NOOL_HYST;
-const int16_t nool_normal_out_hyst = OUT_NOOL_NORMAL_HYST;
-
 uint32_t delay_start_ms = 0;
+
+/*
+ * @brief modify the delay start time
+ * 
+ * Used to wait x seconds before running
+ */
+void set_delay_start_time(uint32_t delay)
+{
+  delay_start_ms = delay;
+}
+
+// Used to wait x seconds before running
+uint32_t get_delay_start_time()
+{
+  return delay_start_ms;
+}
+
+/*
+ * @brief get the ms the car entered the running state
+ * 
+ * Used only to check in main if end debug inertia test
+ */
+uint32_t get_running_ms()
+{
+  return running_loop_millisecs;
+}
 
 void update_running_state(rnevent_e rnevent)
 {
@@ -31,16 +51,6 @@ void update_running_state(rnevent_e rnevent)
   {
     set_running_state(RUNNING_NOOL);
   }
-}
-
-/*
- * @brief get the ms the car entered the running state
- * 
- * Used only to check in main if end debug inertia test
- */
-uint32_t get_running_ms()
-{
-  return running_loop_millisecs;
 }
 
 void update_state(event_e event)
@@ -114,22 +124,6 @@ void update_state(event_e event)
 }
 
 /*
- * @brief modify the delay start time
- * 
- * Used to wait x seconds before running
- */
-void set_delay_start_time(uint32_t delay)
-{
-  delay_start_ms = delay;
-}
-
-// Used to wait x seconds before running
-uint32_t get_delay_start_time()
-{
-  return delay_start_ms;
-}
-
-/*
  * @brief get current state
  */
 state_e get_state()
@@ -156,40 +150,6 @@ rnstate_e get_running_state()
 void set_running_state(rnstate_e state)
 {
   running_state = state;
-}
-
-/*
- * @brief get next sub-state (running)
- *
- */
-void get_next_running_state(int16_t avg_proportional)
-{
-
-  if (running_state == RUNNING_NORMAL)
-  {
-    if (ENABLE_TURBO_MODE && (avg_proportional < normal_out_hyst))
-    {
-      update_running_state(SET_TURBO_MODE_STATE);
-    }
-    else if (ENABLE_NOOL_MODE && (avg_proportional > normal_nool_out_hyst))
-    {
-      update_running_state(SET_NOOL_MODE_STATE);
-    }
-  }
-  else if (running_state == RUNNING_STLINE)
-  {
-    if (avg_proportional > turbo_out_hyst)
-    {
-      update_running_state(SET_NORMAL_MODE_STATE);
-    }
-  }
-  else if (running_state == RUNNING_NOOL)
-  {
-    if (avg_proportional < nool_normal_out_hyst)
-    {
-      update_running_state(SET_NORMAL_MODE_STATE);
-    }
-  }
 }
 
 /* 

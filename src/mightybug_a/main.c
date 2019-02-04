@@ -8,6 +8,7 @@ uint32_t pidvel_map_ms = 0;
 
 void set_pidvel_map_time(uint32_t current_time);
 uint32_t get_pidvel_map_time(void);
+void get_next_running_state(int16_t avg_error);
 
 uint32_t last_ms_inline = 0;
 
@@ -339,6 +340,42 @@ void running_state(void)
     print_telemetry(current_loop_millisecs);
   }
 }
+
+/*
+ * @brief get next sub-state (running)
+ *
+ */
+void get_next_running_state(int16_t avg_error)
+{
+
+  if (get_running_state() == RUNNING_NORMAL)
+  {
+    if (ENABLE_TURBO_MODE && (avg_error < OUT_NORMAL_HYST))
+    {
+      update_running_state(SET_TURBO_MODE_STATE);
+    }
+    else if (ENABLE_NOOL_MODE && (avg_error > OUT_NORMAL_NOOL_HYST))
+    {
+      update_running_state(SET_NOOL_MODE_STATE);
+    }
+  }
+  else if (get_running_state() == RUNNING_STLINE)
+  {
+    if (avg_error > OUT_TURBO_HYST)
+    {
+      update_running_state(SET_NORMAL_MODE_STATE);
+    }
+  }
+  else if (get_running_state() == RUNNING_NOOL)
+  {
+    if (avg_error < OUT_NOOL_NORMAL_HYST)
+    {
+      update_running_state(SET_NORMAL_MODE_STATE);
+    }
+  }
+}
+
+
 
 void setup_keypad(void)
 {
