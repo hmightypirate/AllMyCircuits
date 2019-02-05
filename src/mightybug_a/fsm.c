@@ -8,24 +8,6 @@ uint32_t running_loop_millisecs = 0; //Used for antiwheelie
 static uint16_t seq_decrease_line_pos = 0;
 static uint16_t seq_increase_line_pos = 0;
 
-uint32_t delay_start_ms = 0;
-
-/*
- * @brief modify the delay start time
- * 
- * Used to wait x seconds before running
- */
-void set_delay_start_time(uint32_t delay)
-{
-  delay_start_ms = delay;
-}
-
-// Used to wait x seconds before running
-uint32_t get_delay_start_time()
-{
-  return delay_start_ms;
-}
-
 /*
  * @brief get the ms the car entered the running state
  * 
@@ -80,7 +62,6 @@ void update_state(event_e event)
       if (get_calibrated_sensors_count() >= NUM_SENSORS -
                                                 MAX_NUM_NOT_CALLIBRATED_SENSORS)
       {
-        set_delay_start_time(get_millisecs_since_start());
         current_state = DELAYED_START_STATE;
       }
       break;

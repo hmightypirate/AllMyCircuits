@@ -140,11 +140,19 @@ void out_of_battery_state(void)
 
 void delayed_start_state(void)
 {
+  static uint32_t delayed_start_time = 0;
+
+  if (delayed_start_time == 0) {
+    delayed_start_time = get_millisecs_since_start();
+  }
+  
   /* Stop motors */
   stop_motors();
 
-  if (current_loop_millisecs - get_delay_start_time() > DELAYED_START_MS)
+  if (current_loop_millisecs - delayed_start_time > DELAYED_START_MS)
   {
+    delayed_start_time = 0;
+
     // Reset pointer (starting from the beginning)
     if (FLAG_CIRCUIT_MAPPING)
       reset_mapping_pointer();
