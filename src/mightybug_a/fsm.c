@@ -3,10 +3,6 @@
 static state_e current_state = IDLE_STATE;
 static rnstate_e running_state = RUNNING_NORMAL;
 
-// Variables for handling target velocity in normal mode
-static uint16_t seq_decrease_line_pos = 0;
-static uint16_t seq_increase_line_pos = 0;
-
 void update_running_state(rnevent_e rnevent)
 {
   // loop out of period
@@ -120,115 +116,5 @@ void set_running_state(rnstate_e state)
   running_state = state;
 }
 
-/* 
- * @brief obtains the aggregate number of pos readings improving/decreasing line position
- *
- */
-void update_sequential_readings(int16_t new_proportional, int16_t past_proportional)
-{
-  if (new_proportional < 0)
-  {
-    new_proportional = -new_proportional;
-  }
 
-  if (past_proportional < 0)
-  {
-    past_proportional = -past_proportional;
-  }
-
-  if (new_proportional > past_proportional)
-  {
-    seq_increase_line_pos += 1;
-    seq_decrease_line_pos = 0;
-  }
-  else
-  {
-    seq_decrease_line_pos += 1;
-    seq_increase_line_pos = 0;
-  }
-}
-
-void reset_sequential_readings(void)
-{
-  seq_decrease_line_pos = 0;
-  seq_increase_line_pos = 0;
-}
-
-/* 
- * @brief updates the target velocity
- *
- */
-void update_target_normal()
-{
-  /* only works in normal mode */
-  if (running_state == RUNNING_NORMAL)
-  {
-    if ((seq_decrease_line_pos > DEC_NORMAL_THRESHOLD) && (get_target_velocity() < MAX_VEL_MOTOR_DEC_MODE))
-    {
-      set_target_velocity(get_target_velocity() + DEC_NORMAL_QTY);
-      if (RESET_DEC_AFTER_SET)
-      {
-        seq_decrease_line_pos = 0;
-      }
-    }
-    else if ((seq_increase_line_pos > INC_NORMAL_THRESHOLD) && (get_target_velocity() > MIN_VEL_MOTOR_INC_MODE))
-    {
-      set_target_velocity(get_target_velocity() + INC_NORMAL_QTY);
-      if (RESET_INC_AFTER_SET)
-      {
-        seq_increase_line_pos = 0;
-      }
-    }
-  }
-}
-
-/* 
- * @brief updates the target velocity
- *
- */
-void update_target_normal_with_encoders()
-{
-
-  /* only works in normal mode */
-  if (running_state == RUNNING_NORMAL)
-  {
-    int32_t diff_acc = 0;
-    // is left wheel running faster than right wheel
-    if (get_left_encoder_ticks() > get_right_encoder_ticks())
-    {
-      // right wheel is acc faster ?
-      diff_acc = get_right_acc() - get_left_acc();
-    }
-    else
-    {
-      diff_acc = get_left_acc() - get_right_acc();
-    }
-
-    int32_t step_qty = 0;
-
-    if (diff_acc > 0)
-    {
-      step_qty = STEP_NORMAL_QTY_INC;
-    }
-    else
-    {
-      step_qty = STEP_NORMAL_QTY_DEC;
-    }
-
-    int32_t next_vel = vel_maps[get_current_pidvel_map()] + step_qty * diff_acc;
-
-    /*
-      if (next_vel < MIN_VEL_MOTOR_INC_MODE)
-	{
-	  next_vel = MIN_VEL_MOTOR_INC_MODE;
-	}
-      else if (next_vel > MAX_VEL_MOTOR_DEC_MODE)
-	{
-	  next_vel = MAX_VEL_MOTOR_DEC_MODE;
-	}
-      */
-
-    set_target_velocity(next_vel);
-  }
-}
 

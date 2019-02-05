@@ -73,9 +73,4 @@ rnstate_e get_running_state();
 void set_running_state(rnstate_e state);
 void update_running_state(rnevent_e rnevent);
 
-void update_sequential_readings(int16_t new_proportional, int16_t past_proportional);
-void reset_sequential_readings(void);
-void update_target_normal();
-void update_target_normal_with_encoders();
-
 #endif /* __FSM_H */
