@@ -11,7 +11,7 @@ uint32_t get_pidvel_map_time(void);
 void get_next_running_state(int16_t avg_error);
 
 uint32_t last_ms_inline = 0;
-
+uint32_t running_loop_millisecs = 0;
 /*
  * @brief gets the current ms inline
  */
@@ -231,6 +231,29 @@ void select_running_state(int error)
   }
 }
 
+/*
+ * @brief change velocity to avoid wheelie at start
+ */
+void set_vel_antiwheelie(uint32_t current_loop_millisecs)
+{
+  if ((current_loop_millisecs - running_loop_millisecs) < MAX_DURATION_WHEELIE_START)
+  {
+    set_target_velocity(MAX_VEL_WHEELIE_START);
+  }
+  else
+  {
+    if (get_running_state() == RUNNING_STLINE)
+    {
+      set_target_velocity(vel_turbo_maps[get_current_pidvel_map()]);
+    }
+    else if (get_running_state() == RUNNING_NOOL)
+    {
+      set_target_velocity(vel_nool_maps[get_current_pidvel_map()]);
+    }
+  }
+}
+
+
 void acceleartion_and_brake_control(void)
 {
   if (!USE_ENCODERS_FOR_INCDEC)
@@ -305,11 +328,20 @@ bool stop_conditions(void)
            (!FLAG_DELAY_STOP_OUT_OF_LINE ||
             (FLAG_DELAY_STOP_OUT_OF_LINE &&
              exceeds_time_out_of_line(current_loop_millisecs)))) ||
-          (DEBUG_INERTIA_TEST && (current_loop_millisecs - get_running_ms() > DEBUG_INERTIA_TIME_MS)));
+          (DEBUG_INERTIA_TEST && (current_loop_millisecs - running_loop_millisecs > DEBUG_INERTIA_TIME_MS)));
 }
 
 void running_state(void)
 {
+  static uint32_t running_loop_millisecs = 0;
+
+  if (running_loop_millisecs == 0) {
+    running_loop_millisecs = get_millisecs_since_start();
+  }
+  if (current_loop_millisecs - running_loop_millisecs > MAX_DURATION_WHEELIE_START) {
+    running_loop_millisecs = 0;
+  }
+
   sync_iterations += 1;
 
   read_line_sensors(line_sensor_value);
