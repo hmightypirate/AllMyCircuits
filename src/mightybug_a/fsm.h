@@ -2,13 +2,7 @@
 #define __FSM_H
 
 #include <stdint.h>
-#include "sensors.h"
-#include "pid.h"
-#include "cron.h"
-#include "motors.h"
 #include "libjukebox.h"
-#include "configs.h"
-#include "pidvelmap.h"
 
 typedef enum {
   IDLE_STATE,

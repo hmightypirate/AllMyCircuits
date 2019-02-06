@@ -42,11 +42,7 @@ void update_state(event_e event)
     switch (current_state)
     {
     case CALIBRATION_STATE:
-      if (get_calibrated_sensors_count() >= NUM_SENSORS -
-                                                MAX_NUM_NOT_CALLIBRATED_SENSORS)
-      {
-        current_state = DELAYED_START_STATE;
-      }
+      current_state = DELAYED_START_STATE;
       break;
     case RUNNING_STATE:
       current_state = IDLE_STATE;

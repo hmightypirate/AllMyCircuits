@@ -261,6 +261,11 @@ void delayed_start_state(void)
   static uint32_t delayed_start_time = 0;
 
   if (delayed_start_time == 0) {
+    if (get_calibrated_sensors_count() < NUM_SENSORS - MAX_NUM_NOT_CALLIBRATED_SENSORS)
+    {
+      update_state(FORCE_CALIBRATION_EVENT);
+      return;
+    }
     delayed_start_time = get_millisecs_since_start();
   }
   
