@@ -21,19 +21,19 @@ static uint16_t seq_increase_line_pos = 0;
  * @brief obtains the aggregate number of pos readings improving/decreasing line position
  *
  */
-void update_sequential_readings(int16_t new_proportional, int16_t past_proportional)
+void update_sequential_readings(int16_t error, int16_t last_error)
 {
-  if (new_proportional < 0)
+  if (error < 0)
   {
-    new_proportional = -new_proportional;
+    error = -error;
   }
 
-  if (past_proportional < 0)
+  if (last_error < 0)
   {
-    past_proportional = -past_proportional;
+    last_error = -last_error;
   }
 
-  if (new_proportional > past_proportional)
+  if (error > last_error)
   {
     seq_increase_line_pos += 1;
     seq_decrease_line_pos = 0;
@@ -127,23 +127,6 @@ void update_target_normal_with_encoders()
 
     set_target_velocity(next_vel);
   }
-}
-
-
-/*
- * @brief gets the current ms inline
- */
-void update_ms_inline(uint32_t current_ms)
-{
-  last_ms_inline = current_ms;
-}
-
-/*
- * @brief checks if the car has exceeded the time out of line
- */
-uint8_t exceeds_time_out_of_line(uint32_t current_ms)
-{
-  return (current_ms - last_ms_inline) > MS_DELAY_OUT_OF_LINE;
 }
 
 void keypad_events(void)
@@ -426,7 +409,7 @@ void just_run_state(int control)
   // Set the current ms (inline)
   if (!is_out_of_line())
   {
-    update_ms_inline(current_loop_millisecs);
+    last_ms_inline = current_loop_millisecs;
   }
 
   // Do circuit mapping
@@ -450,7 +433,7 @@ bool stop_conditions(void)
   return ((is_out_of_line() && !DEBUG_INERTIA_TEST &&
            (!FLAG_DELAY_STOP_OUT_OF_LINE ||
             (FLAG_DELAY_STOP_OUT_OF_LINE &&
-             exceeds_time_out_of_line(current_loop_millisecs)))) ||
+             ((current_loop_millisecs - last_ms_inline) > MS_DELAY_OUT_OF_LINE)))) ||
           (DEBUG_INERTIA_TEST && (current_loop_millisecs - running_loop_millisecs > DEBUG_INERTIA_TIME_MS)));
 }
 
