@@ -147,52 +147,72 @@ void keypad_events(void)
   }
 }
 
+void turbo_running_state()
+{
+  set_target_as_turbo();
+  reset_pids_turbo();
+  jukebox_setcurrent_song(NO_SONG);
+  if (TURBO_PITCH_DEBUG)
+    jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+  set_led_mode(LED_1, OFF);
+}
+
+void normal_running_state()
+{
+  set_target_as_normal();
+  reset_pids_normal();
+  jukebox_setcurrent_song(NO_SONG);
+  if (TURBO_PITCH_DEBUG)
+    jukebox_setcurrent_song(TENOR_BEAT_ORDER);
+  set_led_mode(LED_1, ON);
+  // reset variables used for special acc/dec in NORMAL mode
+  reset_sequential_readings();
+}
+
+void nool_running_state()
+{
+  set_target_as_nool();
+  reset_pids_nool();
+  jukebox_setcurrent_song(NO_SONG);
+  if (TURBO_PITCH_DEBUG)
+    jukebox_setcurrent_song(BASS_BEAT_ORDER);
+  set_led_mode(LED_1, BLINK);
+}
+
+void stop_running_state()
+{
+  stop_motors();
+  jukebox_setcurrent_song(OUT_OF_LINE_SONG);
+}
+
+void recovery_running_state()
+{
+  jukebox_setcurrent_song(OUT_OF_LINE_SONG);
+}
+
 void check_rn_state(void)
 {
   rnstate_e running_state = get_running_state();
 
-  if (!is_out_of_line())
-  {
-    jukebox_setcurrent_song(NO_SONG);
-  }
-
   switch (running_state)
   {
   case RUNNING_STLINE:
-    set_target_as_turbo();
-    reset_pids_turbo();
-    if (TURBO_PITCH_DEBUG)
-      jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
-    set_led_mode(LED_1, OFF);
+    turbo_running_state();
     break;
   case RUNNING_NORMAL:
-    set_target_as_normal();
-    reset_pids_normal();
-    if (TURBO_PITCH_DEBUG)
-      jukebox_setcurrent_song(TENOR_BEAT_ORDER);
-    set_led_mode(LED_1, ON);
-    // reset variables used for special acc/dec in NORMAL mode
-    reset_sequential_readings();
+    normal_running_state();
     break;
   case RUNNING_NOOL:
-    set_target_as_nool();
-    reset_pids_nool();
-    if (TURBO_PITCH_DEBUG)
-      jukebox_setcurrent_song(BASS_BEAT_ORDER);
-    set_led_mode(LED_1, BLINK);
+    nool_running_state();
     break;
+  case RUNNING_RECOVERY:
+    recovery_running_state();
+    break;
+  case RUNNING_STOP:
   default:
-    set_target_as_normal();
-    reset_pids_normal();
-    if (TURBO_PITCH_DEBUG)
-      jukebox_setcurrent_song(SONG_TWO_BEAT_ORDER);
-    set_led_mode(LED_1, ON);
+    stop_running_state();
   }
 
-  if (is_out_of_line())
-  {
-    jukebox_setcurrent_song(OUT_OF_LINE_SONG);
-  }
 }
 
 void music_update(void)
@@ -243,7 +263,8 @@ void delayed_start_state(void)
 {
   static uint32_t delayed_start_time = 0;
 
-  if (delayed_start_time == 0) {
+  if (delayed_start_time == 0)
+  {
     if (get_calibrated_sensors_count() < NUM_SENSORS - MAX_NUM_NOT_CALLIBRATED_SENSORS)
     {
       update_state(FORCE_CALIBRATION_EVENT);
@@ -251,7 +272,7 @@ void delayed_start_state(void)
     }
     delayed_start_time = get_millisecs_since_start();
   }
-  
+
   /* Stop motors */
   stop_motors();
 
@@ -307,7 +328,6 @@ void info_map_state(void)
 void change_map_state(void)
 {
   select_next_pidvel_map();
-  reset_pids_normal();
   set_pidvel_map_time(current_loop_millisecs);
   update_state(CHANGED_MAP_EVENT);
 }
@@ -358,7 +378,6 @@ void set_vel_antiwheelie(uint32_t current_loop_millisecs)
     }
   }
 }
-
 
 void acceleartion_and_brake_control(void)
 {
@@ -441,10 +460,12 @@ void running_state(void)
 {
   static uint32_t running_loop_millisecs = 0;
 
-  if (running_loop_millisecs == 0) {
+  if (running_loop_millisecs == 0)
+  {
     running_loop_millisecs = get_millisecs_since_start();
   }
-  if (current_loop_millisecs - running_loop_millisecs > MAX_DURATION_WHEELIE_START) {
+  if (current_loop_millisecs - running_loop_millisecs > MAX_DURATION_WHEELIE_START)
+  {
     running_loop_millisecs = 0;
   }
 
@@ -520,8 +541,6 @@ void get_next_running_state(int16_t avg_error)
     }
   }
 }
-
-
 
 void setup_keypad(void)
 {
