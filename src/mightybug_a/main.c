@@ -6,8 +6,6 @@ uint32_t current_loop_millisecs = 0;
 
 uint32_t pidvel_map_ms = 0;
 
-void set_pidvel_map_time(uint32_t current_time);
-uint32_t get_pidvel_map_time(void);
 void get_next_running_state(int16_t avg_error);
 
 uint32_t last_ms_inline = 0;
@@ -317,7 +315,7 @@ void info_map_state(void)
 
   jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
 
-  if (current_loop_millisecs - get_pidvel_map_time() > DELAYED_PIDVEL_CHANGE_MS)
+  if (current_loop_millisecs - pidvel_map_ms > DELAYED_PIDVEL_CHANGE_MS)
   {
     stop_music_play();
     pull_enable_jukebox();
@@ -328,7 +326,7 @@ void info_map_state(void)
 void change_map_state(void)
 {
   select_next_pidvel_map();
-  set_pidvel_map_time(current_loop_millisecs);
+  pidvel_map_ms = current_loop_millisecs);
   update_state(CHANGED_MAP_EVENT);
 }
 
@@ -647,25 +645,6 @@ void check_battery(void)
       update_state(OUT_OF_BATTERY_EVENT);
     }
   }
-}
-
-/*
- * @brief sets the time entering a pid/vel mapping state
- * 
- */
-void set_pidvel_map_time(uint32_t current_time)
-{
-  pidvel_map_ms = current_time;
-}
-
-/*
- * @brief obtain the time entering a pid/vel mapping state
- * 
- * Used to wait x seconds before enable changing pidvel map again
- */
-uint32_t get_pidvel_map_time(void)
-{
-  return pidvel_map_ms;
 }
 
 /*
