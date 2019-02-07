@@ -56,8 +56,6 @@ void update_state(event_e event)
     if (current_state == CALIBRATION_STATE)
     {
       current_state = INFO_MAP_STATE;
-      push_enable_jukebox();
-      enable_jukebox();
     }
     else if (current_state == INFO_MAP_STATE)
     {
@@ -77,6 +75,8 @@ void update_state(event_e event)
   case FORCE_CALIBRATION_EVENT:
     current_state = CALIBRATION_STATE;
   case CHANGE_MAP_TIMEOUT_EVENT:
+    current_state = CALIBRATION_STATE;
+  case CHANGED_MAP_EVENT:
     current_state = INFO_MAP_STATE;
   default:
     current_state = IDLE_STATE;

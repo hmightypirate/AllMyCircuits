@@ -294,6 +294,16 @@ void delayed_start_state(void)
 
 void info_map_state(void)
 {
+  static bool just_entered_state = true;
+
+  if (just_entered_state)
+  {
+    just_entered_state = false;
+    pidvel_map_ms = current_loop_millisecs;
+    push_enable_jukebox();
+    enable_jukebox();
+  }
+
   /* stop motors */
   stop_motors();
 
@@ -317,6 +327,7 @@ void info_map_state(void)
 
   if (current_loop_millisecs - pidvel_map_ms > DELAYED_PIDVEL_CHANGE_MS)
   {
+    just_entered_state = true;
     stop_music_play();
     pull_enable_jukebox();
     update_state(CHANGE_MAP_TIMEOUT_EVENT);
@@ -326,7 +337,7 @@ void info_map_state(void)
 void change_map_state(void)
 {
   select_next_pidvel_map();
-  pidvel_map_ms = current_loop_millisecs);
+  pidvel_map_ms = current_loop_millisecs;
   update_state(CHANGED_MAP_EVENT);
 }
 
@@ -564,7 +575,6 @@ void update_modules(void)
 
 void set_car_default_parameters(void)
 {
-  reset_pids_normal();
 
   if (!SOFT_CALIBRATION)
   {
@@ -579,6 +589,9 @@ void set_car_default_parameters(void)
   /* reset pid */
   reset_pid();
 
+  /* default map of constants of pid */
+  reset_pids_normal();
+
   /* reset readings for turbo calculation */
   reset_prop_readings();
 
@@ -588,7 +601,9 @@ void set_car_default_parameters(void)
   }
 
   if (FLAG_MAX_VEL_DELAY)
+  {
     reset_veldelay();
+  }
 }
 
 void setup_modules()
