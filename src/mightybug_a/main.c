@@ -181,6 +181,8 @@ void stop_running_state()
 {
   stop_motors();
   jukebox_setcurrent_song(OUT_OF_LINE_SONG);
+  set_led_mode(LED_2, OFF);
+
 }
 
 void recovery_running_state()
@@ -354,9 +356,7 @@ void select_running_state(int error)
       if (is_enable_avg_readings())
       {
         // Obtain the average number of readings
-        int16_t avg_error = get_avg_abs_readings();
-
-        get_next_running_state(avg_error);
+        get_next_running_state(get_avg_abs_readings());
       }
     }
     else
@@ -413,13 +413,6 @@ void acceleartion_and_brake_control(void)
 
 void stop_state()
 {
-  // stop the motors if out of line
-  stop_motors();
-
-  // led off
-  set_led_mode(LED_2, OFF);
-
-  // Send car to calibration if reached the end of line
   if (get_all_inline())
   {
     update_state(ALL_SENSORS_IN_LINE_EVENT);
@@ -467,15 +460,12 @@ bool stop_conditions(void)
 
 void running_state(void)
 {
-  static uint32_t running_loop_millisecs = 0;
+  static bool just_entered_state = true;
 
-  if (running_loop_millisecs == 0)
+  if (just_entered_state)
   {
+    just_entered_state = false;
     running_loop_millisecs = get_millisecs_since_start();
-  }
-  if (current_loop_millisecs - running_loop_millisecs > MAX_DURATION_WHEELIE_START)
-  {
-    running_loop_millisecs = 0;
   }
 
   sync_iterations += 1;
