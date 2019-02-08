@@ -20,7 +20,7 @@
 // TODO: DEBUG and PICKLE out of motor module
 /* if this flag is set, both motors will receive target velocity till they reach and end of line */
 #define DEBUG_INERTIA_TEST 0
-#define DEBUG_INERTIA_TIME_MS 1000
+#define INERTIA_MODE_LIMIT_TIME 1000
 
 /* Pickle configuration */
 #define TURBO_PICKLE 1

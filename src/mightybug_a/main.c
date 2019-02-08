@@ -6,124 +6,50 @@ uint32_t current_loop_millisecs = 0;
 
 uint32_t pidvel_map_ms = 0;
 
-void get_next_running_state(int16_t avg_error);
-
 uint32_t last_ms_inline = 0;
 uint32_t running_loop_millisecs = 0;
 
-// Variables for handling target velocity in normal mode
-static uint16_t seq_decrease_line_pos = 0;
-static uint16_t seq_increase_line_pos = 0;
+int32_t line_error = 0;
 
-/* 
- * @brief obtains the aggregate number of pos readings improving/decreasing line position
+uint32_t delayed_start_time = 0;
+
+void just_run_state(void);
+
+/*
+ * @brief get next sub-state (running)
  *
  */
-void update_sequential_readings(int16_t error, int16_t last_error)
+void get_next_running_state(int16_t avg_error)
 {
-  if (error < 0)
-  {
-    error = -error;
-  }
 
-  if (last_error < 0)
-  {
-    last_error = -last_error;
-  }
-
-  if (error > last_error)
-  {
-    seq_increase_line_pos += 1;
-    seq_decrease_line_pos = 0;
-  }
-  else
-  {
-    seq_decrease_line_pos += 1;
-    seq_increase_line_pos = 0;
-  }
-}
-
-void reset_sequential_readings(void)
-{
-  seq_decrease_line_pos = 0;
-  seq_increase_line_pos = 0;
-}
-
-/* 
- * @brief updates the target velocity
- *
- */
-void update_target_normal()
-{
-  /* only works in normal mode */
   if (get_running_state() == RUNNING_NORMAL)
   {
-    if ((seq_decrease_line_pos > DEC_NORMAL_THRESHOLD) && (get_target_velocity() < MAX_VEL_MOTOR_DEC_MODE))
+    if (ENABLE_TURBO_MODE && (avg_error < OUT_NORMAL_HYST))
     {
-      set_target_velocity(get_target_velocity() + DEC_NORMAL_QTY);
-      if (RESET_DEC_AFTER_SET)
-      {
-        seq_decrease_line_pos = 0;
-      }
+      update_running_state(SET_TURBO_MODE_STATE);
     }
-    else if ((seq_increase_line_pos > INC_NORMAL_THRESHOLD) && (get_target_velocity() > MIN_VEL_MOTOR_INC_MODE))
+    else if (ENABLE_NOOL_MODE && (avg_error > OUT_NORMAL_NOOL_HYST))
     {
-      set_target_velocity(get_target_velocity() + INC_NORMAL_QTY);
-      if (RESET_INC_AFTER_SET)
-      {
-        seq_increase_line_pos = 0;
-      }
+      update_running_state(SET_NOOL_MODE_STATE);
     }
   }
-}
-
-/* 
- * @brief updates the target velocity
- *
- */
-void update_target_normal_with_encoders()
-{
-
-  /* only works in normal mode */
-  if (get_running_state() == RUNNING_NORMAL)
+  else if (get_running_state() == RUNNING_STLINE)
   {
-    int32_t diff_acc = 0;
-    // is left wheel running faster than right wheel
-    if (get_left_encoder_ticks() > get_right_encoder_ticks())
+    if (avg_error > OUT_TURBO_HYST)
     {
-      // right wheel is acc faster ?
-      diff_acc = get_right_acc() - get_left_acc();
+      // reset variables used for special acc/dec in NORMAL mode
+      reset_sequential_readings();
+      update_running_state(SET_NORMAL_MODE_STATE);
     }
-    else
+  }
+  else if (get_running_state() == RUNNING_NOOL)
+  {
+    if (avg_error < OUT_NOOL_NORMAL_HYST)
     {
-      diff_acc = get_left_acc() - get_right_acc();
+      // reset variables used for special acc/dec in NORMAL mode
+      reset_sequential_readings();
+      update_running_state(SET_NORMAL_MODE_STATE);
     }
-
-    int32_t step_qty = 0;
-
-    if (diff_acc > 0)
-    {
-      step_qty = STEP_NORMAL_QTY_INC;
-    }
-    else
-    {
-      step_qty = STEP_NORMAL_QTY_DEC;
-    }
-
-    int32_t next_vel = vel_maps[get_current_pidvel_map()] + step_qty * diff_acc;
-
-    /*
-      if (next_vel < MIN_VEL_MOTOR_INC_MODE)
-	{
-	  next_vel = MIN_VEL_MOTOR_INC_MODE;
-	}
-      else if (next_vel > MAX_VEL_MOTOR_DEC_MODE)
-	{
-	  next_vel = MAX_VEL_MOTOR_DEC_MODE;
-	}
-      */
-
-    set_target_velocity(next_vel);
   }
 }
 
@@ -149,45 +75,83 @@ void turbo_running_state()
 {
   set_target_as_turbo();
   reset_pids_turbo();
+  
   jukebox_setcurrent_song(NO_SONG);
   if (TURBO_PITCH_DEBUG)
     jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+  
   set_led_mode(LED_1, OFF);
+  
+  just_run_state();
 }
 
 void normal_running_state()
 {
   set_target_as_normal();
+  if (!USE_ENCODERS_FOR_INCDEC)
+  {
+    if ((ENABLE_INCDEC_NORMAL_FLAG) && (sync_iterations % ITS_INCDEC_NORMAL == 0))
+    {
+      update_target_normal();
+    }
+  }
+  else
+  {
+    if (ENABLE_INCDEC_NORMAL_FLAG)
+    {
+      update_target_normal_with_encoders();
+    }
+  }
   reset_pids_normal();
+
   jukebox_setcurrent_song(NO_SONG);
   if (TURBO_PITCH_DEBUG)
     jukebox_setcurrent_song(TENOR_BEAT_ORDER);
+
   set_led_mode(LED_1, ON);
-  // reset variables used for special acc/dec in NORMAL mode
-  reset_sequential_readings();
+
+  just_run_state();
 }
 
 void nool_running_state()
 {
   set_target_as_nool();
   reset_pids_nool();
+
   jukebox_setcurrent_song(NO_SONG);
   if (TURBO_PITCH_DEBUG)
     jukebox_setcurrent_song(BASS_BEAT_ORDER);
+
   set_led_mode(LED_1, BLINK);
+
+  just_run_state();
 }
 
 void stop_running_state()
 {
-  stop_motors();
   jukebox_setcurrent_song(OUT_OF_LINE_SONG);
+
   set_led_mode(LED_2, OFF);
 
+  stop_motors();
 }
 
 void recovery_running_state()
 {
+
+  set_target_as_normal();
+  reset_pids_normal();
+
   jukebox_setcurrent_song(OUT_OF_LINE_SONG);
+
+  set_led_mode(LED_1, BLINK);
+
+  if ((current_loop_millisecs - last_ms_inline) > MS_DELAY_OUT_OF_LINE)
+  {
+    update_running_state(STOP_RUNNING_EVENT);
+  }
+
+  just_run_state();
 }
 
 void check_rn_state(void)
@@ -212,7 +176,6 @@ void check_rn_state(void)
   default:
     stop_running_state();
   }
-
 }
 
 void music_update(void)
@@ -241,6 +204,8 @@ void idle_state(void)
   reset_calibration_values();
   stop_motors();
 
+  delayed_start_time = 0;
+
   /* Clear led during idle state */
   set_led_mode(LED_2, OFF);
 }
@@ -261,8 +226,6 @@ void out_of_battery_state(void)
 
 void delayed_start_state(void)
 {
-  static uint32_t delayed_start_time = 0;
-
   if (delayed_start_time == 0)
   {
     if (get_calibrated_sensors_count() < NUM_SENSORS - MAX_NUM_NOT_CALLIBRATED_SENSORS)
@@ -286,7 +249,9 @@ void delayed_start_state(void)
 
     if (FLAG_MAX_VEL_DELAY)
       reset_veldelay();
+
     reset_encoder_ticks();
+
     update_state(DELAYED_START_TIMEOUT_EVENT);
   }
 
@@ -343,11 +308,11 @@ void change_map_state(void)
   update_state(CHANGED_MAP_EVENT);
 }
 
-void select_running_state(int error)
+void select_running_state(void)
 {
   if (sync_iterations % TIME_BETWEEN_STORE_POS == 0)
   {
-    set_new_reading(error);
+    set_new_reading(line_error);
 
     if (!USE_ENCODERS_FOR_STATE)
     {
@@ -375,40 +340,6 @@ void set_vel_antiwheelie(uint32_t current_loop_millisecs)
   {
     set_target_velocity(MAX_VEL_WHEELIE_START);
   }
-  else
-  {
-    if (get_running_state() == RUNNING_STLINE)
-    {
-      set_target_velocity(vel_turbo_maps[get_current_pidvel_map()]);
-    }
-    else if (get_running_state() == RUNNING_NOOL)
-    {
-      set_target_velocity(vel_nool_maps[get_current_pidvel_map()]);
-    }
-  }
-}
-
-void acceleartion_and_brake_control(void)
-{
-  if (!USE_ENCODERS_FOR_INCDEC)
-  {
-    if ((ENABLE_INCDEC_NORMAL_FLAG) && (sync_iterations % ITS_INCDEC_NORMAL == 0))
-    {
-      update_target_normal();
-    }
-  }
-  else
-  {
-    if (ENABLE_INCDEC_NORMAL_FLAG)
-    {
-      update_target_normal_with_encoders();
-    }
-  }
-
-  if (FLAG_ANTI_WHEELIE_START)
-  {
-    set_vel_antiwheelie(current_loop_millisecs);
-  }
 }
 
 void stop_state()
@@ -419,8 +350,17 @@ void stop_state()
   }
 }
 
-void just_run_state(int control)
+void just_run_state()
 {
+
+  if (FLAG_ANTI_WHEELIE_START)
+  {
+    set_vel_antiwheelie(current_loop_millisecs);
+  }
+
+  /* pid control */
+  int control = 0;
+  control = pid(line_error);
 
   motor_control(control);
 
@@ -432,6 +372,10 @@ void just_run_state(int control)
   {
     last_ms_inline = current_loop_millisecs;
   }
+  else
+  {
+    update_running_state(LOST_LINE_EVENT);
+  }
 
   // Do circuit mapping
   if (FLAG_CIRCUIT_MAPPING)
@@ -440,22 +384,28 @@ void just_run_state(int control)
   }
 }
 
-bool stop_conditions(void)
+void inertia_run_state(void)
 {
-  /* motor control 
+  static bool just_entered_state = true;
 
-	          stops if:
-	          1) is out of line and not delay is used
-	          2) is out of line and has exceeded the maximum time allowed
-	          3) the time of an inertia test is over
+  if (just_entered_state)
+  {
+    just_entered_state = false;
+    running_loop_millisecs = get_millisecs_since_start();
+  }
 
-	*/
+  set_target_as_normal();
+  motor_control(0);
 
-  return ((is_out_of_line() && !DEBUG_INERTIA_TEST &&
-           (!FLAG_DELAY_STOP_OUT_OF_LINE ||
-            (FLAG_DELAY_STOP_OUT_OF_LINE &&
-             ((current_loop_millisecs - last_ms_inline) > MS_DELAY_OUT_OF_LINE)))) ||
-          (DEBUG_INERTIA_TEST && (current_loop_millisecs - running_loop_millisecs > DEBUG_INERTIA_TIME_MS)));
+  if (current_loop_millisecs - running_loop_millisecs > INERTIA_MODE_LIMIT_TIME)
+  {
+    update_running_state(INERTIA_TIMEOUT_EVENT);
+  }
+}
+
+void inertia_stop_state(void)
+{
+  stop_motors();
 }
 
 void running_state(void)
@@ -471,73 +421,21 @@ void running_state(void)
   sync_iterations += 1;
 
   read_line_sensors(line_sensor_value);
-
-  // Running
-  int error = get_line_position(line_sensor_value);
+  line_error = get_line_position(line_sensor_value);
 
   // update consecutive iterations increasing or decreasing error
-  update_sequential_readings(error, get_last_error());
+  update_sequential_readings(line_error, get_last_error());
 
   // check with encoders or line position if we are in st_line or not
-  select_running_state(error);
+  select_running_state();
   // set running parameters according to running state (music, leds, velocities, ...)
   check_rn_state();
 
-  // Accelerate/Break in NORMAL mode and antiwheelie
-  acceleartion_and_brake_control();
-
-  if (stop_conditions())
-  {
-    stop_state();
-  }
-  else
-  {
-    /* pid control */
-    int control = 0;
-    control = pid(error);
-    just_run_state(control);
-  }
-
-  // update encoders velocity
   update_velocities_encoders();
 
   if (TELEMETRY)
   {
     print_telemetry(current_loop_millisecs);
-  }
-}
-
-/*
- * @brief get next sub-state (running)
- *
- */
-void get_next_running_state(int16_t avg_error)
-{
-
-  if (get_running_state() == RUNNING_NORMAL)
-  {
-    if (ENABLE_TURBO_MODE && (avg_error < OUT_NORMAL_HYST))
-    {
-      update_running_state(SET_TURBO_MODE_STATE);
-    }
-    else if (ENABLE_NOOL_MODE && (avg_error > OUT_NORMAL_NOOL_HYST))
-    {
-      update_running_state(SET_NOOL_MODE_STATE);
-    }
-  }
-  else if (get_running_state() == RUNNING_STLINE)
-  {
-    if (avg_error > OUT_TURBO_HYST)
-    {
-      update_running_state(SET_NORMAL_MODE_STATE);
-    }
-  }
-  else if (get_running_state() == RUNNING_NOOL)
-  {
-    if (avg_error < OUT_NOOL_NORMAL_HYST)
-    {
-      update_running_state(SET_NORMAL_MODE_STATE);
-    }
   }
 }
 

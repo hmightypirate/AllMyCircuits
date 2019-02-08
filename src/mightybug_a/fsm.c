@@ -44,6 +44,7 @@ void update_state(event_e event)
     case CALIBRATION_STATE:
       current_state = DELAYED_START_STATE;
       break;
+    case DELAYED_START_STATE:
     case RUNNING_STATE:
       current_state = IDLE_STATE;
       break;
