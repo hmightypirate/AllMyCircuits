@@ -53,7 +53,7 @@ void blink_led(uint8_t led, uint32_t millis)
  */
 void set_led(uint8_t led)
 {
-  gpio_clear(led_port[led], led_pin[led]);
+  gpio_set(led_port[led], led_pin[led]);
 }
 
 /*
@@ -63,7 +63,7 @@ void set_led(uint8_t led)
  */
 void clear_led(uint8_t led)
 {
-  gpio_set(led_port[led], led_pin[led]);
+  gpio_clear(led_port[led], led_pin[led]);
 }
 
 
