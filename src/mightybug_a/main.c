@@ -75,13 +75,11 @@ void turbo_running_state()
 {
   set_target_as_turbo();
   reset_pids_turbo();
-  
+
   jukebox_setcurrent_song(NO_SONG);
   if (TURBO_PITCH_DEBUG)
     jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
-  
-  set_led_mode(LED_1, OFF);
-  
+
   just_run_state();
 }
 
@@ -108,8 +106,6 @@ void normal_running_state()
   if (TURBO_PITCH_DEBUG)
     jukebox_setcurrent_song(TENOR_BEAT_ORDER);
 
-  set_led_mode(LED_1, ON);
-
   just_run_state();
 }
 
@@ -122,18 +118,17 @@ void nool_running_state()
   if (TURBO_PITCH_DEBUG)
     jukebox_setcurrent_song(BASS_BEAT_ORDER);
 
-  set_led_mode(LED_1, BLINK);
-
   just_run_state();
 }
 
 void stop_running_state()
 {
+  stop_motors();
+
   jukebox_setcurrent_song(OUT_OF_LINE_SONG);
 
-  set_led_mode(LED_2, OFF);
-
-  stop_motors();
+  set_led_mode(LED_1, OFF);
+  set_led_mode(LED_2, ON);
 }
 
 void recovery_running_state()
@@ -145,13 +140,15 @@ void recovery_running_state()
   jukebox_setcurrent_song(OUT_OF_LINE_SONG);
 
   set_led_mode(LED_1, BLINK);
+  set_led_mode(LED_2, BLINK);
+
+  just_run_state();
 
   if ((current_loop_millisecs - last_ms_inline) > MS_DELAY_OUT_OF_LINE)
   {
     update_running_state(STOP_RUNNING_EVENT);
   }
 
-  just_run_state();
 }
 
 void check_rn_state(void)
@@ -192,6 +189,7 @@ void calibration_state(void)
   /* stop motors during calibration */
   stop_motors();
   /* led is on during calibration */
+  set_led_mode(LED_1, ON);
   set_led_mode(LED_2, ON);
 
   jukebox_setcurrent_song(CALIBRATION_SONG);
@@ -205,8 +203,12 @@ void idle_state(void)
   stop_motors();
 
   delayed_start_time = 0;
+  running_loop_millisecs = 0;
+
+  jukebox_setcurrent_song(NO_SONG);
 
   /* Clear led during idle state */
+  set_led_mode(LED_1, ON);
   set_led_mode(LED_2, OFF);
 }
 
@@ -255,17 +257,17 @@ void delayed_start_state(void)
     update_state(DELAYED_START_TIMEOUT_EVENT);
   }
 
+  jukebox_setcurrent_song(NO_SONG);
+
   /* Led on */
+  set_led_mode(LED_1, OFF);
   set_led_mode(LED_2, ON);
 }
 
 void info_map_state(void)
 {
-  static bool just_entered_state = true;
-
-  if (just_entered_state)
+  if (pidvel_map_ms == 0)
   {
-    just_entered_state = false;
     pidvel_map_ms = current_loop_millisecs;
     push_enable_jukebox();
     enable_jukebox();
@@ -274,29 +276,28 @@ void info_map_state(void)
   /* stop motors */
   stop_motors();
 
+  set_led_mode(LED_1, ON);
+
   if (get_current_pidvel_map() == 0)
   {
     set_led_mode(LED_1, BLINK);
-    set_led_mode(LED_2, BLINK);
   }
   else if (get_current_pidvel_map() == 1)
   {
-    set_led_mode(LED_1, DOUBLE_BLINK);
     set_led_mode(LED_2, DOUBLE_BLINK);
   }
   else if (get_current_pidvel_map() == 2)
   {
     set_led_mode(LED_1, TRIPLE_BLINK);
-    set_led_mode(LED_2, TRIPLE_BLINK);
   }
 
   jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
 
   if (current_loop_millisecs - pidvel_map_ms > DELAYED_PIDVEL_CHANGE_MS)
   {
-    just_entered_state = true;
-    stop_music_play();
+    disable_jukebox();
     pull_enable_jukebox();
+    pidvel_map_ms = 0;
     update_state(CHANGE_MAP_TIMEOUT_EVENT);
   }
 }
@@ -364,13 +365,14 @@ void just_run_state()
 
   motor_control(control);
 
-  // blinking: normal behaviour
-  set_led_mode(LED_2, BLINK);
-
   // Set the current ms (inline)
   if (!is_out_of_line())
   {
     last_ms_inline = current_loop_millisecs;
+    if (get_running_state() == RUNNING_RECOVERY)
+    {
+      update_running_state(RUNNING_NORMAL);
+    } 
   }
   else
   {
@@ -410,12 +412,11 @@ void inertia_stop_state(void)
 
 void running_state(void)
 {
-  static bool just_entered_state = true;
 
-  if (just_entered_state)
+  if (running_loop_millisecs == 0)
   {
-    just_entered_state = false;
     running_loop_millisecs = get_millisecs_since_start();
+    update_running_state(SET_NORMAL_MODE_STATE);
   }
 
   sync_iterations += 1;
@@ -430,6 +431,9 @@ void running_state(void)
   select_running_state();
   // set running parameters according to running state (music, leds, velocities, ...)
   check_rn_state();
+
+  set_led_mode(LED_1, OFF);
+  set_led_mode(LED_2, OFF);
 
   update_velocities_encoders();
 
@@ -534,6 +538,7 @@ void execute_state(state_e state)
     break;
   case INFO_MAP_STATE:
     info_map_state();
+    break;
   default:
     running_state();
   }

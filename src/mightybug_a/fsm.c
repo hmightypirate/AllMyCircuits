@@ -5,7 +5,6 @@ static rnstate_e running_state = RUNNING_NORMAL;
 
 void update_running_state(rnevent_e rnevent)
 {
-  // loop out of period
   if (rnevent == SET_NORMAL_MODE_STATE)
   {
     set_running_state(RUNNING_NORMAL);
@@ -17,6 +16,14 @@ void update_running_state(rnevent_e rnevent)
   else if (rnevent == SET_NOOL_MODE_STATE)
   {
     set_running_state(RUNNING_NOOL);
+  }
+  else if (rnevent == STOP_RUNNING_EVENT)
+  {
+    set_running_state(RUNNING_STOP);
+  }
+  else if (rnevent == LOST_LINE_EVENT)
+  {
+    set_running_state(RUNNING_RECOVERY);
   }
 }
 
@@ -75,10 +82,13 @@ void update_state(event_e event)
     break;
   case FORCE_CALIBRATION_EVENT:
     current_state = CALIBRATION_STATE;
+    break;
   case CHANGE_MAP_TIMEOUT_EVENT:
     current_state = CALIBRATION_STATE;
+    break;
   case CHANGED_MAP_EVENT:
     current_state = INFO_MAP_STATE;
+    break;
   default:
     current_state = IDLE_STATE;
   }
