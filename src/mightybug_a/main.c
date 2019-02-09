@@ -137,8 +137,6 @@ void recovery_running_state()
   set_target_as_normal();
   reset_pids_normal();
 
-  jukebox_setcurrent_song(OUT_OF_LINE_SONG);
-
   set_led_mode(LED_1, BLINK);
   set_led_mode(LED_2, BLINK);
 
