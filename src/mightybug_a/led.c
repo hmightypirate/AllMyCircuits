@@ -5,8 +5,8 @@ uint16_t led_half_period[2] = {LED_BLINK_PERIOD_DEFAULT / 2,
 			       LED_BLINK_PERIOD_DEFAULT / 2};
 uint32_t led_last_toggle[2] = {0, 0};
 
-uint32_t led_port[2] = {LED_PORT, LED2_PORT};
-uint32_t led_pin[2] = {LED_PIN, LED2_PIN};
+uint32_t led_port[2] = {LED1_PORT, LED2_PORT};
+uint32_t led_pin[2] = {LED1_PIN, LED2_PIN};
 
 /*
  * @brief sets the period of the async blink

@@ -23,21 +23,21 @@ void get_next_running_state(int16_t avg_error)
 {
 
 	if (get_running_state() == RUNNING_NORMAL) {
-		if (ENABLE_TURBO_MODE && (avg_error < OUT_NORMAL_HYST)) {
+		if (ENABLE_TURBO_MODE && (avg_error < NORMAL_TO_TURBO_THRESHOLD)) {
 			update_running_state(SET_TURBO_MODE_STATE);
 		} else if (ENABLE_NOOL_MODE &&
-			   (avg_error > OUT_NORMAL_NOOL_HYST)) {
+			   (avg_error > NORMAL_TO_NOOL_THRESHOLD)) {
 			update_running_state(SET_NOOL_MODE_STATE);
 		}
 	} else if (get_running_state() == RUNNING_STLINE) {
-		if (avg_error > OUT_TURBO_HYST) {
+		if (avg_error > TURBO_TO_NORMAL_THRESHOLD) {
 			// reset variables used for special acc/dec in NORMAL
 			// mode
 			reset_sequential_readings();
 			update_running_state(SET_NORMAL_MODE_STATE);
 		}
 	} else if (get_running_state() == RUNNING_NOOL) {
-		if (avg_error < OUT_NOOL_NORMAL_HYST) {
+		if (avg_error < NOOL_TO_NORMAL_THRESHOLD) {
 			// reset variables used for special acc/dec in NORMAL
 			// mode
 			reset_sequential_readings();
@@ -67,7 +67,7 @@ void turbo_running_state()
 	reset_pids_turbo();
 
 	jukebox_setcurrent_song(NO_SONG);
-	if (TURBO_PITCH_DEBUG)
+	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 
 	just_run_state();
@@ -89,7 +89,7 @@ void normal_running_state()
 	reset_pids_normal();
 
 	jukebox_setcurrent_song(NO_SONG);
-	if (TURBO_PITCH_DEBUG)
+	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(TENOR_BEAT_ORDER);
 
 	just_run_state();
@@ -101,7 +101,7 @@ void nool_running_state()
 	reset_pids_nool();
 
 	jukebox_setcurrent_song(NO_SONG);
-	if (TURBO_PITCH_DEBUG)
+	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(BASS_BEAT_ORDER);
 
 	just_run_state();
@@ -128,7 +128,7 @@ void recovery_running_state()
 
 	just_run_state();
 
-	if ((current_loop_millisecs - last_ms_inline) > MS_DELAY_OUT_OF_LINE) {
+	if ((current_loop_millisecs - last_ms_inline) > MAX_RUNNING_RECOVERY_TIME) {
 		update_running_state(STOP_RUNNING_EVENT);
 	}
 }
@@ -221,7 +221,7 @@ void delayed_start_state(void)
 	/* Stop motors */
 	stop_motors();
 
-	if (current_loop_millisecs - delayed_start_time > DELAYED_START_MS) {
+	if (current_loop_millisecs - delayed_start_time > DELAYED_START_WAIT_TIME) {
 		delayed_start_time = 0;
 
 		// Reset pointer (starting from the beginning)
@@ -266,7 +266,7 @@ void info_map_state(void)
 
 	jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
 
-	if (current_loop_millisecs - pidvel_map_ms > DELAYED_PIDVEL_CHANGE_MS) {
+	if (current_loop_millisecs - pidvel_map_ms > AVAILABLE_MAP_CHANGE_TIME) {
 		disable_jukebox();
 		pull_enable_jukebox();
 		pidvel_map_ms = 0;
@@ -286,7 +286,7 @@ void select_running_state(void)
 	if (sync_iterations % TIME_BETWEEN_STORE_POS == 0) {
 		set_new_reading(line_error);
 
-		if (!USE_ENCODERS_FOR_STATE) {
+		if (!SELECT_RUNNING_STATE_USING_ENCODERS) {
 
 			// Check that the minimum number of readings was
 			// performed
@@ -306,8 +306,8 @@ void select_running_state(void)
 void set_vel_antiwheelie(uint32_t current_loop_millisecs)
 {
 	if ((current_loop_millisecs - running_loop_millisecs) <
-	    MAX_DURATION_WHEELIE_START) {
-		set_target_velocity(MAX_VEL_WHEELIE_START);
+	    MAX_ANTIWHEELIE_TIME) {
+		set_target_velocity(MAX_ANTIWHEELIE_VELOCITY);
 	}
 }
 
@@ -321,7 +321,7 @@ void stop_state()
 void just_run_state()
 {
 
-	if (FLAG_ANTI_WHEELIE_START) {
+	if (ANTIWHEELIE_AT_START) {
 		set_vel_antiwheelie(current_loop_millisecs);
 	}
 
@@ -525,7 +525,7 @@ int main(void)
 
 		// inner loop is executed at a fixed period of time
 		if ((current_loop_millisecs - last_loop_millisecs) >=
-		    FIXED_LOOP_TIME) {
+		    LOOP_PERIOD) {
 			last_loop_millisecs = current_loop_millisecs;
 			execute_state(get_state());
 		}

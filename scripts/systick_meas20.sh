@@ -2,7 +2,7 @@
 sed -i 's/^#define ENCODER_BUFFER_LEN.*$/#define ENCODER_BUFFER_LEN 20/' ../src/mightybug_a/encoder.h
 
 # turbo state
-sed -i 's/#define OUT_TURBO_HYST.*/#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 4:20/' ../src/mightybug_a/fsm.h
+sed -i 's/#define TURBO_TO_NORMAL_THRESHOLD.*/#define TURBO_TO_NORMAL_THRESHOLD SELECT_RUNNING_STATE_USING_ENCODERS? 4:20/' ../src/mightybug_a/fsm.h
 
 # mappings
 sed -i 's/^.*mapping vel normal/500, 650, 675 \/\/ mapping vel normal/' ../src/mightybug_a/fsm.c 

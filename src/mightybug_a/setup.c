@@ -31,13 +31,13 @@ void clock_setup(void)
 	timer_reset(RCC_RIGHT_ENCODER);
 
 	/* Enable TIMER for PWM engine */
-	rcc_periph_clock_enable(RCC_PWM_ENGINE);
+	rcc_periph_clock_enable(RCC_PWM_MOTORS);
 
 	/* Enable TIMER for buzzer */
 	rcc_periph_clock_enable(RCC_PWM_BUZZER);
 
 	/* Enable ADC clock (sensors) */
-	rcc_periph_clock_enable(RCC_ADC_SENSORS);
+	rcc_periph_clock_enable(RCC_ADC_LINE_SENSORS);
 
 	/* Activate clock for AFIO, if used */
 	if (USE_ALTERNATE_FUNCTIONS) {
@@ -275,8 +275,8 @@ void gpio_setup(void)
 		      SENSOR_7_PIN);
 
 	/* Set internal LED */
-	gpio_set_mode(LED_PORT, GPIO_MODE_OUTPUT_2_MHZ,
-		      GPIO_CNF_OUTPUT_PUSHPULL, LED_PIN);
+	gpio_set_mode(LED1_PORT, GPIO_MODE_OUTPUT_2_MHZ,
+		      GPIO_CNF_OUTPUT_PUSHPULL, LED1_PIN);
 
 	/* Set secondary LED */
 	gpio_set_mode(LED2_PORT, GPIO_MODE_OUTPUT_2_MHZ,

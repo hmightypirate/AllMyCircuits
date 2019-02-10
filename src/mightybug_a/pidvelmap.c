@@ -7,7 +7,7 @@ uint8_t current_pidvel_mapping = INITIAL_PIDVEL_MAPPING;
  */
 void select_next_pidvel_map(void)
 {
-	current_pidvel_mapping = (current_pidvel_mapping + 1) % MAX_MAPPINGS;
+	current_pidvel_mapping = (current_pidvel_mapping + 1) % NUMBER_OF_MAPPINGS;
 }
 
 /*

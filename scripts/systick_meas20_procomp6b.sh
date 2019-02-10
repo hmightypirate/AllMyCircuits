@@ -2,7 +2,7 @@
 sed -i 's/^#define ENCODER_BUFFER_LEN.*$/#define ENCODER_BUFFER_LEN 20/' ../src/mightybug_a/encoder.h
 
 # turbo state
-sed -i 's/#define OUT_TURBO_HYST.*/#define OUT_TURBO_HYST USE_ENCODERS_FOR_STATE? 4:20/' ../src/mightybug_a/fsm.h
+sed -i 's/#define TURBO_TO_NORMAL_THRESHOLD.*/#define TURBO_TO_NORMAL_THRESHOLD SELECT_RUNNING_STATE_USING_ENCODERS? 4:20/' ../src/mightybug_a/fsm.h
 
 # mappings
 sed -i 's/^.*mapping vel normal/700, 750, 800 \/\/ mapping vel normal/' ../src/mightybug_a/fsm.c 
@@ -41,4 +41,4 @@ sed -i 's/#define MAX_VEL_DELAY_STEP_UP.*$/#define MAX_VEL_DELAY_STEP_UP  30/' .
 
 # stop out of line
 sed -i 's/#define FLAG_DELAY_STOP_OUT_OF_LINE.*$/#define FLAG_DELAY_STOP_OUT_OF_LINE 0/' ../src/mightybug_a/fsm.h
-sed -i 's/#define MS_DELAY_OUT_OF_LINE.*$/#define MS_DELAY_OUT_OF_LINE 1600 \/\/ ms/' ../src/mightybug_a/fsm.h
+sed -i 's/#define MAX_RUNNING_RECOVERY_TIME.*$/#define MAX_RUNNING_RECOVERY_TIME 1600 \/\/ ms/' ../src/mightybug_a/fsm.h
