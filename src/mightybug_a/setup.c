@@ -104,10 +104,10 @@ void motor_pwm_setup(void)
 	/* Set timer 4 mode to no divisor (72MHz), Edge-aligned, up-counting */
 	timer_set_mode(PWM_MOTOR_TIMER, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE,
 		       TIM_CR1_DIR_UP);
-	/* Set divider to 3 */
+	/* Set divider to 7 */
 	timer_set_prescaler(PWM_MOTOR_TIMER, 7);
 	/* A timer update event is generated only after the specified number of
-	 * repeat count cycles have been completed. */
+	 * repeat count cycles have been completed. - In bluepill is useless */
 	timer_set_repetition_counter(PWM_MOTOR_TIMER, 0);
 	/* Enable Auto-Reload Buffering. */
 	timer_enable_preload(PWM_MOTOR_TIMER);
@@ -121,8 +121,8 @@ void motor_pwm_setup(void)
 		timer_enable_break_main_output(PWM_MOTOR_TIMER);
 	}
 
-	/* The freq is 72 MHz / ((1+3)*(1+0)*(1+1024)) = 17560,975609756 Hz ->
-	 * period of 56.9 uS*/
+	/* The freq is 72 MHz / ((1+7)*(1+0)*(1+999)) = 9000 Hz ->
+	 * period of 111.1 uS*/
 
 	/* Enable output GPIOs */
 	gpio_set_mode(LEFT_MOTOR_PWM_PORT, GPIO_MODE_OUTPUT_50_MHZ,
