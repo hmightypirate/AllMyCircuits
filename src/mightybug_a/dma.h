@@ -1,10 +1,10 @@
 #ifndef __DMA_H
 #define __DMA_H
 
-#include <stdint.h>
-#include <string.h>
 #include <libopencm3/stm32/dma.h>
 #include <libopencm3/stm32/usart.h>
+#include <stdint.h>
+#include <string.h>
 
 #define DMA_BUFFER_SIZE 256
 

@@ -1,9 +1,9 @@
 #ifndef __KEYPAD_H
 #define __KEYPAD_H
 
-#include "setup.h"
 #include "cron.h"
 #include "fsm.h"
+#include "setup.h"
 
 /* Debounce period defined in ms */
 #define DEBOUNCE_PERIOD 10

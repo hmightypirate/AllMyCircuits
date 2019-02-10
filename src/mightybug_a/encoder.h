@@ -1,10 +1,10 @@
 #ifndef __ENCODER_H
 #define __ENCODER_H
 
-#include <inttypes.h>
-#include <stdio.h>
 #include "commons.h"
 #include "setup.h"
+#include <inttypes.h>
+#include <stdio.h>
 
 /* wheel perimeter in mm * 0.01 */
 #define WHEEL_PERIMETER 1050
@@ -19,7 +19,7 @@
 #define ACC_MEAS 10
 
 /* Weird encoder measures */
-#define WEIRD_ENCODER_MEAS UINT16_MAX/2
+#define WEIRD_ENCODER_MEAS UINT16_MAX / 2
 
 void update_encoder_ticks(void);
 void update_velocities_encoders(void);

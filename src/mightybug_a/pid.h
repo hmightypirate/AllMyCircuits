@@ -7,8 +7,7 @@
 #define MAX_PID_ERROR 2000
 #define PID_CONTROL_DIVISOR 100
 
-
-/* STORE POSITION (in main loop iterations) 
+/* STORE POSITION (in main loop iterations)
    # store line position every <it> * TIME_BETWEEN_STORE_POS
 */
 #define TIME_BETWEEN_STORE_POS 1
@@ -38,6 +37,6 @@ int16_t get_last_error(void);
 void reset_prop_readings();
 void set_new_reading(uint16_t proportional);
 uint8_t is_enable_avg_readings();
-int16_t  get_avg_abs_readings();
+int16_t get_avg_abs_readings();
 
 #endif /* __PID_H */

@@ -1,10 +1,10 @@
 #ifndef __PIDVELMAP_H
 #define __PIDVELMAP_H
 
-#include <stdint.h>
 #include "configs.h"
-#include "pid.h"
 #include "motors.h"
+#include "pid.h"
+#include <stdint.h>
 
 void reset_pids_normal(void);
 void reset_pids_turbo(void);

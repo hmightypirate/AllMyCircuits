@@ -1,17 +1,15 @@
 #ifndef __JUKEBOX_SONGS_H
 #define __JUKEBOX_SONGS_H
 
-#include <stdio.h>
 #include "libmusic.h"
+#include <stdio.h>
 
 struct Song {
 	int length;
-        int bpm;  /* beats per minute */
+	int bpm; /* beats per minute */
 	uint8_t *notes_pitch;
 	uint8_t *notes_duration;
 };
-
-
 
 #define JUKEBOX_SONGS_TOTAL_SONGS 9
 
