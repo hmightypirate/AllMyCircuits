@@ -36,6 +36,9 @@ void get_next_running_state(int16_t avg_error)
 			reset_sequential_readings();
 			update_running_state(SET_NORMAL_MODE_STATE);
 		}
+		break;
+	default:
+		return;
 	}
 }
 
@@ -62,6 +65,9 @@ void turbo_running_state()
 	jukebox_setcurrent_song(NO_SONG);
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+	
+	set_led_mode(LED_1, OFF);
+	set_led_mode(LED_2, OFF);
 
 	just_run_state();
 }
@@ -85,6 +91,9 @@ void normal_running_state()
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(TENOR_BEAT_ORDER);
 
+	set_led_mode(LED_1, OFF);
+	set_led_mode(LED_2, OFF);
+
 	just_run_state();
 }
 
@@ -96,6 +105,9 @@ void nool_running_state()
 	jukebox_setcurrent_song(NO_SONG);
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(BASS_BEAT_ORDER);
+
+	set_led_mode(LED_1, OFF);
+	set_led_mode(LED_2, OFF);
 
 	just_run_state();
 }
@@ -196,6 +208,7 @@ void out_of_battery_state(void)
 	stop_motors();
 
 	/* Led off */
+	set_led_mode(LED_1, BLINK);
 	set_led_mode(LED_2, OFF);
 
 	jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
@@ -209,7 +222,7 @@ void delayed_start_state(void)
 			update_state(FORCE_CALIBRATION_EVENT);
 			return;
 		}
-		delayed_start_time = get_millisecs_since_start();
+		delayed_start_time = current_loop_millisecs;
 	}
 
 	/* Stop motors */
@@ -251,15 +264,17 @@ void info_map_state(void)
 
 	set_led_mode(LED_1, ON);
 
-	if (get_current_pidvel_map() == 0) {
-		set_led_mode(LED_1, BLINK);
-	} else if (get_current_pidvel_map() == 1) {
+	uint8_t current_pidvel_map = get_current_pidvel_map();
+
+	if (current_pidvel_map == 0) {
+		set_led_mode(LED_2, BLINK);
+	} else if (current_pidvel_map == 1) {
 		set_led_mode(LED_2, DOUBLE_BLINK);
-	} else if (get_current_pidvel_map() == 2) {
-		set_led_mode(LED_1, TRIPLE_BLINK);
+	} else if (current_pidvel_map == 2) {
+		set_led_mode(LED_2, TRIPLE_BLINK);
 	}
 
-	jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
+	jukebox_setcurrent_song(get_map_song(current_pidvel_map));
 
 	if (current_loop_millisecs - pidvel_map_ms >
 	    AVAILABLE_MAP_CHANGE_TIME) {
@@ -307,13 +322,6 @@ void set_vel_antiwheelie(uint32_t current_loop_millisecs)
 	}
 }
 
-void stop_state()
-{
-	if (get_all_inline()) {
-		update_state(ALL_SENSORS_IN_LINE_EVENT);
-	}
-}
-
 void just_run_state()
 {
 
@@ -334,7 +342,11 @@ void just_run_state()
 			update_running_state(RUNNING_NORMAL);
 		}
 	} else {
-		update_running_state(LOST_LINE_EVENT);
+		if (get_all_inline()) {
+			update_state(ALL_SENSORS_IN_LINE_EVENT);
+		} else {
+			update_running_state(LOST_LINE_EVENT);
+		}
 	}
 
 	// Do circuit mapping
@@ -345,11 +357,8 @@ void just_run_state()
 
 void inertia_run_state(void)
 {
-	static bool just_entered_state = true;
-
-	if (just_entered_state) {
-		just_entered_state = false;
-		running_loop_millisecs = get_millisecs_since_start();
+	if (running_loop_millisecs == 0) {
+		running_loop_millisecs = current_loop_millisecs;
 	}
 
 	set_target_as_normal();
@@ -370,7 +379,7 @@ void running_state(void)
 {
 
 	if (running_loop_millisecs == 0) {
-		running_loop_millisecs = get_millisecs_since_start();
+		running_loop_millisecs = current_loop_millisecs;
 		update_running_state(SET_NORMAL_MODE_STATE);
 	}
 
@@ -387,9 +396,6 @@ void running_state(void)
 	// set running parameters according to running state (music, leds,
 	// velocities, ...)
 	check_rn_state();
-
-	set_led_mode(LED_1, OFF);
-	set_led_mode(LED_2, OFF);
 
 	update_velocities_encoders();
 
