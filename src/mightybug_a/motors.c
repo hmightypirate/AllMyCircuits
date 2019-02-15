@@ -247,7 +247,7 @@ void motor_control(int32_t control)
 
 	// aplying pickle
 	if ((TURBO_PICKLE && TURBO_PICKLE_IN_CORNERS) ||
-	    (TURBO_PICKLE && get_running_state() == RUNNING_STLINE)) {
+	    (TURBO_PICKLE && get_running_state() == RUNNING_TURBO)) {
 
 		left_velocity =
 		    get_pickle_turbo(left_velocity, get_left_encoder_ticks());

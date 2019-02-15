@@ -8,7 +8,7 @@ void update_running_state(rnevent_e rnevent)
 	if (rnevent == SET_NORMAL_MODE_STATE) {
 		set_running_state(RUNNING_NORMAL);
 	} else if (rnevent == SET_TURBO_MODE_STATE) {
-		set_running_state(RUNNING_STLINE);
+		set_running_state(RUNNING_TURBO);
 	} else if (rnevent == SET_NOOL_MODE_STATE) {
 		set_running_state(RUNNING_NOOL);
 	} else if (rnevent == STOP_RUNNING_EVENT) {

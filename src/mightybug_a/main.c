@@ -21,25 +21,18 @@ void just_run_state(void);
  */
 void get_next_running_state(int16_t avg_error)
 {
-
-	if (get_running_state() == RUNNING_NORMAL) {
-		if (ENABLE_TURBO_MODE && (avg_error < NORMAL_TO_TURBO_THRESHOLD)) {
-			update_running_state(SET_TURBO_MODE_STATE);
-		} else if (ENABLE_NOOL_MODE &&
-			   (avg_error > NORMAL_TO_NOOL_THRESHOLD)) {
-			update_running_state(SET_NOOL_MODE_STATE);
-		}
-	} else if (get_running_state() == RUNNING_STLINE) {
-		if (avg_error > TURBO_TO_NORMAL_THRESHOLD) {
-			// reset variables used for special acc/dec in NORMAL
-			// mode
-			reset_sequential_readings();
-			update_running_state(SET_NORMAL_MODE_STATE);
-		}
-	} else if (get_running_state() == RUNNING_NOOL) {
-		if (avg_error < NOOL_TO_NORMAL_THRESHOLD) {
-			// reset variables used for special acc/dec in NORMAL
-			// mode
+	switch (get_running_state()) {
+	case RUNNING_NORMAL:
+	case RUNNING_NOOL:
+	case RUNNING_TURBO:
+		if (avg_error < NORMAL_TO_TURBO_THRESHOLD) {
+			if (ENABLE_TURBO_MODE)
+				update_running_state(SET_TURBO_MODE_STATE);
+		} else if (avg_error > NORMAL_TO_NOOL_THRESHOLD) {
+			if (ENABLE_NOOL_MODE)
+				update_running_state(SET_NOOL_MODE_STATE);
+		} else if ((avg_error > TURBO_TO_NORMAL_THRESHOLD) &&
+			   (avg_error < NOOL_TO_NORMAL_THRESHOLD)) {
 			reset_sequential_readings();
 			update_running_state(SET_NORMAL_MODE_STATE);
 		}
@@ -128,7 +121,8 @@ void recovery_running_state()
 
 	just_run_state();
 
-	if ((current_loop_millisecs - last_ms_inline) > MAX_RUNNING_RECOVERY_TIME) {
+	if ((current_loop_millisecs - last_ms_inline) >
+	    MAX_RUNNING_RECOVERY_TIME) {
 		update_running_state(STOP_RUNNING_EVENT);
 	}
 }
@@ -138,7 +132,7 @@ void check_rn_state(void)
 	rnstate_e running_state = get_running_state();
 
 	switch (running_state) {
-	case RUNNING_STLINE:
+	case RUNNING_TURBO:
 		turbo_running_state();
 		break;
 	case RUNNING_NORMAL:
@@ -221,7 +215,8 @@ void delayed_start_state(void)
 	/* Stop motors */
 	stop_motors();
 
-	if (current_loop_millisecs - delayed_start_time > DELAYED_START_WAIT_TIME) {
+	if (current_loop_millisecs - delayed_start_time >
+	    DELAYED_START_WAIT_TIME) {
 		delayed_start_time = 0;
 
 		// Reset pointer (starting from the beginning)
@@ -266,7 +261,8 @@ void info_map_state(void)
 
 	jukebox_setcurrent_song(get_map_song(get_current_pidvel_map()));
 
-	if (current_loop_millisecs - pidvel_map_ms > AVAILABLE_MAP_CHANGE_TIME) {
+	if (current_loop_millisecs - pidvel_map_ms >
+	    AVAILABLE_MAP_CHANGE_TIME) {
 		disable_jukebox();
 		pull_enable_jukebox();
 		pidvel_map_ms = 0;
