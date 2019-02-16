@@ -6,7 +6,7 @@
 #include "setup.h"
 
 /* Debounce period defined in ms */
-#define DEBOUNCE_PERIOD 10
+#define DEBOUNCE_PERIOD 500
 
 void keypad_update(void);
 void keypad_setup(uint32_t current_millis);

@@ -24,7 +24,7 @@
 #define INERTIA_MODE_LIMIT_TIME 1000
 
 /* Pickle configuration */
-#define TURBO_PICKLE 1
+#define TURBO_PICKLE 0
 #define TURBO_PICKLE_IN_CORNERS 0
 #define PICKLE_ENC_DISTANCE_DOWN 700 // No pickle going down
 #define PICKLE_ENC_DISTANCE_UP 3

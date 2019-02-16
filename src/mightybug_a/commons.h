@@ -33,10 +33,10 @@
 #define ENABLE_NOOL_MODE 0
 
 // Disturbing pitch to discern normal/turbo states
-#define RUNNING_STATE_PITCH 0 
+#define RUNNING_STATE_PITCH 0
 
 /* Wait time in out of line */
-#define MAX_RUNNING_RECOVERY_TIME 1600 // ms
+#define MAX_RUNNING_RECOVERY_TIME 10 // ms
 
 /* Hysteresis values for changing state whilst running  */
 #define SELECT_RUNNING_STATE_USING_ENCODERS 1
@@ -47,7 +47,7 @@
 
 /* Incremental/Decremental target velocity in NORMAL mode */
 #define USE_ENCODERS_FOR_INCDEC 1
-#define ENABLE_INCDEC_NORMAL_FLAG 1
+#define ENABLE_INCDEC_NORMAL_FLAG 0
 #define ITS_INCDEC_NORMAL 10
 #define INC_NORMAL_THRESHOLD 10
 #define DEC_NORMAL_THRESHOLD 10

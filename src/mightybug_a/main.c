@@ -19,7 +19,7 @@ void just_run_state(void);
  * @brief get next sub-state (running)
  *
  */
-void get_next_running_state(int16_t avg_error)
+void check_running_mode_thresholds(int16_t avg_error)
 {
 	switch (get_running_state()) {
 	case RUNNING_NORMAL:
@@ -62,7 +62,7 @@ void turbo_running_state()
 	set_target_as_turbo();
 	reset_pids_turbo();
 
-	jukebox_setcurrent_song(NO_SONG);
+	jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 	
@@ -114,6 +114,9 @@ void nool_running_state()
 
 void stop_running_state()
 {
+	if (!is_out_of_line()) {
+		update_running_state(SET_NORMAL_MODE_STATE);
+	}
 	stop_motors();
 
 	jukebox_setcurrent_song(OUT_OF_LINE_SONG);
@@ -303,10 +306,10 @@ void select_running_state(void)
 			// performed
 			if (is_enable_avg_readings()) {
 				// Obtain the average number of readings
-				get_next_running_state(get_avg_abs_readings());
+				check_running_mode_thresholds(get_avg_abs_readings());
 			}
 		} else {
-			get_next_running_state(get_abs_diff_encoders());
+			check_running_mode_thresholds(get_abs_diff_encoders());
 		}
 	}
 }
@@ -339,7 +342,7 @@ void just_run_state()
 	if (!is_out_of_line()) {
 		last_ms_inline = current_loop_millisecs;
 		if (get_running_state() == RUNNING_RECOVERY) {
-			update_running_state(RUNNING_NORMAL);
+			update_running_state(SET_NORMAL_MODE_STATE);
 		}
 	} else {
 		if (get_all_inline()) {
