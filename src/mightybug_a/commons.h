@@ -65,4 +65,9 @@
 #define MAX_ANTIWHEELIE_VELOCITY 350
 #define MAX_ANTIWHEELIE_TIME 500
 
+/* if this flag is set, both motors will receive target velocity till they reach
+ * and end of line */
+#define DEBUG_INERTIA_TEST 0
+#define INERTIA_MODE_LIMIT_TIME 1000
+
 #endif /* __COMMONS_H */

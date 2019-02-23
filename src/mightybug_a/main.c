@@ -225,6 +225,28 @@ void out_of_battery_state(void)
 	jukebox_setcurrent_song(OUT_OF_BATTERY_SONG);
 }
 
+void delayed_start_inertia_state(void)
+{
+	if (delayed_start_time == 0) {
+		delayed_start_time = current_loop_millisecs;
+	}
+
+	/* Stop motors */
+	stop_motors();
+
+	if (current_loop_millisecs - delayed_start_time >
+	    DELAYED_START_WAIT_TIME) {
+		delayed_start_time = 0;
+		update_state(DELAYED_START_TIMEOUT_EVENT);
+	}
+
+	jukebox_setcurrent_song(NO_SONG);
+
+	/* Led on */
+	set_led_mode(LED_1, OFF);
+	set_led_mode(LED_2, ON);
+}
+
 void delayed_start_state(void)
 {
 	if (delayed_start_time == 0) {
@@ -382,11 +404,6 @@ void inertia_run_state(void)
 	}
 }
 
-void inertia_stop_state(void)
-{
-	stop_motors();
-}
-
 void running_state(void)
 {
 
@@ -504,6 +521,12 @@ void execute_state(state_e state)
 		break;
 	case INFO_MAP_STATE:
 		info_map_state();
+		break;
+	case DELAYED_START_INERTIA_STATE:
+		delayed_start_inertia_state();
+		break;
+	case INERTIA_STATE:
+		inertia_run_state();
 		break;
 	default:
 		running_state();

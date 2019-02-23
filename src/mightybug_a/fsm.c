@@ -31,7 +31,10 @@ void update_state(event_e event)
 		current_state = IDLE_STATE;
 		break;
 	case DELAYED_START_TIMEOUT_EVENT:
-		current_state = RUNNING_STATE;
+		if (current_state == DELAYED_START_STATE)
+			current_state = RUNNING_STATE;
+		else if (current_state == DELAYED_START_INERTIA_STATE)
+			current_state = INERTIA_STATE;
 		break;
 	case BUTTON1_PRESSED_EVENT:
 		break;
@@ -54,6 +57,9 @@ void update_state(event_e event)
 			current_state = INFO_MAP_STATE;
 		} else if (current_state == INFO_MAP_STATE) {
 			current_state = CHANGE_MAP_STATE;
+		} else if (current_state == IDLE_STATE) {
+			if (DEBUG_INERTIA_TEST)
+				current_state = DELAYED_START_INERTIA_STATE;
 		}
 		break;
 	case BUTTON2_RELEASED_EVENT:
@@ -74,6 +80,9 @@ void update_state(event_e event)
 		break;
 	case CHANGED_MAP_EVENT:
 		current_state = INFO_MAP_STATE;
+		break;
+	case INERTIA_TIMEOUT_EVENT:
+		current_state = IDLE_STATE;
 		break;
 	default:
 		current_state = IDLE_STATE;

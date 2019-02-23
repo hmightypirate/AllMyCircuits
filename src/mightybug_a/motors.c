@@ -231,11 +231,6 @@ void motor_control(int32_t control)
 {
 	control = trunc_to_range(control, -MAX_PID_ERROR, MAX_PID_ERROR);
 
-	if (DEBUG_INERTIA_TEST) {
-		// running in straight lines
-		control = 0;
-	}
-
 	int32_t step_target_velocity = target_velocity;
 	if (FLAG_MAX_VEL_DELAY) {
 		step_target_velocity =
