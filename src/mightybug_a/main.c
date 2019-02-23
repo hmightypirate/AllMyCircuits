@@ -15,6 +15,11 @@ uint32_t delayed_start_time = 0;
 
 void just_run_state(void);
 
+void go_to_normal(void)
+{
+	reset_sequential_readings();
+	update_running_state(SET_NORMAL_MODE_STATE);
+}
 /*
  * @brief get next sub-state (running)
  *
@@ -28,13 +33,16 @@ void check_running_mode_thresholds(int16_t avg_error)
 		if (avg_error < NORMAL_TO_TURBO_THRESHOLD) {
 			if (ENABLE_TURBO_MODE)
 				update_running_state(SET_TURBO_MODE_STATE);
+			else
+				go_to_normal();
 		} else if (avg_error > NORMAL_TO_NOOL_THRESHOLD) {
 			if (ENABLE_NOOL_MODE)
 				update_running_state(SET_NOOL_MODE_STATE);
+			else
+				go_to_normal();
 		} else if ((avg_error > TURBO_TO_NORMAL_THRESHOLD) &&
 			   (avg_error < NOOL_TO_NORMAL_THRESHOLD)) {
-			reset_sequential_readings();
-			update_running_state(SET_NORMAL_MODE_STATE);
+			go_to_normal();
 		}
 		break;
 	default:
@@ -65,7 +73,7 @@ void turbo_running_state()
 	jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
-	
+
 	set_led_mode(LED_1, OFF);
 	set_led_mode(LED_2, OFF);
 
@@ -306,7 +314,8 @@ void select_running_state(void)
 			// performed
 			if (is_enable_avg_readings()) {
 				// Obtain the average number of readings
-				check_running_mode_thresholds(get_avg_abs_readings());
+				check_running_mode_thresholds(
+				    get_avg_abs_readings());
 			}
 		} else {
 			check_running_mode_thresholds(get_abs_diff_encoders());
