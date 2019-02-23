@@ -83,14 +83,13 @@ void turbo_running_state()
 void normal_running_state()
 {
 	set_target_as_normal();
-	if (!USE_ENCODERS_FOR_INCDEC) {
-		if ((ENABLE_INCDEC_NORMAL_FLAG) &&
-		    (sync_iterations % ITS_INCDEC_NORMAL == 0)) {
-			update_target_normal();
-		}
-	} else {
-		if (ENABLE_INCDEC_NORMAL_FLAG) {
+	if (ENABLE_INCDEC_NORMAL_FLAG) {
+		if (USE_ENCODERS_FOR_INCDEC) {
 			update_target_normal_with_encoders();
+		} else {
+			if (sync_iterations % ITS_INCDEC_NORMAL == 0) {
+				update_target_normal();
+			}
 		}
 	}
 	reset_pids_normal();
