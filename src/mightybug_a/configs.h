@@ -9,15 +9,15 @@
 
 /* pid maps: k_p, k_i, k_d */
 static const int16_t pid_maps[NUMBER_OF_MAPPINGS * 3] = {
-    200, 0, 300, // 400, 0, 500
-    200, 0, 300, 200, 0, 300};
+    250, 0, 300, // 400, 0, 500
+    250, 0, 300, 250, 0, 300};
 
 static const int16_t vel_maps[NUMBER_OF_MAPPINGS] = {
     // 650, 675, 725
     // 600, 650, 700 // mapping 1st test
     // 700, 750, 780 // mapping 2nd test
     // 650, 725, 800 // mapping vel normal
-    50, 450, 500 // for testing purposes
+    775, 800, 825 // for testing purposes
 };
 
 // Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro
@@ -40,7 +40,7 @@ static const int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
     // 575, 600, 625 //mapping 1st test
     // 625, 650, 675 //mapping 2nd test
     // 600, 650, 700 // mapping vel turbo
-    500, 500, 500 // testing turbo
+    675, 725, 775 // testing turbo
 };
 
 static const uint8_t map_songs[NUMBER_OF_MAPPINGS] = {

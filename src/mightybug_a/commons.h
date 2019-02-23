@@ -47,7 +47,7 @@
 
 /* Incremental/Decremental target velocity in NORMAL mode */
 #define USE_ENCODERS_FOR_INCDEC 1
-#define ENABLE_INCDEC_NORMAL_FLAG 0
+#define ENABLE_INCDEC_NORMAL_FLAG 1
 #define ITS_INCDEC_NORMAL 10
 #define INC_NORMAL_THRESHOLD 10
 #define DEC_NORMAL_THRESHOLD 10
@@ -57,8 +57,8 @@
 #define MIN_VEL_MOTOR_INC_MODE 250
 #define MAX_VEL_MOTOR_DEC_MODE 950
 #define DEC_NORMAL_QTY 5
-#define STEP_NORMAL_QTY_DEC 40
-#define STEP_NORMAL_QTY_INC 8
+#define STEP_NORMAL_QTY_DEC 50
+#define STEP_NORMAL_QTY_INC 40
 
 /* anti-wheelie at start variables */
 #define ANTIWHEELIE_AT_START 1

@@ -18,7 +18,7 @@
 #define BACKWARD 1
 
 /* Pickle configuration */
-#define TURBO_PICKLE 0
+#define TURBO_PICKLE 1
 #define TURBO_PICKLE_IN_CORNERS 0
 #define PICKLE_ENC_DISTANCE_DOWN 700 // No pickle going down
 #define PICKLE_ENC_DISTANCE_UP 3
@@ -28,7 +28,7 @@
 #define FLAG_MAX_VEL_DELAY 1
 #define MAX_VEL_DELAY 20
 #define MAX_VEL_DELAY_STEP_DOWN 300
-#define MAX_VEL_DELAY_STEP_UP 30
+#define MAX_VEL_DELAY_STEP_UP 150
 
 typedef struct {
 	int32_t motor_vel[MAX_VEL_DELAY];
