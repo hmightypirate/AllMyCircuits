@@ -1,6 +1,6 @@
 sinclude ../../rules.mk
 
-VERSION_NAME=disable_drive
+VERSION_NAME=electronic_experience
 BIN_PATH=./bin
 
 CSRC = $(wildcard *.c)
