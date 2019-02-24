@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Use the following tags: Added, Changed, Fixed and Removed
 
-## [Disable Drive 1.3.0] - Unreleased
+## [Electronic Experience 1.4.0] - Unreleased
 
 ### Added
 TODO
@@ -35,7 +35,28 @@ TODO
 ### Removed
 TODO
 
-## [Candid Car 1.2.0] - Unreleased
+## [Disable Drive 1.3.0] - 24/02/2019
+
+### Added
+- Preliminary circuit mapping
+- Turbo Pickle
+- Using leds as feedback for state
+- Adding Pitch for feedback 
+- Accelerating/Braking in corners
+- antiwheelie heuristics (limiting velocity during acceleration/brake)
+
+### Changed
+- Refactoring Code
+- Using encoders for changing states (corner detection)
+
+### Fixed
+- Fixed CLI commands
+- Delaying derivative in PID
+
+### Removed
+TODO
+
+## [Candid Car 1.2.0] - 21/07/2018
 
 ### Added
 - Added example for storing data in flash
