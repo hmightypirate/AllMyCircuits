@@ -110,26 +110,26 @@ static void cli_mtr_set() {
 		return;
 	}
 	int velocity = atoi(command_line + 8);
-	reset_target_velocity(velocity);
-	printf("%i\n", get_target_velocity());
+	set_target_velocity(velocity);
+	printf("%i\n", (int)get_target_velocity());
 }
 
 char str_MTR_GET[] = "MTR GET";
 static void cli_mtr_get() {
-	printf("%i\n", get_target_velocity());
+	printf("%i\n", (int)get_target_velocity());
 }
 
 char str_MTR_INC[] = "MTR INC";
 static void cli_mtr_inc() {
 	int velocity = get_target_velocity() + VELOCITY_STEP;
-	reset_target_velocity(velocity);
+	set_target_velocity(velocity);
 	printf("%i\n", velocity);
 }
 
 char str_MTR_DEC[] = "MTR DEC";
 static void cli_mtr_dec() {
 	int velocity = get_target_velocity() - VELOCITY_STEP;
-	reset_target_velocity(velocity);
+	set_target_velocity(velocity);
 	printf("%i\n", velocity);
 }
 
@@ -165,7 +165,7 @@ static void cli_fsm_run() {
 
 char str_FSM_CAL[] = "FSM CAL";
 static void cli_fsm_cal() {
-	update_state(FORCE_CALLIBRATION_EVENT);
+	update_state(FORCE_CALIBRATION_EVENT);
 	printf("CALIBRATE\n");
 }
 

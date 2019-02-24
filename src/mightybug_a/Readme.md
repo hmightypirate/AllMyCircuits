@@ -64,7 +64,7 @@ TODO
 ## [Bat Bolido: 1.1.0] - 05/05/2018
 
 ### Added
-- FSM for car state: callibration, running and out of line detection
+- FSM for car state: calibration, running and out of line detection
 - commands for changing PID ctes, car state, target velocity of motors, etc.
 - buzzer library. Changing musics regarding car state.
 - measure battery voltage

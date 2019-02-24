@@ -15,6 +15,6 @@
 #define SHOW_RIGHT_ENCODER 1
 #define SHOW_LEFT_ACC 1
 #define SHOW_RIGHT_ACC 1
-#define SHOW_TARGET_VEL 1
+#define SHOW_TARGET_VEL 0
 
 void print_telemetry(int);
