@@ -21,6 +21,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Use the following tags: Added, Changed, Fixed and Removed
 
+## [Disable Drive 1.3.0] - Unreleased
+
+### Added
+TODO
+
+### Changed
+TODO
+
+### Fixed
+TODO
+
+### Removed
+TODO
+
 ## [Candid Car 1.2.0] - Unreleased
 
 ### Added
@@ -50,7 +64,7 @@ Use the following tags: Added, Changed, Fixed and Removed
 ## [Bat Bolido: 1.1.0] - 05/05/2018
 
 ### Added
-- FSM for car state: callibration, running and out of line detection
+- FSM for car state: calibration, running and out of line detection
 - commands for changing PID ctes, car state, target velocity of motors, etc.
 - buzzer library. Changing musics regarding car state.
 - measure battery voltage

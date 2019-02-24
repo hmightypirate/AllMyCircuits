@@ -1,23 +1,22 @@
 #ifndef __JUKEBOX_SONGS_H
 #define __JUKEBOX_SONGS_H
 
-#include <stdio.h>
 #include "libmusic.h"
+#include <stdio.h>
 
 struct Song {
 	int length;
-        int bpm;  /* beats per minute */
+	int bpm; /* beats per minute */
 	uint8_t *notes_pitch;
 	uint8_t *notes_duration;
 };
 
-
-
-#define JUKEBOX_SONGS_TOTAL_SONGS 6
+#define JUKEBOX_SONGS_TOTAL_SONGS 9
 
 struct Song jukebox_song_list[JUKEBOX_SONGS_TOTAL_SONGS];
 
 /* Check the example buzzer_jukebox for a more commplete list of songs */
+#define NO_SONG -1
 
 #define SONG_EUROPE_ORDER 0
 #define SONG_LEN_EUROPE 97
@@ -43,6 +42,17 @@ struct Song jukebox_song_list[JUKEBOX_SONGS_TOTAL_SONGS];
 #define SONG_LEN_THREE_BEAT 6
 #define SONG_VEL_THREE_BEAT 250
 
+#define SOPRANO_BEAT_ORDER 6
+#define SOPRANO_LEN_BEAT 2
+#define SOPRANO_VEL_BEAT 250
+
+#define TENOR_BEAT_ORDER 7
+#define TENOR_LEN_BEAT 2
+#define TENOR_VEL_BEAT 150
+
+#define BASS_BEAT_ORDER 8
+#define BASS_LEN_BEAT 2
+#define BASS_VEL_BEAT 50
 
 uint8_t init_jukebox_songs(void);
 uint8_t get_total_songs_number(void);
