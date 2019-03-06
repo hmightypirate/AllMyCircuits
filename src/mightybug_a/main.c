@@ -50,6 +50,34 @@ void check_running_mode_thresholds(int16_t avg_error)
 	}
 }
 
+/*
+ * @brief next state using inline 
+ */
+void check_running_mode_inline()
+{
+  switch (get_running_state()) {
+  case RUNNING_NORMAL:
+
+    if (get_inline_change()) {
+	update_running_state(SET_TURBO_MODE_STATE);	
+      }
+    
+    break;
+    
+  case RUNNING_TURBO:
+    if (get_inline_change()) {
+	update_running_state(SET_NORMAL_MODE_STATE);
+      }
+    
+    break;
+
+  default:
+    break;
+  }
+
+}
+
+
 void keypad_events(void)
 {
 	if (button_released(BUTTON1)) {
@@ -335,11 +363,28 @@ void select_running_state(void)
 			// performed
 			if (is_enable_avg_readings()) {
 				// Obtain the average number of readings
-				check_running_mode_thresholds(
-				    get_avg_abs_readings());
+			  if (FORCE_STATECHANGE_ALL_INLINE)
+			    {
+			      check_running_mode_inline();
+			    }
+			  else
+			    {
+			      check_running_mode_thresholds(
+							    get_avg_abs_readings());
+
+			    }
 			}
 		} else {
-			check_running_mode_thresholds(get_abs_diff_encoders());
+
+		  if (FORCE_STATECHANGE_ALL_INLINE)
+		    {
+		      check_running_mode_inline();	
+		    }
+		  else
+		    {
+		      check_running_mode_thresholds(get_abs_diff_encoders());
+		      
+		    }
 		}
 	}
 }

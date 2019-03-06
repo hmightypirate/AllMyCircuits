@@ -30,6 +30,7 @@
 /* if 1 the car stops after finding an horizontal line -> all sensors detect
  * line */
 #define FINISH_ALL_INLINE 0
+#define FORCE_STATECHANGE_ALL_INLINE 0
 
 /* the line follower position will be calculated between
    (-(NUM_SENSORS-1)/2 * SEP_SENSORS , (NUM_SENSORS-1)/2 * SEP_SENSORS)
@@ -58,6 +59,7 @@ uint16_t *get_blacks(void);
 uint16_t *get_thresholds(void);
 uint8_t get_all_inline(void);
 void reset_all_inline(void);
+uint8_t get_inline_change(void);
 
 int get_position(void);
 

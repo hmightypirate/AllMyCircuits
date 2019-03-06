@@ -16,5 +16,6 @@
 #define SHOW_LEFT_ACC 1
 #define SHOW_RIGHT_ACC 1
 #define SHOW_TARGET_VEL 0
+#define SHOW_SENSOR_INLINE 0
 
 void print_telemetry(int);
