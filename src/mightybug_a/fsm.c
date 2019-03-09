@@ -15,6 +15,8 @@ void update_running_state(rnevent_e rnevent)
 		set_running_state(RUNNING_STOP);
 	} else if (rnevent == LOST_LINE_EVENT) {
 		set_running_state(RUNNING_RECOVERY);
+	} else if (rnevent == NEAR_CORNER_EVENT) {
+		set_running_state(RUNNING_BRAKE);
 	}
 }
 

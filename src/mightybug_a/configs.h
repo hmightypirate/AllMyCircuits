@@ -40,7 +40,16 @@ static const int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
     // 575, 600, 625 //mapping 1st test
     // 625, 650, 675 //mapping 2nd test
     // 600, 650, 700 // mapping vel turbo
-    675, 725, 775 // testing turbo
+    // 675, 725, 775 // testing turbo
+    700, 800, 900
+};
+
+static const int16_t vel_brake_maps[NUMBER_OF_MAPPINGS] = {
+    // 515, 515, 515
+    // 575, 600, 625 //mapping 1st test
+    // 625, 650, 675 //mapping 2nd test
+    // 600, 650, 700 // mapping vel turbo
+    400, 500, 600 // testing turbo
 };
 
 static const uint8_t map_songs[NUMBER_OF_MAPPINGS] = {

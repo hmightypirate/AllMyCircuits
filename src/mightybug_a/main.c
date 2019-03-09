@@ -51,32 +51,34 @@ void check_running_mode_thresholds(int16_t avg_error)
 }
 
 /*
- * @brief next state using inline 
+ * @brief next state using inline
  */
 void check_running_mode_inline()
 {
-  switch (get_running_state()) {
-  case RUNNING_NORMAL:
+	switch (get_running_state()) {
+	case RUNNING_NORMAL:
 
-    if (get_inline_change()) {
-	update_running_state(SET_TURBO_MODE_STATE);	
-      }
-    
-    break;
-    
-  case RUNNING_TURBO:
-    if (get_inline_change()) {
-	update_running_state(SET_NORMAL_MODE_STATE);
-      }
-    
-    break;
+		if (get_inline_change()) {
+			update_running_state(SET_TURBO_MODE_STATE);
+		}
 
-  default:
-    break;
-  }
+		break;
 
+	case RUNNING_TURBO:
+		if (get_inline_change()) {
+			update_running_state(NEAR_CORNER_EVENT);
+		}
+
+		break;
+	case RUNNING_BRAKE:
+		if (get_inline_change()) {
+			update_running_state(SET_NORMAL_MODE_STATE);
+		}
+		break;
+	default:
+		break;
+	}
 }
-
 
 void keypad_events(void)
 {
@@ -104,6 +106,21 @@ void turbo_running_state()
 
 	set_led_mode(LED_1, OFF);
 	set_led_mode(LED_2, OFF);
+
+	just_run_state();
+}
+
+void brake_running_state()
+{
+	set_target_as_brake();
+	reset_pids_turbo();
+
+	jukebox_setcurrent_song(NO_SONG);
+	if (RUNNING_STATE_PITCH)
+		jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+
+	set_led_mode(LED_1, ON);
+	set_led_mode(LED_2, ON);
 
 	just_run_state();
 }
@@ -194,6 +211,8 @@ void check_rn_state(void)
 	case RUNNING_RECOVERY:
 		recovery_running_state();
 		break;
+	case RUNNING_BRAKE:
+		brake_running_state();
 	case RUNNING_STOP:
 	default:
 		stop_running_state();
@@ -363,28 +382,21 @@ void select_running_state(void)
 			// performed
 			if (is_enable_avg_readings()) {
 				// Obtain the average number of readings
-			  if (FORCE_STATECHANGE_ALL_INLINE)
-			    {
-			      check_running_mode_inline();
-			    }
-			  else
-			    {
-			      check_running_mode_thresholds(
-							    get_avg_abs_readings());
-
-			    }
+				if (FORCE_STATECHANGE_ALL_INLINE) {
+					check_running_mode_inline();
+				} else {
+					check_running_mode_thresholds(
+					    get_avg_abs_readings());
+				}
 			}
 		} else {
 
-		  if (FORCE_STATECHANGE_ALL_INLINE)
-		    {
-		      check_running_mode_inline();	
-		    }
-		  else
-		    {
-		      check_running_mode_thresholds(get_abs_diff_encoders());
-		      
-		    }
+			if (FORCE_STATECHANGE_ALL_INLINE) {
+				check_running_mode_inline();
+			} else {
+				check_running_mode_thresholds(
+				    get_abs_diff_encoders());
+			}
 		}
 	}
 }

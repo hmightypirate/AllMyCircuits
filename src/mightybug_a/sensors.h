@@ -30,7 +30,7 @@
 /* if 1 the car stops after finding an horizontal line -> all sensors detect
  * line */
 #define FINISH_ALL_INLINE 0
-#define FORCE_STATECHANGE_ALL_INLINE 0
+#define FORCE_STATECHANGE_ALL_INLINE 1
 
 /* the line follower position will be calculated between
    (-(NUM_SENSORS-1)/2 * SEP_SENSORS , (NUM_SENSORS-1)/2 * SEP_SENSORS)
