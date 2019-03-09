@@ -213,6 +213,7 @@ void check_rn_state(void)
 		break;
 	case RUNNING_BRAKE:
 		brake_running_state();
+		break;
 	case RUNNING_STOP:
 	default:
 		stop_running_state();

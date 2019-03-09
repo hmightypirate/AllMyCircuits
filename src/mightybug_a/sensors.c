@@ -145,6 +145,7 @@ int get_line_position(uint16_t *value)
 
 	// store past value here
 	former_detected_all_inline = detected_all_inline;
+	detected_all_inline = 0;
 
 	for (int i = 0; i < NUM_SENSORS; i++) {
 		// Check whites/blacks detected
