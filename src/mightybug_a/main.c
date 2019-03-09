@@ -13,6 +13,8 @@ int32_t line_error = 0;
 
 uint32_t delayed_start_time = 0;
 
+rnstate_e last_rn_state = RUNNING_NORMAL;
+
 void just_run_state(void);
 
 void go_to_normal(void)
@@ -180,8 +182,8 @@ void stop_running_state()
 void recovery_running_state()
 {
 
-	set_target_as_normal();
-	reset_pids_normal();
+	// set_target_as_normal();
+	// reset_pids_normal();
 
 	set_led_mode(LED_1, BLINK);
 	set_led_mode(LED_2, BLINK);
@@ -430,12 +432,22 @@ void just_run_state()
 	if (!is_out_of_line()) {
 		last_ms_inline = current_loop_millisecs;
 		if (get_running_state() == RUNNING_RECOVERY) {
-			update_running_state(SET_NORMAL_MODE_STATE);
+			if (last_rn_state == RUNNING_NORMAL)
+				update_running_state(SET_NORMAL_MODE_STATE);
+			else if (last_rn_state == RUNNING_TURBO)
+				update_running_state(SET_TURBO_MODE_STATE);
+			else if (last_rn_state == RUNNING_BRAKE)
+				update_running_state(NEAR_CORNER_EVENT);
+			else
+				update_running_state(SET_NORMAL_MODE_STATE);
 		}
 	} else {
 		if (get_all_inline()) {
 			update_state(ALL_SENSORS_IN_LINE_EVENT);
 		} else {
+			if (get_running_state()!=RUNNING_RECOVERY) {
+				last_rn_state = get_running_state();
+			}
 			update_running_state(LOST_LINE_EVENT);
 		}
 	}
