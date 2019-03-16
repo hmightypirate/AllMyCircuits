@@ -13,6 +13,8 @@ int32_t line_error = 0;
 
 uint32_t delayed_start_time = 0;
 
+rnstate_e last_rn_state = RUNNING_NORMAL;
+
 void just_run_state(void);
 
 void go_to_normal(void)
@@ -50,6 +52,36 @@ void check_running_mode_thresholds(int16_t avg_error)
 	}
 }
 
+/*
+ * @brief next state using inline
+ */
+void check_running_mode_inline()
+{
+	switch (get_running_state()) {
+	case RUNNING_NORMAL:
+
+		if (get_inline_change()) {
+			update_running_state(SET_TURBO_MODE_STATE);
+		}
+
+		break;
+
+	case RUNNING_TURBO:
+		if (get_inline_change()) {
+			update_running_state(NEAR_CORNER_EVENT);
+		}
+
+		break;
+	case RUNNING_BRAKE:
+		if (get_inline_change()) {
+			update_running_state(SET_NORMAL_MODE_STATE);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 void keypad_events(void)
 {
 	if (button_released(BUTTON1)) {
@@ -76,6 +108,21 @@ void turbo_running_state()
 
 	set_led_mode(LED_1, OFF);
 	set_led_mode(LED_2, OFF);
+
+	just_run_state();
+}
+
+void brake_running_state()
+{
+	set_target_as_brake();
+	reset_pids_turbo();
+
+	jukebox_setcurrent_song(NO_SONG);
+	if (RUNNING_STATE_PITCH)
+		jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+
+	set_led_mode(LED_1, ON);
+	set_led_mode(LED_2, ON);
 
 	just_run_state();
 }
@@ -135,8 +182,8 @@ void stop_running_state()
 void recovery_running_state()
 {
 
-	set_target_as_normal();
-	reset_pids_normal();
+	// set_target_as_normal();
+	// reset_pids_normal();
 
 	set_led_mode(LED_1, BLINK);
 	set_led_mode(LED_2, BLINK);
@@ -165,6 +212,9 @@ void check_rn_state(void)
 		break;
 	case RUNNING_RECOVERY:
 		recovery_running_state();
+		break;
+	case RUNNING_BRAKE:
+		brake_running_state();
 		break;
 	case RUNNING_STOP:
 	default:
@@ -335,11 +385,21 @@ void select_running_state(void)
 			// performed
 			if (is_enable_avg_readings()) {
 				// Obtain the average number of readings
-				check_running_mode_thresholds(
-				    get_avg_abs_readings());
+				if (FORCE_STATECHANGE_ALL_INLINE) {
+					check_running_mode_inline();
+				} else {
+					check_running_mode_thresholds(
+					    get_avg_abs_readings());
+				}
 			}
 		} else {
-			check_running_mode_thresholds(get_abs_diff_encoders());
+
+			if (FORCE_STATECHANGE_ALL_INLINE) {
+				check_running_mode_inline();
+			} else {
+				check_running_mode_thresholds(
+				    get_abs_diff_encoders());
+			}
 		}
 	}
 }
@@ -372,12 +432,22 @@ void just_run_state()
 	if (!is_out_of_line()) {
 		last_ms_inline = current_loop_millisecs;
 		if (get_running_state() == RUNNING_RECOVERY) {
-			update_running_state(SET_NORMAL_MODE_STATE);
+			if (last_rn_state == RUNNING_NORMAL)
+				update_running_state(SET_NORMAL_MODE_STATE);
+			else if (last_rn_state == RUNNING_TURBO)
+				update_running_state(SET_TURBO_MODE_STATE);
+			else if (last_rn_state == RUNNING_BRAKE)
+				update_running_state(NEAR_CORNER_EVENT);
+			else
+				update_running_state(SET_NORMAL_MODE_STATE);
 		}
 	} else {
 		if (get_all_inline()) {
 			update_state(ALL_SENSORS_IN_LINE_EVENT);
 		} else {
+			if (get_running_state()!=RUNNING_RECOVERY) {
+				last_rn_state = get_running_state();
+			}
 			update_running_state(LOST_LINE_EVENT);
 		}
 	}

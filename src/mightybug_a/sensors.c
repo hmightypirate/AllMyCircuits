@@ -5,6 +5,7 @@ static uint16_t white_sensors[NUM_SENSORS];
 static uint16_t calibrated_sensors[NUM_SENSORS];
 static uint16_t threshold[NUM_SENSORS];
 static uint8_t last_drift = LEFT_DRIFT;
+static uint8_t former_detected_all_inline = 0;
 static uint8_t detected_all_inline = 0;
 static int out_of_line = 0;
 
@@ -142,6 +143,10 @@ int get_line_position(uint16_t *value)
 
 	out_of_line = 0;
 
+	// store past value here
+	former_detected_all_inline = detected_all_inline;
+	detected_all_inline = 0;
+
 	for (int i = 0; i < NUM_SENSORS; i++) {
 		// Check whites/blacks detected
 		if (value[i] > threshold[i])
@@ -159,11 +164,16 @@ int get_line_position(uint16_t *value)
 	}
 
 	// all sensors are black
-	if ((whites_detected == 0 && FINISH_ALL_INLINE && FOLLOW_BLACK_LINE) ||
-	    (blacks_detected == 0 && FINISH_ALL_INLINE && FOLLOW_WHITE_LINE)) {
+	if ((whites_detected == 0 && (FINISH_ALL_INLINE || FORCE_STATECHANGE_ALL_INLINE) && FOLLOW_BLACK_LINE) ||
+	     (blacks_detected == 0 && (FINISH_ALL_INLINE || FORCE_STATECHANGE_ALL_INLINE) && FOLLOW_WHITE_LINE)) {
+	  detected_all_inline = 1;
+
+	  // specific to stopping the car
+	  if (FINISH_ALL_INLINE)
+	    {
 		out_of_line = 1;
-		detected_all_inline = 1;
 		position = 0;
+	    }
 	}
 
 	if ((blacks_detected == 0 && FOLLOW_BLACK_LINE) ||
@@ -328,4 +338,13 @@ uint8_t get_all_inline(void)
 void reset_all_inline(void)
 {
 	detected_all_inline = 0;
+}
+
+
+/* 
+ * @brief obtain rising-edge changes in inline full detection
+ */ 
+uint8_t get_inline_change(void)
+{
+  return (detected_all_inline ^ former_detected_all_inline) && detected_all_inline;
 }

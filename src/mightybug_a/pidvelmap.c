@@ -61,6 +61,15 @@ void set_target_as_turbo(void)
 }
 
 /*
+ * @brief resets current target velocity with the brake velocity
+ *
+ */
+void set_target_as_brake(void)
+{
+	set_target_velocity(vel_brake_maps[get_current_pidvel_map()]);
+}
+
+/*
  * @brief resets current target velocity with the velocity in corners
  *
  */

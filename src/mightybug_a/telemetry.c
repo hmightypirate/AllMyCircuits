@@ -33,5 +33,7 @@ void print_telemetry(int millis)
 		printf("%d,", (int)get_right_acc());
 	if (SHOW_TARGET_VEL)
 		printf("%d,", (int)get_target_velocity());
+	if (SHOW_SENSOR_INLINE)
+	  printf("%u,", (unsigned int)get_inline_change());
 	printf("\n");
 }

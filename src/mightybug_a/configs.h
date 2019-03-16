@@ -18,6 +18,7 @@ static const int16_t vel_maps[NUMBER_OF_MAPPINGS] = {
     // 700, 750, 780 // mapping 2nd test
     // 650, 725, 800 // mapping vel normal
     775, 800, 825 // for testing purposes
+    //500, 600, 700
 };
 
 // Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro
@@ -40,7 +41,17 @@ static const int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
     // 575, 600, 625 //mapping 1st test
     // 625, 650, 675 //mapping 2nd test
     // 600, 650, 700 // mapping vel turbo
-    675, 725, 775 // testing turbo
+    // 675, 725, 775 // testing turbo
+    800, 900, 950
+};
+
+static const int16_t vel_brake_maps[NUMBER_OF_MAPPINGS] = {
+    // 515, 515, 515
+    // 575, 600, 625 //mapping 1st test
+    // 625, 650, 675 //mapping 2nd test
+    //550, 600, 650 // mapping vel brake
+    600, 650, 700
+    //300, 400, 500 // testing turbo
 };
 
 static const uint8_t map_songs[NUMBER_OF_MAPPINGS] = {
