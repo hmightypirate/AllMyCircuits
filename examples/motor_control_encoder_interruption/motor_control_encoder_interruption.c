@@ -110,73 +110,6 @@ void encoder_setup(uint32_t timer, int afio_function, int channel1,
 }
 
 
-/*
- * @brief pwm engine setup
- */
-void motor_pwm_setup(void)
-{
-	/* The speed control pin accepts a PWM input with a frequency of up to
-	 * 100 kHz */
-
-	/* Set timer 4 mode to no divisor (72MHz), Edge-aligned, up-counting */
-	timer_set_mode(PWM_MOTOR_TIMER, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE,
-		       TIM_CR1_DIR_UP);
-	/* Set divider to 7 */
-	timer_set_prescaler(PWM_MOTOR_TIMER, 7);
-	/* A timer update event is generated only after the specified number of
-	 * repeat count cycles have been completed. - In bluepill is useless */
-	timer_set_repetition_counter(PWM_MOTOR_TIMER, 0);
-	/* Enable Auto-Reload Buffering. */
-	timer_enable_preload(PWM_MOTOR_TIMER);
-	/* Enable the Timer to Run Continuously. */
-	timer_continuous_mode(PWM_MOTOR_TIMER);
-	/* Specify the timer period in the auto-reload register. */
-	timer_set_period(PWM_MOTOR_TIMER, MAX_VEL_MOTOR);
-
-	/* Enable Main output bit as Timer 1 is and andvanced timer */
-	if (PWM_MOTOR_TIMER == TIM1) {
-		timer_enable_break_main_output(PWM_MOTOR_TIMER);
-	}
-
-	/* The freq is 72 MHz / ((1+7)*(1+0)*(1+999)) = 9000 Hz ->
-	 * period of 111.1 uS*/
-
-	/* Enable output GPIOs */
-	gpio_set_mode(LEFT_MOTOR_PWM_PORT, GPIO_MODE_OUTPUT_50_MHZ,
-		      GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, LEFT_MOTOR_PWM_PIN);
-
-	gpio_set_mode(RIGHT_MOTOR_PWM_PORT, GPIO_MODE_OUTPUT_50_MHZ,
-		      GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, RIGHT_MOTOR_PWM_PIN);
-
-	/* Timer Set Output Compare Mode.
-
-	   Specifies how the comparator output will respond to a compare match.
-	   The mode can be:
-
-	   Frozen - the output does not respond to a match.
-	   Active - the output assumes the active state on the first match.
-	   Inactive - the output assumes the inactive state on the first match.
-	   Toggle - The output switches between active and inactive states on
-	   each match. Force inactive. The output is forced low regardless of
-	   the compare state. Force active. The output is forced high regardless
-	   of the compare state. PWM1 - The output is active when the counter is
-	   less than the compare register contents and inactive otherwise. PWM2
-	   - The output is inactive when the counter is less than the compare
-	   register contents and active otherwise. */
-	timer_set_oc_mode(PWM_MOTOR_TIMER, LEFT_MOTOR_OUTPUT_CHANNEL,
-			  LEFT_MOTOR_OUTPUT_PWM);
-	timer_set_oc_mode(PWM_MOTOR_TIMER, RIGHT_MOTOR_OUTPUT_CHANNEL,
-			  RIGHT_MOTOR_OUTPUT_PWM); // so it is in contra phase
-	/* This is a convenience function to set the OC preload register value
-	 * for loading to the compare register. */
-	timer_set_oc_value(PWM_MOTOR_TIMER, LEFT_MOTOR_OUTPUT_CHANNEL, 0);
-	timer_set_oc_value(PWM_MOTOR_TIMER, RIGHT_MOTOR_OUTPUT_CHANNEL, 0);
-
-	timer_enable_oc_output(PWM_MOTOR_TIMER, LEFT_MOTOR_OUTPUT_CHANNEL);
-	timer_enable_oc_output(PWM_MOTOR_TIMER, RIGHT_MOTOR_OUTPUT_CHANNEL);
-
-	timer_enable_counter(PWM_MOTOR_TIMER);
-}
 
 /*
  * @brief systick setup
@@ -207,7 +140,6 @@ void sys_tick_handler(void) {
     uint32_t timer_tmp = (uint16_t)timer_get_counter(LEFT_ENCODER_TIMER);
 
     left_encoder_agg += encoder_measurement(timer_tmp);
-    
     timer_set_counter(LEFT_ENCODER_TIMER, 0);
  
 }
@@ -283,7 +215,6 @@ void setup_microcontroller(void)
 	clock_setup();
 	gpio_setup();
 	usart_setup();
-	motor_pwm_setup();
 	/* left encoder */
 	encoder_setup(LEFT_ENCODER_TIMER, LEFT_ENCODER_AFIO,
 		      LEFT_ENCODER_CHANNEL1, LEFT_ENCODER_CHANNEL2,
