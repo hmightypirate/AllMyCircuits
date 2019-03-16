@@ -1,11 +1,26 @@
 #include "setup.h"
-
-/* Read encoders every x systicks */
-#define ENCODER_MEASURE_TICKS 10000
+#include "utils.h"
 
 volatile uint32_t temp32 = 0;
 volatile uint32_t left_encoder_agg = 0;
 volatile uint32_t interrupt_counter = 0;
+
+/*
+ * @brief perform encoder measurements
+ */
+static uint32_t encoder_measurement(uint32_t value)
+{
+
+	if (value > WEIRD_ENCODER_MEAS) {
+		/* summing 1 because the first tick is the max number of ticks
+		 */
+		value = UINT16_MAX + 1 - value;
+	}
+
+	return value;
+}
+
+
 
 /*
  * Setup clocks of internal connections
@@ -50,7 +65,7 @@ void clock_setup(void)
  */
 void usart_setup(void)
 {
-	nvic_set_priority(NVIC_USART1_IRQ, 16);
+	nvic_set_priority(NVIC_USART1_IRQ, 15);
 	nvic_enable_irq(NVIC_USART1_IRQ);
 
 	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
@@ -189,20 +204,12 @@ void sys_tick_handler(void) {
   // Increase systick calls
   temp32++;
 
-  // We call this handler every 1ms so 1000ms = 1s on/off.
-  if (temp32 >= ENCODER_MEASURE_TICKS) {
-    gpio_toggle(GPIOC, GPIO13);
-    temp32 = 0;
-    // Read encoders
-
     uint32_t timer_tmp = (uint16_t)timer_get_counter(LEFT_ENCODER_TIMER);
 
-    left_encoder_agg += timer_tmp;
+    left_encoder_agg += encoder_measurement(timer_tmp);
     
     timer_set_counter(LEFT_ENCODER_TIMER, 0);
-    
-    new_measure = 1;
-  }
+ 
 }
 
 
@@ -211,7 +218,7 @@ void tim2_isr(void)
 {
 
   // count the number of interruptions
-  interrupt_counter += 1;
+  interrupt_counter++;
   
   /* Clear interrrupt flag. */
   timer_clear_flag(TIM2, TIM_SR_UIF);
@@ -282,11 +289,6 @@ void setup_microcontroller(void)
 		      LEFT_ENCODER_CHANNEL1, LEFT_ENCODER_CHANNEL2,
 		      LEFT_ENCODER_CHANNEL1_TI, LEFT_ENCODER_CHANNEL2_TI);
 
-	/* Right encoder */
-	encoder_setup(RIGHT_ENCODER_TIMER, RIGHT_ENCODER_AFIO,
-		      RIGHT_ENCODER_CHANNEL1, RIGHT_ENCODER_CHANNEL2,
-		      RIGHT_ENCODER_CHANNEL1_TI, RIGHT_ENCODER_CHANNEL2_TI);
-	
 	/* Line sensor setup */
 	systick_setup();
 
@@ -309,13 +311,15 @@ int main(void) {
   uint32_t last_loop_ms = 0;
   uint32_t current_loop_ms = 0;
   
-  while(true)
+  while(1)
     {
       current_loop_ms = temp32;
-      
+     
       if ((current_loop_ms - last_loop_ms) >= 1000)
 	{
-	  
+	  gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
+	  printf("Agg %lu\n", left_encoder_agg);
+	  printf("irq %lu\n", interrupt_counter);
 	  
 	  last_loop_ms = current_loop_ms;
 	}      

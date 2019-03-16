@@ -1,10 +1,10 @@
 sinclude ../../rules.mk
 
 
-CSRC = motor_control_encoder_interruption.c
+CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-motor_control_encoder_interruption.elf: $(OBJ)
+main.elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -19,7 +19,7 @@ clean_all:
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: motor_control_encoder_interruption.bin
+bin: main.bin
 
-all: libopencm3 motor_control_encoder_interruption.bin
+all: libopencm3 main.bin
 
