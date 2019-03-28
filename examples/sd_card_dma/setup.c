@@ -51,7 +51,7 @@ void gpio_setup(void) {
 }
 
 const uint8_t SETUP_OK = 1;
-const uint8_t SETUP_ERROR_I2C_COULD_NOT_SETUP = -1;
+const uint8_t SETUP_ERROR_SD_COULD_NOT_SETUP = -1;
 
 
 uint8_t setup() {
@@ -64,7 +64,7 @@ uint8_t setup() {
 	systick_setup();
 	lib_spi_setup();
 	if (lib_sd_raw_setup() != 1){
-		return SETUP_ERROR_I2C_COULD_NOT_SETUP;
+		return SETUP_ERROR_SD_COULD_NOT_SETUP;
 	}
 	return SETUP_OK;
 }

@@ -4,5 +4,5 @@
 
 
 uint8_t lib_sd_raw_setup(){
-
+	return 1;
 }
