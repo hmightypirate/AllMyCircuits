@@ -1,26 +1,10 @@
 #include "setup.h"
 #include "utils.h"
 
-volatile uint32_t temp32 = 0;
-volatile uint32_t left_encoder_agg = 0;
-volatile uint32_t interrupt_counter = 0;
+#define MILLISEC_SLICES 9000
 
-/*
- * @brief perform encoder measurements
- */
-static uint32_t encoder_measurement(uint32_t value)
-{
-
-	if (value > WEIRD_ENCODER_MEAS) {
-		/* summing 1 because the first tick is the max number of ticks
-		 */
-		value = UINT16_MAX + 1 - value;
-	}
-
-	return value;
-}
-
-
+volatile uint32_t millis = 0;
+volatile uint32_t left_encoder_updates = 0;
 
 /*
  * Setup clocks of internal connections
@@ -43,16 +27,6 @@ void clock_setup(void)
 	/* Enable TIMER for encoder (left encoder) */
 	rcc_periph_clock_enable(RCC_LEFT_ENCODER);
 	timer_reset(RCC_LEFT_ENCODER);
-
-	/* Enable TIMER for encoder (right encoder) */
-	rcc_periph_clock_enable(RCC_RIGHT_ENCODER);
-	timer_reset(RCC_RIGHT_ENCODER);
-
-	/* Enable TIMER for PWM engine */
-	rcc_periph_clock_enable(RCC_PWM_MOTORS);
-
-	/* Enable TIMER for buzzer */
-	rcc_periph_clock_enable(RCC_PWM_BUZZER);
 
 	/* Activate clock for AFIO, if used */
 	if (USE_ALTERNATE_FUNCTIONS) {
@@ -87,7 +61,6 @@ void usart_setup(void)
 	usart_enable(USART1);
 }
 
-
 void encoder_setup(uint32_t timer, int afio_function, int channel1,
 		   int channel2, int channel1_ti, int channel2_ti)
 {
@@ -97,7 +70,7 @@ void encoder_setup(uint32_t timer, int afio_function, int channel1,
 	}
 
 	/* No reset clock: full period */
-	timer_set_period(timer, 0xFFFF);
+	timer_set_period(timer, 1);
 
 	/* Encoders in quadrature */
 	timer_slave_set_mode(timer, TIM_SMCR_SMS_EM3);
@@ -108,8 +81,6 @@ void encoder_setup(uint32_t timer, int afio_function, int channel1,
 
 	timer_enable_counter(timer);
 }
-
-
 
 /*
  * @brief systick setup
@@ -123,7 +94,7 @@ void systick_setup()
 
 	/* 9000000/9000 = 1000 overflows per second - one interrupt every 1ms*/
 	/* SysTick interrupt every N clock pulses: set reload to N-1 */
-	systick_set_reload(9000 - 1);
+	systick_set_reload(MILLISEC_SLICES - 1);
 
 	systick_interrupt_enable();
 
@@ -131,74 +102,41 @@ void systick_setup()
 	systick_counter_enable();
 }
 
-
-
-void sys_tick_handler(void) {
-  // Increase systick calls
-  temp32++;
-
-    uint32_t timer_tmp = (uint16_t)timer_get_counter(LEFT_ENCODER_TIMER);
-
-    left_encoder_agg += encoder_measurement(timer_tmp);
-    timer_set_counter(LEFT_ENCODER_TIMER, 0);
- 
+void sys_tick_handler(void)
+{
+	// Increase systick calls
+	millis++;
 }
-
-
 
 void tim2_isr(void)
 {
+	if (timer_get_flag(TIM2, TIM_SR_UIF)) {
+		// count the number of left_encoder updates
+		left_encoder_updates++;
 
-  // count the number of interruptions
-  interrupt_counter++;
-  
-  /* Clear interrrupt flag. */
-  timer_clear_flag(TIM2, TIM_SR_UIF);
+		/* Clear interrrupt flag. */
+		timer_clear_flag(TIM2, TIM_SR_UIF);
+	}
 }
 
 void setup_irq_timers(void)
 {
 
-  /* Without this the timer interrupt routine will never be called. */
-  nvic_enable_irq(NVIC_TIM2_IRQ);
-  nvic_set_priority(NVIC_TIM2_IRQ, 1);
+	/* Without this the timer interrupt routine will never be called. */
+	nvic_enable_irq(NVIC_TIM2_IRQ);
+	nvic_set_priority(NVIC_TIM2_IRQ, 1);
 
-  /* Update interrupt enable. */
-  timer_enable_irq(TIM2, TIM_DIER_UIE);
-
+	/* Update interrupt enable. */
+	timer_enable_irq(TIM2, TIM_DIER_UIE);
 }
-
 
 void gpio_setup(void)
 {
-
 	/* Set internal LED */
 	gpio_set_mode(LED1_PORT, GPIO_MODE_OUTPUT_2_MHZ,
 		      GPIO_CNF_OUTPUT_PUSHPULL, LED1_PIN);
 
-	/* Set secondary LED */
-	gpio_set_mode(LED2_PORT, GPIO_MODE_OUTPUT_2_MHZ,
-		      GPIO_CNF_OUTPUT_PUSHPULL, LED2_PIN);
-
-	/* Set motor control ports */
-	/* Control GPIOs configuration for right motor */
-	gpio_set_mode(RIGHT_MOTOR_IN1_PORT, GPIO_MODE_OUTPUT_2_MHZ,
-		      GPIO_CNF_OUTPUT_PUSHPULL, RIGHT_MOTOR_IN1_PIN);
-
-	gpio_set_mode(RIGHT_MOTOR_IN2_PORT, GPIO_MODE_OUTPUT_2_MHZ,
-		      GPIO_CNF_OUTPUT_PUSHPULL, RIGHT_MOTOR_IN2_PIN);
-
-	/* Left motor control AIN2: PB5 */
-	gpio_set_mode(LEFT_MOTOR_IN2_PORT, GPIO_MODE_OUTPUT_2_MHZ,
-		      GPIO_CNF_OUTPUT_PUSHPULL, LEFT_MOTOR_IN2_PIN);
-
-	/* Control GPIOs configuration for left motor */
-	gpio_set_mode(LEFT_MOTOR_IN1_PORT, GPIO_MODE_OUTPUT_2_MHZ,
-		      GPIO_CNF_OUTPUT_PUSHPULL, LEFT_MOTOR_IN1_PIN);
-
 }
-
-
 
 /*
  * @brief setup of microcontroller functionality
@@ -227,35 +165,27 @@ void setup_microcontroller(void)
 	setup_irq_timers();
 }
 
-
-
-
 /*
  * @brief main function
  *
  */
-int main(void) {
-  
-  setup_microcontroller();
+int main(void)
+{
 
- 
-  uint32_t last_loop_ms = 0;
-  uint32_t current_loop_ms = 0;
-  
-  while(1)
-    {
-      current_loop_ms = temp32;
-     
-      if ((current_loop_ms - last_loop_ms) >= 1000)
-	{
-	  gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
-	  printf("Agg %lu\n", left_encoder_agg);
-	  printf("irq %lu\n", interrupt_counter);
-	  
-	  last_loop_ms = current_loop_ms;
-	}      
-    }
-  
+	setup_microcontroller();
 
-  return 0;
+	uint32_t last_loop_ms = 0;
+	uint32_t current_loop_ms = 0;
+
+	while (1) {
+		current_loop_ms = millis;
+
+		if ((current_loop_ms - last_loop_ms) >= 1000) {
+			gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
+			printf("Time: %lu Updates: %lu\n", millis / 1000, left_encoder_updates);
+			last_loop_ms = current_loop_ms;
+		}
+	}
+
+	return 0;
 }
