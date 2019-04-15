@@ -1,18 +1,19 @@
+#include "motors.h"
 #include "setup.h"
 #include "utils.h"
-#include "motors.h"
 
 #define MILLISEC_SLICES 9000
 
-volatile uint32_t millis = 0;
-volatile uint32_t left_encoder_updates = 0;
-volatile uint32_t rpm_measurement = 0;
-volatile uint32_t new_left_encoder_count_time = 0;
-volatile uint32_t last_left_encoder_count_time = 0;
-volatile uint32_t new_millis = 0;
-volatile uint32_t last_millis = 0;
-volatile uint32_t agg = 0;
+#define CH1 0
+#define CH2 1
 
+volatile uint32_t millis = 0;
+volatile uint32_t agg = 0;
+volatile uint32_t last_interrupt = CH1;
+volatile uint32_t last_edge_ch1_time = 0;
+volatile uint32_t last_edge_ch2_time = 0;
+volatile uint32_t last_edge_ch1_ms_time = 0;
+volatile uint32_t last_edge_ch2_ms_time = 0;
 
 /*
  * Setup clocks of internal connections
@@ -38,7 +39,6 @@ void clock_setup(void)
 
 	/* Enable TIMER for PWM engine */
 	rcc_periph_clock_enable(RCC_PWM_MOTORS);
-
 
 	/* Activate clock for AFIO, if used */
 	if (USE_ALTERNATE_FUNCTIONS) {
@@ -73,27 +73,58 @@ void usart_setup(void)
 	usart_enable(USART1);
 }
 
-void encoder_setup(uint32_t timer, int afio_function, int channel1,
-		   int channel2, int channel1_ti, int channel2_ti)
+void encoder_setup(void)
 {
-	if (afio_function) {
-		gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON,
-				   afio_function);
-	}
+	/* Enable EXTI15 interrupt. */
+	nvic_set_priority(NVIC_EXTI15_10_IRQ, 14);
+	nvic_enable_irq(NVIC_EXTI15_10_IRQ);
 
-	/* No reset clock: full period */
-	timer_set_period(timer, 0x1);
+	/* Set GPIO15 (in GPIO port A) to 'input open-drain'. */
+	gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO15);
 
-	/* Encoders in quadrature */
-	timer_slave_set_mode(timer, TIM_SMCR_SMS_EM3);
+	/* Configure the EXTI subsystem. */
+	exti_select_source(EXTI15, GPIOA);
+	exti_set_trigger(EXTI15, EXTI_TRIGGER_BOTH);
+	exti_enable_request(EXTI15);
 
-	/* Set input channels */
-	timer_ic_set_input(timer, channel1, channel1_ti);
-	timer_ic_set_input(timer, channel2, channel2_ti);
+	/* This let us use PB3 as standard GPIO */
+	gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON, AFIO_EXTI3);
 
-	timer_enable_counter(timer);
+	/* Enable EXTI3 interrupt. */
+	nvic_set_priority(NVIC_EXTI3_IRQ, 13);
+	nvic_enable_irq(NVIC_EXTI3_IRQ);
+
+	/* Set GPIO3 (in GPIO port B) to 'input open-drain'. */
+	gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO3);
+
+	/* Configure the EXTI subsystem. */
+	exti_select_source(EXTI3, GPIOB);
+	exti_set_trigger(EXTI3, EXTI_TRIGGER_BOTH);
+	exti_enable_request(EXTI3);
 }
 
+void exti15_10_isr(void)
+{
+	last_edge_ch1_time = systick_get_value();
+	last_edge_ch1_ms_time = millis;
+	last_interrupt = CH1;
+
+	agg++;
+
+	exti_reset_request(EXTI15);
+}
+
+void exti3_isr(void)
+{
+
+	last_edge_ch2_time = systick_get_value();
+	last_edge_ch2_ms_time = millis;
+	last_interrupt = CH2;
+
+	agg++;
+
+	exti_reset_request(EXTI3);
+}
 
 /*
  * @brief pwm engine setup
@@ -154,7 +185,6 @@ void motor_pwm_setup(void)
 	timer_enable_counter(PWM_MOTOR_TIMER);
 }
 
-
 /*
  * @brief systick setup
  *
@@ -181,24 +211,21 @@ void sys_tick_handler(void)
 	millis++;
 }
 
-void tim2_isr(void)
+uint32_t get_motor_last_measured_rpm(void)
 {
-	if (timer_get_flag(TIM2, TIM_SR_UIF)) {
-		new_left_encoder_count_time = systick_get_value();
-		new_millis = millis;
+	uint32_t diff_count_time = 0;
 
-		// count the number of left_encoder updates
-		left_encoder_updates++;
-		agg++;
-		uint32_t diff_count_time = (MILLISEC_SLICES * (new_millis - last_millis)) + last_left_encoder_count_time - new_left_encoder_count_time;
-
-		rpm_measurement = 45000000/diff_count_time;
-
-		last_left_encoder_count_time = new_left_encoder_count_time;
-		last_millis = new_millis;
-		/* Clear interrrupt flag. */
-		timer_clear_flag(TIM2, TIM_SR_UIF);
+	if (last_interrupt == CH1) {
+		diff_count_time =
+		    (MILLISEC_SLICES * (last_edge_ch1_ms_time - last_edge_ch2_ms_time)) +
+		    last_edge_ch2_time - last_edge_ch1_time;
+	} else {
+		diff_count_time =
+		    (MILLISEC_SLICES * (last_edge_ch2_ms_time - last_edge_ch1_ms_time)) +
+		    last_edge_ch1_time - last_edge_ch2_time;		
 	}
+
+    return 45000000 / diff_count_time;
 }
 
 void setup_irq_timers(void)
@@ -225,7 +252,6 @@ void gpio_setup(void)
 	/* Control GPIOs configuration for left motor */
 	gpio_set_mode(LEFT_MOTOR_IN1_PORT, GPIO_MODE_OUTPUT_2_MHZ,
 		      GPIO_CNF_OUTPUT_PUSHPULL, LEFT_MOTOR_IN1_PIN);
-
 }
 
 /*
@@ -245,9 +271,7 @@ void setup_microcontroller(void)
 	usart_setup();
 	motor_pwm_setup();
 	/* left encoder */
-	encoder_setup(LEFT_ENCODER_TIMER, LEFT_ENCODER_AFIO,
-		      LEFT_ENCODER_CHANNEL1, LEFT_ENCODER_CHANNEL2,
-		      LEFT_ENCODER_CHANNEL1_TI, LEFT_ENCODER_CHANNEL2_TI);
+	encoder_setup();
 
 	/* Line sensor setup */
 	systick_setup();
@@ -280,7 +304,8 @@ int main(void)
 				set_left_motor_velocity(pwm_value);
 			}
 
-			printf("Time: %lu PWM: %lu RPM: %lu AGG: %lu\n", millis / 1000, pwm_value, rpm_measurement, agg);
+			printf("Time: %lu PWM: %lu RPM: %lu AGG: %lu\n",
+			       millis / 1000, pwm_value, get_motor_last_measured_rpm(), agg);
 			last_loop_ms = current_loop_ms;
 			agg = 0;
 		}

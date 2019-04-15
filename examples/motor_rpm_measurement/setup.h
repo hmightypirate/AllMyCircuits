@@ -9,6 +9,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/exti.h>
 
 /*
  *Active if alternate functions of pins are used
