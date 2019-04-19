@@ -10,7 +10,7 @@
 #include "setup.h"
 
 #include "lib_sd_raw.h"
-#include "lib_spi.h"
+#include "lib_spi_master.h"
 #include "systick.h"
 
 void clock_setup(void) {
@@ -63,7 +63,7 @@ uint8_t setup() {
 	usart_setup();
 	systick_setup();
 	// lib_spi_setup is done by lib_sd_raw_setup, which needs systick_setup
-	lib_sd_raw_setup();
+	//lib_sd_raw_setup();
 
 	return SETUP_OK;
 }

@@ -9,6 +9,27 @@
 uint8_t lib_sd_raw_setup();
 
 
+typedef struct
+{
+uint32_t timeout_write;
+uint32_t timeout_read;
+uint8_t busyflag;
+} sd_context_t;
+
+uint8_t sd_card_present();
+uint8_t sd_initialize(sd_context_t *sdc);
+uint8_t sd_read_block (sd_context_t *sdc, uint32_t blockaddr, uint8_t *data);
+uint8_t sd_write_block (sd_context_t *sdc, uint32_t blockaddr, uint8_t *data);
+void sd_wait_notbusy (sd_context_t *sdc);
+/* Internal functions, used for SD card communications. */
+void sd_packarg(uint32_t *argument, uint32_t value);
+uint8_t sd_set_blocklen (sd_context_t *sdc, uint32_t length);
+uint8_t sd_send_command(sd_context_t *sdc,
+		uint8_t cmd, uint8_t response_type,
+		uint8_t *response, uint8_t *argument);
+void sd_delay(uint32_t number);
+
+
 /* response lengths */
 #define R1 1
 #define R1B 2
@@ -115,5 +136,19 @@ uint8_t lib_sd_raw_setup();
 #define ACMD51 42
 #define ACMD51_R R1
 
+
+
+
+#define SD_BLOCKSIZE 512
+#define SD_BLOCKSIZE_NBITS 9
+
+#define MSK_IDLE 0x01
+
+
+/* Mask off the bits in the OCR corresponding to voltage range 3.2V to
+* 3.4V, OCR bits 20 and 21 */
+#define MSK_OCR_33 0xC0
+
+#define SD_IDLE_WAIT_MAX 100
 
 #endif /* LIB_SD_RAW_H_ */

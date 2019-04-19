@@ -1,15 +1,22 @@
-#include "lib_spi.h"
-
 #include <libopencm3/cm3/common.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
+#include "lib_spi_master.h"
 
 void lib_spi_master_setup() {
 	/* Configure GPIOs: SS=PB12, SCK=PB13, MISO=PB14 and MOSI=PB15 */
-	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ,
-			GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, /* GPIO4 | */
+	gpio_set_mode(
+			GPIOB,
+			GPIO_MODE_OUTPUT_50_MHZ,
+			GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
 			GPIO12 | GPIO13 | GPIO15);
+
+	gpio_set_mode(
+			GPIOB,
+			GPIO_MODE_INPUT,
+			GPIO_CNF_INPUT_FLOAT,
+			GPIO14);
 
 	/* Reset SPI, SPI_CR1 register cleared, SPI is disabled */
 	spi_reset(SPI2);
@@ -24,9 +31,13 @@ void lib_spi_master_setup() {
 	 * Data frame format: 8-bit
 	 * Frame format: MSB First
 	 */
-	spi_init_master(SPI2, SPI_CR1_BAUDRATE_FPCLK_DIV_256,
-			SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE, SPI_CR1_CPHA_CLK_TRANSITION_1,
-			SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+	spi_init_master(
+			SPI2,
+			SPI_CR1_BAUDRATE_FPCLK_DIV_256,
+			SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+			SPI_CR1_CPHA_CLK_TRANSITION_1,
+			SPI_CR1_DFF_8BIT,
+			SPI_CR1_MSBFIRST);
 
 	spi_set_full_duplex_mode(SPI2);
 
@@ -58,7 +69,9 @@ uint8_t lib_spi_master_read_byte() {
 }
 
 void lib_spi_master_write_byte(uint8_t out) {
+	spi_set_nss_high(SPI2);
 	spi_write(SPI2, (uint16_t) out);
+	spi_set_nss_low(SPI2);
 }
 
 uint8_t lib_spi_master_write_read_byte(uint8_t out) {
