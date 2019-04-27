@@ -1,13 +1,5 @@
 #include "utils.h"
 #include "setup.h"
-#include <stdio.h>
-#include <libopencm3/cm3/scb.h>
-#include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/timer.h>
-#include <libopencm3/stm32/usart.h>
-
 
 /*
  * @brief set gpio modes, enable gpio clocks
@@ -19,10 +11,18 @@ void gpio_setup(void) {
   rcc_periph_clock_enable(RCC_GPIOB);
   rcc_periph_clock_enable(RCC_GPIOA);
 
+  /* Enable USART */
+  rcc_periph_clock_enable(RCC_USART1);
+
+  /* Enable GPIO for encoder */
+  rcc_periph_clock_enable(RCC_TIM2);
+  rcc_periph_clock_enable(RCC_AFIO);
+  
   /* Set internal LED */
   gpio_set_mode(INTERNAL_LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                 INTERNAL_LED);
 
+  
 }
 
 
@@ -31,17 +31,19 @@ void gpio_setup(void) {
  */
 void usart_setup(void)
 {
-	/* Enable USART */
-	rcc_periph_clock_enable(RCC_USART1);
-  
-	nvic_set_priority(NVIC_USART1_IRQ, 15);
+
+  	nvic_set_priority(NVIC_USART1_IRQ, 15);
 	nvic_enable_irq(NVIC_USART1_IRQ);
 
 	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ,
 		      GPIO_CNF_INPUT_PULL_UPDOWN, GPIO_USART1_TX);
+
+
+	/*
 	gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
 		      GPIO_USART1_RX);
 
+	*/
 	/* Setup USART PARAMETERS */
 	usart_set_baudrate(USART1, USART_BAUDRATE);
 	usart_set_databits(USART1, USART_DATABITS);
@@ -49,8 +51,12 @@ void usart_setup(void)
 	usart_set_mode(USART1, USART_MODE);
 	usart_set_parity(USART1, USART_PARITY);
 	usart_set_flow_control(USART1, USART_FLOWCONTROL);
+
+	/* Enable RX interruptions to usart1_isr() function */
+	//usart_enable_rx_interrupt(USART1);
 	/* Enable USART */
 	usart_enable(USART1);
+
 }
 
 /*
@@ -59,9 +65,6 @@ void usart_setup(void)
 void encoder_setup()
 {
 
-  /* Enable GPIO for encoder */
-  rcc_periph_clock_enable(RCC_TIM2);
-  rcc_periph_clock_enable(RCC_AFIO);
 
   timer_reset(RCC_TIM2);
 
