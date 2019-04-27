@@ -296,16 +296,16 @@ int main(void)
 	while (1) {
 		current_loop_ms = millis;
 
-		if ((current_loop_ms - last_loop_ms) >= 1000) {
+		if ((current_loop_ms - last_loop_ms) >= 20) {
 			gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
 
-			if ((current_loop_ms % 4000) == 0) {
-				pwm_value = (pwm_value + 200) % 1000;
+			if ((current_loop_ms % 2000) == 0) {
+				pwm_value = (pwm_value + 50) % 1000;
 				set_left_motor_velocity(pwm_value);
 			}
 
 			printf("Time: %lu PWM: %lu RPM: %lu AGG: %lu\n",
-			       millis / 1000, pwm_value, get_motor_last_measured_rpm(), agg);
+			       millis / 20, pwm_value, get_motor_last_measured_rpm(), agg);
 			last_loop_ms = current_loop_ms;
 			agg = 0;
 		}
