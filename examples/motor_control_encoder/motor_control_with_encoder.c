@@ -13,8 +13,6 @@
  * @brief set gpio modes, enable gpio clocks
  */
 void gpio_setup(void) {
-  /* Enable GPIOB clock (for PWM and control pins) */
-  rcc_periph_clock_enable(RCC_GPIOB);
 
   /* Enable GPIOC clock (For internal LED */
   rcc_periph_clock_enable(RCC_GPIOC);
@@ -91,10 +89,12 @@ void encoder_setup()
  *
  */
 int main(void) {
-    rcc_clock_setup_in_hse_8mhz_out_72mhz();
+  SCB_VTOR = (uint32_t) 0x08000000; 
+  
+  rcc_clock_setup_in_hse_8mhz_out_72mhz();
     /* Change interrupt vector table location to avoid conflict with */
     /* serial bootloader interrupt vectors */                                                  
-    SCB_VTOR = (uint32_t) 0x08000000; 
+
     
     /* Initial setup */
     gpio_setup();
@@ -131,7 +131,7 @@ int main(void) {
 	  next_measure = read_count - old_read_count;
 	}
       
-      // printf("Next meas: %u\n", next_measure);
+      printf("Next meas: %u\n", next_measure);
       
       old_read_count = read_count;
       
