@@ -322,7 +322,7 @@ int main(void)
 	while (1) {
 		current_loop_ms = millis;
 
-		if ((current_loop_ms - last_loop_ms) >= 20) {
+		if ((current_loop_ms - last_loop_ms) >= 500) {
 			gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
 
 			if ((current_loop_ms % 2000) == 0) {
@@ -331,7 +331,7 @@ int main(void)
 			}
 
 			printf("Time: %lu PWM: %lu RPM: %lu AGG: %lu\n",
-			       millis / 20, pwm_value,
+			       millis / 500, pwm_value,
 			       get_motor_last_measured_rpm(), agg);
 			last_loop_ms = current_loop_ms;
 			agg = 0;
