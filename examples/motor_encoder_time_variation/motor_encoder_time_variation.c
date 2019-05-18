@@ -2,18 +2,25 @@
 #include "setup.h"
 #include "utils.h"
 
-#define MILLISEC_SLICES 9000
+#define MILLISEC_SLICES 72000
 
 #define CH1 0
 #define CH2 1
 
+#define PWM_VALUE 900
+#define LENGHT_ARRAY_SAMPLES 5000
+
 volatile uint32_t millis = 0;
-volatile uint32_t agg = 0;
 volatile uint32_t last_interrupt = CH1;
-volatile uint32_t last_edge_ch1_time = 0;
-volatile uint32_t last_edge_ch2_time = 0;
-volatile uint32_t last_edge_ch1_ms_time = 0;
-volatile uint32_t last_edge_ch2_ms_time = 0;
+volatile uint32_t edge_ch1_clk_time = 0;
+volatile uint32_t edge_ch2_clk_time = 0;
+volatile uint32_t edge_ch1_ms_time = 0;
+volatile uint32_t edge_ch2_ms_time = 0;
+
+volatile uint8_t take_samples = 0;
+volatile uint16_t save_index = 0;
+volatile uint16_t samples[LENGHT_ARRAY_SAMPLES];
+
 
 /*
  * Setup clocks of internal connections
@@ -105,11 +112,21 @@ void encoder_setup(void)
 
 void exti15_10_isr(void)
 {
-	last_edge_ch1_time = systick_get_value();
-	last_edge_ch1_ms_time = millis;
-	last_interrupt = CH1;
+	edge_ch1_clk_time = systick_get_value();
+	edge_ch1_ms_time = millis;
 
-	agg++;
+	if ((take_samples==1)&&(last_interrupt == CH2)) {
+		samples[save_index] =
+		    (MILLISEC_SLICES * (edge_ch1_ms_time - edge_ch2_ms_time)) +
+		    edge_ch2_clk_time - edge_ch1_clk_time;
+
+		save_index++;
+
+		if (save_index == LENGHT_ARRAY_SAMPLES) {
+			take_samples = 0;
+		}
+	}
+	last_interrupt = CH1;
 
 	exti_reset_request(EXTI15);
 }
@@ -117,11 +134,21 @@ void exti15_10_isr(void)
 void exti3_isr(void)
 {
 
-	last_edge_ch2_time = systick_get_value();
-	last_edge_ch2_ms_time = millis;
-	last_interrupt = CH2;
+	edge_ch2_clk_time = systick_get_value();
+	edge_ch2_ms_time = millis;
 
-	agg++;
+	if ((take_samples == 1) && (last_interrupt == CH1)) {
+		samples[save_index] =
+		    (MILLISEC_SLICES * (edge_ch2_ms_time - edge_ch1_ms_time)) +
+		    edge_ch1_clk_time - edge_ch2_clk_time;
+
+		save_index++;
+
+		if (save_index == LENGHT_ARRAY_SAMPLES) {
+			take_samples = 0;
+		}
+	}
+	last_interrupt = CH2;
 
 	exti_reset_request(EXTI3);
 }
@@ -192,8 +219,8 @@ void motor_pwm_setup(void)
  */
 void systick_setup()
 {
-	/* 72MHz / 8 => 9000000 counts per second */
-	systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
+	/* 72MHz => 72000000 counts per second */
+	systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
 
 	/* 9000000/9000 = 1000 overflows per second - one interrupt every 1ms*/
 	/* SysTick interrupt every N clock pulses: set reload to N-1 */
@@ -209,34 +236,6 @@ void sys_tick_handler(void)
 {
 	// Increase systick calls
 	millis++;
-}
-
-uint32_t get_motor_last_measured_rpm(void)
-{
-	uint32_t diff_count_time = 0;
-
-	if (last_interrupt == CH1) {
-		diff_count_time =
-		    (MILLISEC_SLICES * (last_edge_ch1_ms_time - last_edge_ch2_ms_time)) +
-		    last_edge_ch2_time - last_edge_ch1_time;
-	} else {
-		diff_count_time =
-		    (MILLISEC_SLICES * (last_edge_ch2_ms_time - last_edge_ch1_ms_time)) +
-		    last_edge_ch1_time - last_edge_ch2_time;		
-	}
-
-    return 45000000 / diff_count_time;
-}
-
-void setup_irq_timers(void)
-{
-
-	/* Without this the timer interrupt routine will never be called. */
-	nvic_enable_irq(NVIC_TIM2_IRQ);
-	nvic_set_priority(NVIC_TIM2_IRQ, 1);
-
-	/* Update interrupt enable. */
-	timer_enable_irq(TIM2, TIM_DIER_UIE);
 }
 
 void gpio_setup(void)
@@ -275,9 +274,6 @@ void setup_microcontroller(void)
 
 	/* Line sensor setup */
 	systick_setup();
-
-	/* Timer interruptions setup */
-	setup_irq_timers();
 }
 
 /*
@@ -289,25 +285,37 @@ int main(void)
 
 	setup_microcontroller();
 
-	uint32_t last_loop_ms = 0;
 	uint32_t current_loop_ms = 0;
-	uint32_t pwm_value = 0;
+	uint16_t index = 0;
 
 	while (1) {
 		current_loop_ms = millis;
 
-		if ((current_loop_ms - last_loop_ms) >= 500) {
+		if ((current_loop_ms % 1000) == 0) {
 			gpio_toggle(INTERNAL_LED_PORT, INTERNAL_LED);
+		}
 
-			if ((current_loop_ms % 2000) == 0) {
-				pwm_value = (pwm_value + 50) % 1000;
-				set_left_motor_velocity(pwm_value);
+		if (current_loop_ms == 1000) {
+			set_left_motor_velocity(PWM_VALUE);
+		}
+
+		if (current_loop_ms == 2000) {
+			take_samples = 1;
+		}
+
+		if (current_loop_ms == 3500) {
+			set_left_motor_velocity(0);
+			printf("START\n");
+		}
+
+		if ((current_loop_ms > 4000) && (index < 5000)) {
+			if ((current_loop_ms - 4000) % 2) {
+				printf("%u\n", samples[index++]);
 			}
+		}
 
-			printf("Time: %lu PWM: %lu RPM: %lu AGG: %lu\n",
-			       millis / 500, pwm_value, get_motor_last_measured_rpm(), agg);
-			last_loop_ms = current_loop_ms;
-			agg = 0;
+		if (index == 5000) {
+			printf("END\n");
 		}
 	}
 

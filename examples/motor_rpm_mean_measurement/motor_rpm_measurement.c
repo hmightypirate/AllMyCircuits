@@ -2,18 +2,29 @@
 #include "setup.h"
 #include "utils.h"
 
-#define MILLISEC_SLICES 9000
+#define MILLISEC_SLICES 72000
 
 #define CH1 0
 #define CH2 1
 
+#define NUM_SAMPLES 2
+
 volatile uint32_t millis = 0;
 volatile uint32_t agg = 0;
 volatile uint32_t last_interrupt = CH1;
-volatile uint32_t last_edge_ch1_time = 0;
-volatile uint32_t last_edge_ch2_time = 0;
-volatile uint32_t last_edge_ch1_ms_time = 0;
-volatile uint32_t last_edge_ch2_ms_time = 0;
+volatile uint32_t edge_ch1_clk_time = 0;
+volatile uint32_t edge_ch2_clk_time = 0;
+volatile uint32_t edge_ch1_ms_time = 0;
+volatile uint32_t edge_ch2_ms_time = 0;
+volatile uint32_t diff_time[NUM_SAMPLES];
+volatile uint8_t diff_index = 0;
+
+void init_rpm_arrays(void)
+{
+	for (int i = 0; i < NUM_SAMPLES; i++) {
+		diff_time[i] = 0;
+	}
+}
 
 /*
  * Setup clocks of internal connections
@@ -75,6 +86,9 @@ void usart_setup(void)
 
 void encoder_setup(void)
 {
+
+	init_rpm_arrays();
+
 	/* Enable EXTI15 interrupt. */
 	nvic_set_priority(NVIC_EXTI15_10_IRQ, 14);
 	nvic_enable_irq(NVIC_EXTI15_10_IRQ);
@@ -105,8 +119,16 @@ void encoder_setup(void)
 
 void exti15_10_isr(void)
 {
-	last_edge_ch1_time = systick_get_value();
-	last_edge_ch1_ms_time = millis;
+	edge_ch1_clk_time = systick_get_value();
+	edge_ch1_ms_time = millis;
+
+	if (last_interrupt == CH2) {
+		diff_time[diff_index] =
+		    (MILLISEC_SLICES * (edge_ch1_ms_time - edge_ch2_ms_time)) +
+		    edge_ch2_clk_time - edge_ch1_clk_time;
+
+		diff_index = (diff_index + 1) % NUM_SAMPLES;
+	}
 	last_interrupt = CH1;
 
 	agg++;
@@ -117,8 +139,16 @@ void exti15_10_isr(void)
 void exti3_isr(void)
 {
 
-	last_edge_ch2_time = systick_get_value();
-	last_edge_ch2_ms_time = millis;
+	edge_ch2_clk_time = systick_get_value();
+	edge_ch2_ms_time = millis;
+
+	if (last_interrupt == CH1) {
+		diff_time[diff_index] =
+		    (MILLISEC_SLICES * (edge_ch2_ms_time - edge_ch1_ms_time)) +
+		    edge_ch1_clk_time - edge_ch2_clk_time;
+
+		diff_index = (diff_index + 1) % NUM_SAMPLES;
+	}
 	last_interrupt = CH2;
 
 	agg++;
@@ -192,8 +222,8 @@ void motor_pwm_setup(void)
  */
 void systick_setup()
 {
-	/* 72MHz / 8 => 9000000 counts per second */
-	systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
+	/* 72MHz => 72000000 counts per second */
+	systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
 
 	/* 9000000/9000 = 1000 overflows per second - one interrupt every 1ms*/
 	/* SysTick interrupt every N clock pulses: set reload to N-1 */
@@ -215,17 +245,13 @@ uint32_t get_motor_last_measured_rpm(void)
 {
 	uint32_t diff_count_time = 0;
 
-	if (last_interrupt == CH1) {
-		diff_count_time =
-		    (MILLISEC_SLICES * (last_edge_ch1_ms_time - last_edge_ch2_ms_time)) +
-		    last_edge_ch2_time - last_edge_ch1_time;
-	} else {
-		diff_count_time =
-		    (MILLISEC_SLICES * (last_edge_ch2_ms_time - last_edge_ch1_ms_time)) +
-		    last_edge_ch1_time - last_edge_ch2_time;		
+	for (int i = 0; i < NUM_SAMPLES; i++) {
+		diff_count_time += diff_time[i];
 	}
+	diff_count_time /= NUM_SAMPLES;
 
-    return 45000000 / diff_count_time;
+	//return 45000000 / diff_count_time;
+	return 360000000 / diff_count_time;
 }
 
 void setup_irq_timers(void)
@@ -305,7 +331,8 @@ int main(void)
 			}
 
 			printf("Time: %lu PWM: %lu RPM: %lu AGG: %lu\n",
-			       millis / 500, pwm_value, get_motor_last_measured_rpm(), agg);
+			       millis / 500, pwm_value,
+			       get_motor_last_measured_rpm(), agg);
 			last_loop_ms = current_loop_ms;
 			agg = 0;
 		}
