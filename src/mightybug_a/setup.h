@@ -2,6 +2,7 @@
 #define __SETUP_H
 
 #include "commons.h"
+#include "encoder.h"
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/cm3/scb.h>
 #include <libopencm3/cm3/systick.h>
@@ -10,6 +11,10 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/exti.h>
+
+#define USE_ENCODER_TIMER 1
+#define MILLISEC_SLICES 72000
 
 /*
  *Active if alternate functions of pins are used

@@ -22,14 +22,15 @@ void clock_setup(void)
 	/* Enable DMA */
 	rcc_periph_clock_enable(RCC_DMA1);
 
-	/* Enable TIMER for encoder (left encoder) */
-	rcc_periph_clock_enable(RCC_LEFT_ENCODER);
-	timer_reset(RCC_LEFT_ENCODER);
+	if (USE_ENCODER_TIMER) {
+		/* Enable TIMER for encoder (left encoder) */
+		rcc_periph_clock_enable(RCC_LEFT_ENCODER);
+		timer_reset(RCC_LEFT_ENCODER);
 
-	/* Enable TIMER for encoder (right encoder) */
-	rcc_periph_clock_enable(RCC_RIGHT_ENCODER);
-	timer_reset(RCC_RIGHT_ENCODER);
-
+		/* Enable TIMER for encoder (right encoder) */
+		rcc_periph_clock_enable(RCC_RIGHT_ENCODER);
+		timer_reset(RCC_RIGHT_ENCODER);
+	}
 	/* Enable TIMER for PWM engine */
 	rcc_periph_clock_enable(RCC_PWM_MOTORS);
 
@@ -91,6 +92,66 @@ void encoder_setup(uint32_t timer, int afio_function, int channel1,
 	timer_ic_set_input(timer, channel2, channel2_ti);
 
 	timer_enable_counter(timer);
+
+}
+
+void encoder_setup_edge_interruptions(void)
+{
+	// Reset buffer of time differences
+	reset_encoders_edge_times();
+
+	/* Enable EXTI15 interrupt. */
+	nvic_set_priority(NVIC_EXTI15_10_IRQ, 14);
+	nvic_enable_irq(NVIC_EXTI15_10_IRQ);
+
+	/* Set GPIO15 (in GPIO port A) to 'input open-drain'. */
+	gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO15);
+
+	/* Configure the EXTI subsystem. */
+	exti_select_source(EXTI15, GPIOA);
+	exti_set_trigger(EXTI15, EXTI_TRIGGER_BOTH);
+	exti_enable_request(EXTI15);
+
+	/* This let us use PB3 as standard GPIO */
+	gpio_primary_remap(AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_ON, AFIO_EXTI3);
+
+	/* Enable EXTI3 interrupt. */
+	nvic_set_priority(NVIC_EXTI3_IRQ, 13);
+	nvic_enable_irq(NVIC_EXTI3_IRQ);
+
+	/* Set GPIO3 (in GPIO port B) to 'input open-drain'. */
+	gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO3);
+
+	/* Configure the EXTI subsystem. */
+	exti_select_source(EXTI3, GPIOB);
+	exti_set_trigger(EXTI3, EXTI_TRIGGER_BOTH);
+	exti_enable_request(EXTI3);
+
+	// RIGHT MOTOR B6 and B7
+	/* Enable EXTI6 interrupt. */
+	nvic_set_priority(NVIC_EXTI9_5_IRQ, 12);
+	nvic_enable_irq(NVIC_EXTI9_5_IRQ);
+
+	/* Set GPIO6 (in GPIO port B) to 'input open-drain'. */
+	gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO6);
+
+	/* Configure the EXTI subsystem. */
+	exti_select_source(EXTI6, GPIOB);
+	exti_set_trigger(EXTI6, EXTI_TRIGGER_BOTH);
+	exti_enable_request(EXTI6);
+
+	/* Enable EXTI7 interrupt. */
+	// Shared with EXTI6
+	// nvic_set_priority(NVIC_EXTI5_9_IRQ, 12);
+	// nvic_enable_irq(NVIC_EXTI5_9_IRQ);	
+
+	/* Set GPIO7 (in GPIO port B) to 'input open-drain'. */
+	gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO7);
+
+	/* Configure the EXTI subsystem. */
+	exti_select_source(EXTI7, GPIOB);
+	exti_set_trigger(EXTI7, EXTI_TRIGGER_BOTH);
+	exti_enable_request(EXTI7);
 }
 
 /*
@@ -321,11 +382,11 @@ void gpio_setup(void)
 void systick_setup()
 {
 	/* 72MHz / 8 => 9000000 counts per second */
-	systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
+	systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
 
 	/* 9000000/9000 = 1000 overflows per second - one interrupt every 1ms*/
 	/* SysTick interrupt every N clock pulses: set reload to N-1 */
-	systick_set_reload(9000 - 1);
+	systick_set_reload(MILLISEC_SLICES - 1);
 
 	systick_interrupt_enable();
 
@@ -361,6 +422,8 @@ void setup_microcontroller(void)
 	buzzer_pwm_setup();
 	vbatt_setup();
 	dma_setup();
+
+	if (USE_ENCODER_TIMER) {
 	/* left encoder */
 	encoder_setup(LEFT_ENCODER_TIMER, LEFT_ENCODER_AFIO,
 		      LEFT_ENCODER_CHANNEL1, LEFT_ENCODER_CHANNEL2,
@@ -370,7 +433,9 @@ void setup_microcontroller(void)
 	encoder_setup(RIGHT_ENCODER_TIMER, RIGHT_ENCODER_AFIO,
 		      RIGHT_ENCODER_CHANNEL1, RIGHT_ENCODER_CHANNEL2,
 		      RIGHT_ENCODER_CHANNEL1_TI, RIGHT_ENCODER_CHANNEL2_TI);
-
+	} else {
+		encoder_setup_edge_interruptions();
+	}
 	/* Line sensor setup */
 	systick_setup();
 }
