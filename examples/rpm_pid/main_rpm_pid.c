@@ -337,9 +337,9 @@ void set_current_pwm(int32_t pwm) {
 	set_left_motor_velocity(pwm);
 }
 
-static uint16_t k_p = 100; // Proportional constant
+static uint16_t k_p = 10; // Proportional constant
 static uint16_t k_i = 0;   // Integral constant
-static uint16_t k_d = 0;   // Derivative constant
+static uint16_t k_d = 1;   // Derivative constant
 
 int32_t proportional = 0;
 int32_t integral = 0;
@@ -350,6 +350,8 @@ int32_t pid(int32_t error)
 {
 	int32_t control;
 
+	error = error / 1000;
+
 	proportional = error;
 	integral += error;
 	//integral = trunc_to_range(integral, -MAX_INTEGRAL, MAX_INTEGRAL);
@@ -358,7 +360,10 @@ int32_t pid(int32_t error)
 	last_error = error;
 
 	control = proportional * k_p + integral * k_i + derivative * k_d;
-	control = control / 40000;
+	//control = control / 40000;
+
+	if (control > 999) control = 999;
+	if (control < 0) control = 0;
 
 	return control;
 }
@@ -397,7 +402,7 @@ int main(void)
 
 
 			control = pid( target_rpm - get_current_rpm() );
-			set_current_pwm( get_current_pwm() + control );
+			set_current_pwm( control );
 			// TARGET, CURRENT, PWM
 			printf("%i,%lu,%lu\n", rpm_index, get_current_rpm() / 10, get_current_pwm());
 
