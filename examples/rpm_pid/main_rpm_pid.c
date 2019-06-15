@@ -379,9 +379,8 @@ int main(void)
 
 	uint32_t last_loop_ms = 0;
 	uint32_t current_loop_ms = 0;
-	uint32_t pwm_value = 0;
 	rpm_event_t next_event = rpm_events[rpm_index++];
-	rpm_event_t previous_event = {0, 0};
+	//rpm_event_t previous_event = {0, 0};
 	int32_t control = 0;
 
 	while (1) {
@@ -395,7 +394,7 @@ int main(void)
 			if (millis == next_event.time) {
 				set_target_rpm(next_event.rpm);
 				if (rpm_index < MAX_EVENTS) {
-					previous_event = next_event;
+					//previous_event = next_event;
 					next_event = rpm_events[rpm_index++];
 				}
 			}
