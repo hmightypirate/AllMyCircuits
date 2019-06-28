@@ -4,7 +4,9 @@ sinclude ../../rules.mk
 CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-usart_cam_test.elf: $(OBJ)
+BIN = usart_cam_test
+
+$(BIN).elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -16,10 +18,9 @@ clean_all:
 	-$(MAKE) -C libopencm3 clean
 
 
-%.bin: %.elf
+$(BIN).bin: $(BIN).elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: usart_cam_test.bin
+bin: $(BIN).bin
 
-all: libopencm3 usart_cam_test.bin
-
+all: libopencm3 $(BIN).bin

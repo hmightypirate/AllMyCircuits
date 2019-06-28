@@ -4,7 +4,9 @@ sinclude ../../rules.mk
 CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-keypad.elf: $(OBJ)
+BIN = keypad
+
+$(BIN).elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -15,9 +17,10 @@ clean_all:
 	-rm -rf *.o *.bin *.elf *.map *.d
 	-$(MAKE) -C libopencm3 clean
 
-%.bin: %.elf
+
+$(BIN).bin: $(BIN).elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: keypad.bin
+bin: $(BIN).bin
 
-all: libopencm3 keypad.bin
+all: libopencm3 $(BIN).bin

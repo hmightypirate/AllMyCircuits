@@ -4,7 +4,9 @@ sinclude ../../rules.mk
 CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-dma_usart_test.elf: $(OBJ)
+BIN = dma_usart_rxtx_pingpong
+
+$(BIN).elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -16,10 +18,9 @@ clean_all:
 	-$(MAKE) -C libopencm3 clean
 
 
-%.bin: %.elf
+$(BIN).bin: $(BIN).elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: dma_usart_test.bin
+bin: $(BIN).bin
 
-all: libopencm3 dma_usart_test.bin
-
+all: libopencm3 $(BIN).bin

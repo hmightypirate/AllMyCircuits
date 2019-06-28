@@ -1,10 +1,12 @@
 sinclude ../../rules.mk
 
 
-CSRC = cli_test.c
+CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-cli_test.elf: $(OBJ)
+BIN = cli_test
+
+$(BIN).elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -16,10 +18,9 @@ clean_all:
 	-$(MAKE) -C libopencm3 clean
 
 
-%.bin: %.elf
+$(BIN).bin: $(BIN).elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: cli_test.bin
+bin: $(BIN).bin
 
-all: libopencm3 cli_test.bin
-
+all: libopencm3 $(BIN).bin
