@@ -10,7 +10,9 @@ PORT = /dev/ttyUSB0
 EXAMPLE = bluepill_test
 
 build_image:
-	docker build -t $(DOCKER_IMAGE_NAME) .
+	docker build --build-arg UID=$(id -u) \
+		--build-arg GID=$(id -g) \
+		-t $(DOCKER_IMAGE_NAME) .
 
 rm_image:
 	docker rmi -f $(DOCKER_IMAGE_NAME)
