@@ -338,8 +338,8 @@ void set_current_pwm(int32_t pwm) {
 }
 
 static uint16_t k_p = 10; // Proportional constant
-static uint16_t k_i = 0;   // Integral constant
-static uint16_t k_d = 1;   // Derivative constant
+static uint16_t k_i = 1;   // Integral constant
+static uint16_t k_d = 0;   // Derivative constant
 
 int32_t proportional = 0;
 int32_t integral = 0;
@@ -350,7 +350,7 @@ int32_t pid(int32_t error)
 {
 	int32_t control;
 
-	error = error / 1000;
+	error = error / 100;
 
 	proportional = error;
 	integral += error;
@@ -360,7 +360,7 @@ int32_t pid(int32_t error)
 	last_error = error;
 
 	control = proportional * k_p + integral * k_i + derivative * k_d;
-	//control = control / 40000;
+	control = control / 10;
 
 	if (control > 999) control = 999;
 	if (control < 0) control = 0;
