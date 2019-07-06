@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /* Mapping variables */
-#define FLAG_CIRCUIT_MAPPING 1
+#define FLAG_CIRCUIT_MAPPING 0
 #define MAX_MAP_STATES 100
 #define MIN_TICKS_FOR_MAP 400
 #define DIFF_TICKS_EQUAL 100

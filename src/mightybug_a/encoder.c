@@ -279,7 +279,7 @@ uint32_t get_left_encoder_edge_times_mean()
 	for (uint8_t i = 0; i < ENCODER_EDGE_TIMES_NUM_SAMPLES; i++) {
 		mean += left_encoder_edge_times[i];
 	}
-	return mean /= ENCODER_EDGE_TIMES_NUM_SAMPLES;
+	return mean / ENCODER_EDGE_TIMES_NUM_SAMPLES;
 }
 
 uint32_t get_right_encoder_edge_times_mean()
@@ -288,7 +288,7 @@ uint32_t get_right_encoder_edge_times_mean()
 	for (uint8_t i = 0; i < ENCODER_EDGE_TIMES_NUM_SAMPLES; i++) {
 		mean += right_encoder_edge_times[i];
 	}
-	return mean /= ENCODER_EDGE_TIMES_NUM_SAMPLES;
+	return mean / ENCODER_EDGE_TIMES_NUM_SAMPLES;
 }
 
 uint16_t get_current_left_rpm()

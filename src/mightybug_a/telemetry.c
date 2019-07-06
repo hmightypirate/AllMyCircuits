@@ -35,5 +35,9 @@ void print_telemetry(int millis)
 		printf("%d,", (int)get_target_velocity());
 	if (SHOW_SENSOR_INLINE)
 	  printf("%u,", (unsigned int)get_inline_change());
+	if (SHOW_RPM_LEFT)
+	  printf("%u,", (unsigned int)get_current_left_rpm());
+	if (SHOW_RPM_RIGHT)
+	  printf("%u,", (unsigned int)get_current_right_rpm());	
 	printf("\n");
 }

@@ -9,7 +9,7 @@
 
 #define TICKS_PER_MOTOR_REVOLUTION 12
 #define MOTOR_WHEEL_DEMULTIPLIER 10
-#define RPM_FROM_TIME_CONSTANT 320000000
+#define RPM_FROM_TIME_CONSTANT 360000000
 #define ENCODER_EDGE_TIMES_NUM_SAMPLES 3
 
 /* wheel perimeter in mm * 0.01 */
@@ -42,6 +42,7 @@ uint32_t get_last_left_ticks(void);
 uint32_t get_last_right_ticks(void);
 
 void reset_encoders_edge_times(void);
-uint16_t get_current_rpm(void);
+uint16_t get_current_left_rpm(void);
+uint16_t get_current_right_rpm(void);
 
 #endif /* __ENCODER_H */

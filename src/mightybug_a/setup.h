@@ -13,7 +13,7 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/exti.h>
 
-#define USE_ENCODER_TIMER 1
+#define USE_ENCODER_TIMER 0
 #define MILLISEC_SLICES 72000
 
 /*

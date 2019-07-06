@@ -84,7 +84,8 @@ void set_target_as_nool(void)
  */
 void set_target_as_normal(void)
 {
-	set_target_velocity(vel_maps[get_current_pidvel_map()]);
+	set_target_rpm(rpm_maps[get_current_pidvel_map()]);
+	//set_target_velocity(vel_maps[get_current_pidvel_map()]);
 }
 
 /*

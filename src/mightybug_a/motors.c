@@ -264,6 +264,37 @@ void motor_control(int32_t control)
 		increase_pointer_vel_delay(step_target_velocity);
 }
 
+
+void update_left_motor_rpm(int32_t rpm)
+{
+	int32_t control = rpm_pid(MOTOR_LEFT, rpm - get_current_left_rpm() );
+	set_left_motor_velocity(control);
+}
+
+void update_right_motor_rpm(int32_t rpm)
+{
+	int32_t control = rpm_pid(MOTOR_RIGHT, rpm - get_current_right_rpm() );
+	set_right_motor_velocity(control);
+}
+
+/*
+ * given a control signal, obtain the velocity for the left and right motors
+ *
+ * @param[in] control from pid
+ */
+void motor_control_rpm_from_line_pid(int32_t control)
+{
+	control = trunc_to_range(control, -MAX_PID_ERROR, MAX_PID_ERROR);
+
+	int32_t left_rpm = target_rpm + control;
+	int32_t right_rpm = target_rpm - control;
+
+	update_left_motor_rpm(left_rpm);
+	update_right_motor_rpm(right_rpm);
+}
+
+
+
 /*
  * @brief stop the motors
  *

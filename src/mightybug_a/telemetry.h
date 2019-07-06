@@ -11,11 +11,13 @@
 #define SHOW_D_VALUE 0
 #define SHOW_LEFT_PWM 0
 #define SHOW_RIGHT_PWM 0
-#define SHOW_LEFT_ENCODER 1
-#define SHOW_RIGHT_ENCODER 1
-#define SHOW_LEFT_ACC 1
-#define SHOW_RIGHT_ACC 1
+#define SHOW_LEFT_ENCODER 0
+#define SHOW_RIGHT_ENCODER 0
+#define SHOW_LEFT_ACC 0
+#define SHOW_RIGHT_ACC 0
 #define SHOW_TARGET_VEL 0
 #define SHOW_SENSOR_INLINE 0
+#define SHOW_RPM_LEFT 1
+#define SHOW_RPM_RIGHT 1
 
 void print_telemetry(int);

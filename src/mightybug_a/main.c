@@ -139,7 +139,7 @@ void normal_running_state()
 			}
 		}
 	}
-	reset_pids_normal();
+	reset_pids_normal();  // line pid
 
 	jukebox_setcurrent_song(NO_SONG);
 	if (RUNNING_STATE_PITCH)
@@ -422,11 +422,11 @@ void just_run_state()
 		set_vel_antiwheelie(current_loop_millisecs);
 	}
 
-	/* pid control */
+	/* line pid control */
 	int control = 0;
 	control = pid(line_error);
 
-	motor_control(control);
+	motor_control_rpm_from_line_pid(control);
 
 	// Set the current ms (inline)
 	if (!is_out_of_line()) {

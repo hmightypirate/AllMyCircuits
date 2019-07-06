@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define MAX_INTEGRAL 100
-#define MAX_PID_ERROR 2000
+#define MAX_PID_ERROR 20000
 #define PID_CONTROL_DIVISOR 100
 
 /* STORE POSITION (in main loop iterations)
