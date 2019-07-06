@@ -1,6 +1,12 @@
 #include "motors.h"
 
 static int32_t target_velocity = 0;
+static volatile int32_t target_rpm = 0;
+
+static volatile int32_t rpm_proportional[2] = {0, 0};
+static volatile int32_t rpm_integral[2] = {0, 0};
+static volatile int32_t rpm_derivative[2] = {0, 0};
+static volatile int32_t rpm_last_error[2] = {0, 0};
 
 /* storing last velocities for debug */
 static int32_t last_left_vel = 0;
@@ -284,4 +290,37 @@ int32_t get_last_left_vel()
 int32_t get_last_right_vel()
 {
 	return last_right_vel;
+}
+
+
+void set_target_rpm(int32_t rpm)
+{
+	target_rpm = rpm;
+}
+
+int32_t get_target_rpm(void)
+{
+	return target_rpm;
+}
+
+int32_t rpm_pid(uint8_t side, int32_t error)
+{
+	int32_t control;
+
+	error = error / 100;
+
+	rpm_proportional[side] = error;
+	rpm_integral[side] += error;
+	//integral = trunc_to_range(integral, -MAX_INTEGRAL, MAX_INTEGRAL);
+	rpm_derivative[side] = error - rpm_last_error[side];
+
+	rpm_last_error[side] = error;
+
+	control = rpm_proportional[side] * RPM_K_P + rpm_integral[side] * RPM_K_I + rpm_derivative[side] * RPM_K_D;
+	control = control / 10;
+
+	if (control > 999) control = 999;
+	if (control < 0) control = 0;
+
+	return control;
 }

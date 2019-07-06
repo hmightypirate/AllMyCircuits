@@ -9,6 +9,15 @@
 #include "setup.h"
 #include <stdint.h>
 
+// MOTOR LEFT/RIGHT
+#define MOTOR_LEFT 0
+#define MOTOR_RIGHT 1
+
+// RPM PID constants
+#define RPM_K_P 10
+#define RPM_K_I 1 
+#define RPM_K_D 0
+
 // TODO: More intuitive names
 #define RIGHT_MOTOR_PWM_ANTIPHASE 1
 #define LEFT_MOTOR_PWM_ANTIPHASE 0
@@ -38,6 +47,8 @@ typedef struct {
 
 void set_target_velocity(int32_t target_vel);
 int32_t get_target_velocity(void);
+void set_target_rpm(int32_t rpm);
+int32_t get_target_rpm(void);
 void motor_control(int32_t error);
 void stop_motors(void);
 
