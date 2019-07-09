@@ -10,8 +10,8 @@ PORT = /dev/ttyUSB0
 EXAMPLE = bluepill_test
 
 build_image:
-	docker build --build-arg UID=$(id -u) \
-		--build-arg GID=$(id -g) \
+	docker build --build-arg UID=$(shell id -u) \
+		--build-arg GID=$(shell id -g) \
 		-t $(DOCKER_IMAGE_NAME) .
 
 rm_image:
@@ -21,7 +21,7 @@ console:
 	docker run -v $(PWD):/home/src/ \
 		-ti \
 		--rm \
-		--device=/dev/ttyUSB0 \
+		--device=$(PORT) \
 		$(DOCKER_IMAGE_NAME)
 
 buga_fw: ## Build line follower firmware at src/mightybug_a
