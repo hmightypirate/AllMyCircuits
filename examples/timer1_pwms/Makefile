@@ -1,10 +1,12 @@
 sinclude ../../rules.mk
 
 
-CSRC = timer1_pwms.c
+CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-timer1_pwms.elf: $(OBJ)
+BIN = timer1_pwms
+
+$(BIN).elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -16,10 +18,9 @@ clean_all:
 	-$(MAKE) -C libopencm3 clean
 
 
-%.bin: %.elf
+$(BIN).bin: $(BIN).elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: timer1_pwms.bin
+bin: $(BIN).bin
 
-all: libopencm3 timer1_pwms.bin
-
+all: libopencm3 $(BIN).bin

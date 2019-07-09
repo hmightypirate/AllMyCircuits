@@ -1,10 +1,12 @@
 sinclude ../../rules.mk
 
 
-CSRC = systick.c
+CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-systick.elf: $(OBJ)
+BIN = systick
+
+$(BIN).elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -16,10 +18,9 @@ clean_all:
 	-$(MAKE) -C libopencm3 clean
 
 
-%.bin: %.elf
+$(BIN).bin: $(BIN).elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: systick.bin
+bin: $(BIN).bin
 
-all: libopencm3 systick.bin
-
+all: libopencm3 $(BIN).bin

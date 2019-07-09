@@ -1,10 +1,12 @@
 sinclude ../../rules.mk
 
 
-CSRC = buzzer.c
+CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-buzzer.elf: $(OBJ)
+BIN = buzzer_music
+
+$(BIN).elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -16,9 +18,9 @@ clean_all:
 	-$(MAKE) -C libopencm3 clean
 
 
-%.bin: %.elf
+$(BIN).bin: $(BIN).elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: buzzer.bin
+bin: $(BIN).bin
 
-all: libopencm3 buzzer.bin
+all: libopencm3 $(BIN).bin
