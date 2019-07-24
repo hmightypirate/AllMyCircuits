@@ -9,30 +9,33 @@ DOCKER_IMAGE_NAME = mighty-arm-development
 PORT = /dev/ttyUSB0
 EXAMPLE = bluepill_test
 
+UID = $(shell id -u)
+GID = $(shell id -g)
+
 build_image:
-	docker build --build-arg UID=$(shell id -u) \
-		--build-arg GID=$(shell id -g) \
+	sudo docker build --build-arg UID=${UID} \
+		--build-arg GID=${GID} \
 		-t $(DOCKER_IMAGE_NAME) .
 
 rm_image:
-	docker rmi -f $(DOCKER_IMAGE_NAME)
+	sudo docker rmi -f $(DOCKER_IMAGE_NAME)
 
-console:
-	docker run -v $(PWD):/home/src/ \
+console: build_image
+	sudo docker run -v $(shell pwd):/home/src/ \
 		-ti \
 		--rm \
 		--device=$(PORT) \
 		$(DOCKER_IMAGE_NAME)
 
-buga_fw: ## Build line follower firmware at src/mightybug_a
-	docker run -v $(PWD):/home/src/ \
+buga_fw: build_image ## Build line follower firmware at src/mightybug_a
+	sudo docker run -v $(shell pwd):/home/src/ \
 		-ti \
 		--rm \
 		$(DOCKER_IMAGE_NAME) \
 		make -C src/mightybug_a/ clean all
 
-buga_fw_flash: ## Flash firmware to the board at PORT (default: /dev/ttyUSB0). Example: make buga_fw_flash PORT=/dev/ttyUSB3
-	docker run -v $(PWD):/home/src/ \
+buga_fw_flash: build_image ## Flash firmware to the board at PORT (default: /dev/ttyUSB0). Example: make buga_fw_flash PORT=/dev/ttyUSB3
+	sudo docker run -v $(shell pwd):/home/src/ \
 		-ti \
 		--rm \
 		--device=$(PORT) \
@@ -43,8 +46,8 @@ EXAMPLES := $(sort $(wildcard examples/*))
 FLASH := $(addsuffix _flash, $(EXAMPLES))
 
 $(EXAMPLES): BINARY = $(subst examples/,,$@)
-$(EXAMPLES):
-	docker run -v $(PWD):/home/src/ \
+$(EXAMPLES): build_image
+	sudo docker run -v $(shell pwd):/home/src/ \
 		-ti \
 		--rm \
 		$(DOCKER_IMAGE_NAME) \
@@ -52,8 +55,8 @@ $(EXAMPLES):
 
 $(FLASH): FOLDER = $(subst _flash,,$@)
 $(FLASH): BINARY = $(subst examples/,,$(FOLDER))
-$(FLASH):
-	docker run -v $(PWD):/home/src/ \
+$(FLASH): build_image
+	sudo docker run -v $(shell pwd):/home/src/ \
 		-ti \
 		--rm \
 		--device=$(PORT) \
