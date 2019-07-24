@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
   python-serial \
   wget \
   tar \
+  libncurses5-dev \
 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
