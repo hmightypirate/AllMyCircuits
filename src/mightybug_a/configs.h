@@ -23,7 +23,7 @@ static const int16_t vel_maps[NUMBER_OF_MAPPINGS] = {
 
 
 static const int16_t rpm_maps[NUMBER_OF_MAPPINGS] = {
-    10000, 20000, 30000
+    5000, 20000, 30000
 };
 
 // Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro

@@ -14,7 +14,7 @@
 #define MOTOR_RIGHT 1
 
 // RPM PID constants
-#define RPM_K_P 1
+#define RPM_K_P 0
 #define RPM_K_I 1 
 #define RPM_K_D 0
 
