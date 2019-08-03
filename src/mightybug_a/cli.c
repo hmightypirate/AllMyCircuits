@@ -55,19 +55,19 @@ void *get_var(uint8_t var_id, uint8_t index)
 			return (uint8_t *)(cli_vars[var_id].ptr) + index;
 			break;
 		case UINT16_T:
-			return &((uint16_t *)(cli_vars[var_id].ptr))[index];
+			return (uint16_t *)(cli_vars[var_id].ptr) + index;
 			break;
 		case UINT32_T:
 			return (uint32_t *)(cli_vars[var_id].ptr) + index;
 			break;	
 		case INT8_T:
-			return &((int8_t *)(cli_vars[var_id].ptr))[index];
+			return (int8_t *)(cli_vars[var_id].ptr) + index;
 			break;
 		case INT16_T:
-			return &((int16_t *)(cli_vars[var_id].ptr))[index];
+			return (int16_t *)(cli_vars[var_id].ptr) + index;
 			break;
 		case INT32_T:
-			return &((int32_t *)(cli_vars[var_id].ptr))[index];
+			return (int32_t *)(cli_vars[var_id].ptr) +index;
 			break;
 		default:
 			return NULL;
