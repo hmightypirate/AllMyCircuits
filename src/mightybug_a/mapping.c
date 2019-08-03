@@ -42,31 +42,24 @@ number of ticks ? / number of seconds (estimated given the velocity?)
 
 void adding_map_to_list(mapstate_e new_state)
 {
-  if (curr_mapping_pointer < MAX_MAP_STATES)
-    {
-  
-      if (curr_mapping_pointer > 0)
-	{
-	  if (mapping_circuit.mapstates[curr_mapping_pointer - 1] == new_state)
-	    {
-	      	  mapping_circuit.agg_total_ticks[curr_mapping_pointer-1] = curr_agg_total_ticks;
-		  mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] = curr_agg_left_ticks;
-		  mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] = curr_agg_right_ticks;
+  if (curr_mapping_pointer < MAX_MAP_STATES) {
+      if (curr_mapping_pointer > 0) {
+          if (mapping_circuit.mapstates[curr_mapping_pointer - 1] == new_state) {
+	    // Joining sectors (these might happen with UNKNOWN states)
+ 	      mapping_circuit.agg_total_ticks[curr_mapping_pointer-1] += curr_agg_total_ticks;
+	      mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] += curr_agg_left_ticks;
+	      mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] += curr_agg_right_ticks;
 
-
-	    }
-	  else
-	    {
+	  } else {
+	    // Not aggregating sectors
 	      mapping_circuit.agg_total_ticks[curr_mapping_pointer] = curr_agg_total_ticks;
 	      mapping_circuit.agg_left_ticks[curr_mapping_pointer] = curr_agg_left_ticks;
 	      mapping_circuit.agg_right_ticks[curr_mapping_pointer] = curr_agg_right_ticks;
 	      mapping_circuit.first_tick[curr_mapping_pointer] = first_tick_sector;
 	      mapping_circuit.mapstates[curr_mapping_pointer] = new_state;
 	      curr_mapping_pointer += 1;
-	    }
-	}
-      else
-	{
+	   }
+      } else {
 	  // First sector
 	  mapping_circuit.agg_total_ticks[curr_mapping_pointer] = curr_agg_total_ticks;
 	  mapping_circuit.agg_left_ticks[curr_mapping_pointer] = curr_agg_left_ticks;
@@ -78,19 +71,17 @@ void adding_map_to_list(mapstate_e new_state)
 	}
     }
 
-  first_tick_sector += curr_agg_total_ticks;
-  curr_agg_total_ticks = 0;
-  curr_agg_left_ticks = 0;
-  curr_agg_right_ticks = 0;
-
+    first_tick_sector += curr_agg_total_ticks;
+    curr_agg_total_ticks = 0;
+    curr_agg_left_ticks = 0;
+    curr_agg_right_ticks = 0;
 }
 
 
 /*
  * @brief get mapping state
  */
-mapping_e get_mapping_info()
-{
+mapping_e get_mapping_info() {
 	return mapping_circuit;
 }
 
@@ -98,96 +89,68 @@ mapping_e get_mapping_info()
 /*
  * @brief circuit map
  */
-void do_circuit_mapping()
-{
-	// aggregated ticks
-	uint32_t left_ticks = get_left_encoder_ticks();
-	uint32_t right_ticks = get_right_encoder_ticks();
+void do_circuit_mapping() {
 
-	// difference between encoders
-	int16_t diff_encoders = get_abs_diff_encoders();
+    // aggregated ticks
+    uint32_t left_ticks = get_left_encoder_ticks();
+    uint32_t right_ticks = get_right_encoder_ticks();
 
-	// last ticks
-	uint32_t last_left_ticks = get_last_left_ticks();
-	uint32_t last_right_ticks = get_last_right_ticks();
+    // difference between encoders
+    int16_t diff_encoders = get_abs_diff_encoders();
 
-	// It has reached a posible straight line state
-	if (diff_encoders < OUT_MAPSTLINE_STATE)
-	  {
-	    if (curr_mapstate != NONE &&
-		curr_mapstate != ST_LINE)
-	      {
-		// Adding a new state
-		if (curr_agg_total_ticks > MIN_SECTOR_LENGTH)
-		  {
-		    // Adding a stline sector
-		    //FIXME adding a new sector here
+    // last ticks
+    uint32_t last_left_ticks = get_last_left_ticks();
+    uint32_t last_right_ticks = get_last_right_ticks();
 
-		    adding_map_to_list(curr_mapstate);
-		  }
-		else
-		  {
-		    // Adding an unknown sector
-		    //FIXME adding a new sector here
-		    adding_map_to_list(UNKNOWN);
-		  }
-	      }
-     
-	      curr_mapstate = ST_LINE;
-	      }
-          else if (left_ticks > right_ticks)
-	    {
-		// Check if we have reached a new state
-		if (curr_mapstate != NONE &&
-		  curr_mapstate != RIGHT_CORNER)
-		  {
+    // It has reached a posible straight line state
+    if (diff_encoders < OUT_MAPSTLINE_STATE) {
+        if (curr_mapstate != NONE &&
+	    curr_mapstate != ST_LINE) {
+	    // Adding a new state
+	    if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
+	        // Adding a stline sector
+                adding_map_to_list(curr_mapstate);
+	     } else {
+	         // Adding an unknown sector
+		 //FIXME adding a new sector here
+		 adding_map_to_list(UNKNOWN);
+	     }
+	  }
+	  curr_mapstate = ST_LINE;
+     }
+     else if (left_ticks > right_ticks) {
+         // Check if we have reached a new state
+	 if (curr_mapstate != NONE &&
+	    curr_mapstate != RIGHT_CORNER) {
 
-		     if (curr_agg_total_ticks > MIN_SECTOR_LENGTH)
-		     {
-		         // Adding a right corner sector
-		         // FIXME adding here a new sector
-		         adding_map_to_list(curr_mapstate);
-	             }
-		     else
-		     {
-		         // Adding an unknown sector
-		         //FIXME adding a new sector here
-		         adding_map_to_list(UNKNOWN);
-	             }
+	     if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
+	         // Adding a right corner sector
+		 adding_map_to_list(curr_mapstate);
+	     } else {
+	         // Adding an unknown sector
+	         adding_map_to_list(UNKNOWN);
+	     }
+	  }
+	  curr_mapstate = RIGHT_CORNER;
 
-		
-	          }
-		curr_mapstate = RIGHT_CORNER;
-
-	      }
-	  else
-	    {
-		// Check if we have reached a new state
-		if (curr_mapstate != NONE &&
-		  curr_mapstate != LEFT_CORNER)
-		  {
-
-		     if (curr_agg_total_ticks > MIN_SECTOR_LENGTH)
-		     {
-		         // Adding a right corner sector
-		         // FIXME adding here a new sector
-		         adding_map_to_list(curr_mapstate);
-	             }
-		     else
-		     {
-		     // Adding an unknown sector
-		     //FIXME adding a new sector here
-		     adding_map_to_list(UNKNOWN);
-	             }
-
-	          }
-		curr_mapstate = LEFT_CORNER;
-
-	      }
+      } else {
+	  // Check if we have reached a new state
+	  if (curr_mapstate != NONE &&
+	    curr_mapstate != LEFT_CORNER) {
+	      if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
+	          // Adding a right corner sector
+	          adding_map_to_list(curr_mapstate);
+	       } else {
+	           // Adding an unknown sector
+	           adding_map_to_list(UNKNOWN);
+	       }
+	   }
+	   curr_mapstate = LEFT_CORNER;
+      }
 	  
-	  curr_agg_left_ticks += last_left_ticks;
-	  curr_agg_right_ticks += last_right_ticks;
-	  curr_agg_total_ticks = (curr_agg_left_ticks + curr_agg_right_ticks)/2;
+     curr_agg_left_ticks += last_left_ticks;
+     curr_agg_right_ticks += last_right_ticks;
+     curr_agg_total_ticks = (curr_agg_left_ticks + curr_agg_right_ticks)/2;
 
 }
 
@@ -308,38 +271,38 @@ void get_synchro(mapstate_e map_state)
     // Try to synchronize
     // Check if it is starting a new state
 
-    diff_ticks = meas_agg_ticks - mapping_circuit.first_tick[sync_sector_idx];
+    diff_ticks = meas_total_ticks/2 - mapping_circuit.first_tick[sync_sector_idx];
     
     if (diff_ticks < 0) {
       diff_ticks *= -1;
     }
 
     if (diff_ticks < SYNCHRO_MAX_DRIFT) {
-      meas_agg_ticks = mapping_circuit.first_tick[sync_sector_idx];
+      meas_total_ticks = mapping_circuit.first_tick[sync_sector_idx] * 2;
       
     }
     // check if it has finished the current state
     else {
-	diff_ticks = meas_agg_ticks - sync_sector_end;
+	diff_ticks = meas_total_ticks/2 - sync_sector_end;
 	if (diff_ticks < 0) {
 	  diff_ticks *= -1;
 	}
 
 	if (diff_ticks < SYNCHRO_MAX_DRIFT)
 	  {
-	    meas_agg_ticks = sync_sector_end;
+	    meas_total_ticks = sync_sector_end * 2;
 	    sync_change_flag = 1;
 	  }
       }
 } else if (map_state == sync_sector_type) {
-    diff_ticks = meas_agg_ticks = sync_sector_end;
+    diff_ticks = meas_total_ticks/2 - sync_sector_end;
     if (diff_ticks < 0) {
       diff_ticks *= -1;
     }
 
     if (diff_ticks < SYNCHRO_MAX_DRIFT)
     {
-      meas_agg_ticks = sync_sector_end;
+      meas_total_ticks = sync_sector_end * 2;
       sync_change_flag = 1;
     }
   }
@@ -443,5 +406,23 @@ void do_synchro_run(void)
 	meas_r_ticks += last_right_ticks;
 	meas_agg_ticks = (meas_l_ticks + meas_r_ticks)/2;
 	// should divide by 2 but numbers could be very small
-	meas_total_ticks += (last_left_ticks + last_right_ticks); 
+	meas_total_ticks += (last_left_ticks + last_right_ticks);
+
+	if (meas_total_ticks/2 > sync_sector_end &&
+	    sync_sector_type != meas_sector_type)
+	  {
+	    meas_total_ticks = sync_sector_end * 2;
+
+	    // Get next state but do not syncronize
+	    sync_sector_idx = sync_next_sector_idx;
+
+	    get_next_sector();
+
+	    if (meas_sector_type == sync_sector_type)
+	      {
+	          meas_total_ticks += 2 * meas_agg_ticks;
+	      }
+	  }
+	    
+	
 }
