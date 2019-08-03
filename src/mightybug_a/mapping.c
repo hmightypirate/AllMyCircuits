@@ -82,7 +82,7 @@ void adding_map_to_list(mapstate_e new_state)
  * @brief get mapping state
  */
 mapping_e get_mapping_info() {
-	return mapping_circuit;
+    return mapping_circuit;
 }
 
 
@@ -151,7 +151,6 @@ void do_circuit_mapping() {
      curr_agg_left_ticks += last_left_ticks;
      curr_agg_right_ticks += last_right_ticks;
      curr_agg_total_ticks = (curr_agg_left_ticks + curr_agg_right_ticks)/2;
-
 }
 
 
@@ -173,16 +172,15 @@ void reset_mapping_pointer()
  */
 void reset_circuit_mapping()
 {
+    for (int i = 0; i < MAX_MAP_STATES; i++) {
+        mapping_circuit.agg_left_ticks[i] = 0;
+	mapping_circuit.agg_right_ticks[i] = 0;
+	mapping_circuit.agg_total_ticks[i] = 0;
+	mapping_circuit.mapstates[i] = NONE;
+	mapping_circuit.first_tick[i] = 0;
+     }
 
-	for (int i = 0; i < MAX_MAP_STATES; i++) {
-		mapping_circuit.agg_left_ticks[i] = 0;
-		mapping_circuit.agg_right_ticks[i] = 0;
-		mapping_circuit.agg_total_ticks[i] = 0;
-		mapping_circuit.mapstates[i] = NONE;
-		mapping_circuit.first_tick[i] = 0;
-	}
-
-	reset_mapping_pointer();
+    reset_mapping_pointer();
 }
 
 
@@ -209,6 +207,7 @@ void get_next_sector() {
 	sync_sector_type = mapping_circuit.mapstates[MAX_MAP_STATES -1];
 	sync_sector_length = mapping_circuit.agg_total_ticks[MAX_MAP_STATES - 1];
 	sync_sector_end = mapping_circuit.first_tick[MAX_MAP_STATES-1] + sync_sector_length;
+	return;
     }
 		
     if (mapping_circuit.mapstates[sync_sector_idx + 1] == NONE) {
@@ -216,43 +215,37 @@ void get_next_sector() {
 	sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
 	sync_sector_length = mapping_circuit.agg_total_ticks[sync_sector_idx];
 	sync_sector_end = mapping_circuit.first_tick[sync_sector_idx] + sync_sector_length;
+	return;
     }
 
     if (mapping_circuit.mapstates[sync_sector_idx] != UNKNOWN &&
         MAX_MAP_STATES > sync_sector_idx + 2 && 
 	mapping_circuit.mapstates[sync_sector_idx + 1] == UNKNOWN &&
-		  mapping_circuit.mapstates[sync_sector_idx + 2] == mapping_circuit.mapstates[sync_sector_idx]) {
+	mapping_circuit.mapstates[sync_sector_idx + 2] == mapping_circuit.mapstates[sync_sector_idx]) {
         sync_next_sector_idx += 3;
-        sync_sector_idx = sync_sector_idx + 3;
 	sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
 	sync_sector_end = (mapping_circuit.first_tick[sync_sector_idx +2] +
 		  mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
 	sync_sector_end = (mapping_circuit.agg_total_ticks[sync_sector_idx] +
 		  mapping_circuit.agg_total_ticks[sync_sector_idx + 1] +
-			   mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
+	          mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
 
 	while(1) {
-		if (sync_next_sector_idx + 2 < MAX_MAP_STATES &&
-		  mapping_circuit.mapstates[sync_next_sector_idx] == UNKNOWN &&
+	    if (sync_next_sector_idx + 2 < MAX_MAP_STATES &&
+	          mapping_circuit.mapstates[sync_next_sector_idx] == UNKNOWN &&
 		  mapping_circuit.mapstates[sync_next_sector_idx + 1] ==
 		  mapping_circuit.mapstates[sync_sector_idx]) {
 
-		sync_sector_end += (mapping_circuit.agg_total_ticks[sync_next_sector_idx] +
-		  mapping_circuit.agg_total_ticks[sync_next_sector_idx + 1]);
+	         sync_sector_end += (mapping_circuit.agg_total_ticks[sync_next_sector_idx] + mapping_circuit.agg_total_ticks[sync_next_sector_idx + 1]);
 
 		sync_next_sector_idx += 2;
-
-		
-	          }
-		else {
-		    break;
-	        }
-	}
-		  
-    }
-    else {
+	
+	     } else {
+	         break;
+	     }
+	 }		  
+    } else {
       sync_next_sector_idx = sync_sector_idx + 1;
-      sync_sector_idx = sync_sector_idx;
       sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
       sync_sector_length = mapping_circuit.agg_total_ticks[sync_sector_idx];
       sync_sector_end = mapping_circuit.first_tick[sync_sector_idx] + sync_sector_length;
