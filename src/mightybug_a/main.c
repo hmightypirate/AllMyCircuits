@@ -60,20 +60,20 @@ void check_running_mode_inline()
 	switch (get_running_state()) {
 	case RUNNING_NORMAL:
 
-		if (get_inline_change()) {
+		if (get_inline_change() && FORCE_STATECHANGE_ALL_INLINE) {
 			update_running_state(SET_TURBO_MODE_STATE);
 		}
 
 		break;
 
 	case RUNNING_TURBO:
-		if (get_inline_change()) {
+		if (get_inline_change() && FORCE_STATECHANGE_ALL_INLINE) {
 			update_running_state(NEAR_CORNER_EVENT);
 		}
 
 		break;
 	case RUNNING_BRAKE:
-		if (get_inline_change()) {
+		if (get_inline_change() && FORCE_STATECHANGE_ALL_INLINE) {
 			update_running_state(SET_NORMAL_MODE_STATE);
 		}
 		break;

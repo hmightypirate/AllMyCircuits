@@ -362,16 +362,15 @@ static void cli_map_all() {
   
   for (int i = 0; i < MAX_MAP_STATES; i++)
     {
-      printf("%i State: %d, Ticks left: %zu, Ticks right: %zu\n",
+      printf("%i State: %d, Ticks left: %zu, Ticks right: %zu Total: %zu\n",
 	     (int) i,
 	     last_map.mapstates[i],
 	     (unsigned int) last_map.agg_left_ticks[i],
-	     (unsigned int) last_map.agg_right_ticks[i]);
+	     (unsigned int) last_map.agg_right_ticks[i],
+	     (unsigned int) last_map.agg_total_ticks[i]);
     }
 
-  printf("Large stline found %d ", (int) last_map.large_stline_pointer);
-  printf("End of circuit %d ", (int) last_map.rep_pointer);
-
+  
 }
 
 char str_VER[] = "VER";
