@@ -2,6 +2,79 @@
 
 #define CLI_MAX_BUFFER_SIZE 64
 
+typedef struct {
+	void *ptr;
+	type_t type;
+	uint8_t length;
+} cli_var_t;
+
+cli_var_t cli_vars[255];
+
+void add_config_var(void *ptr, uint8_t id, type_t type, uint8_t length)
+{
+	cli_vars[id].ptr = ptr;
+	cli_vars[id].type = type;
+	cli_vars[id].length = length;
+}
+
+
+void set_var(uint8_t var_id, uint8_t index, void *value_ptr)
+{
+	if (index >= cli_vars[var_id].length) return;
+
+	switch (cli_vars[var_id].type) {
+		case UINT8_T:
+			((uint8_t *)(cli_vars[var_id].ptr))[index] = *((uint8_t *)value_ptr);
+			break;
+		case UINT16_T:
+			((uint16_t *)(cli_vars[var_id].ptr))[index] = *((uint16_t *)value_ptr);
+			break;
+		case UINT32_T:
+			((uint32_t *)(cli_vars[var_id].ptr))[index] = *((uint32_t *)value_ptr);
+			break;	
+		case INT8_T:
+			((int8_t *)(cli_vars[var_id].ptr))[index] = *((int8_t *)value_ptr);
+			break;
+		case INT16_T:
+			((int16_t *)(cli_vars[var_id].ptr))[index] = *((int16_t *)value_ptr);
+			break;
+		case INT32_T:
+			((int32_t *)(cli_vars[var_id].ptr))[index] = *((int32_t *)value_ptr);
+			break;
+		default:
+			break;
+	}
+}
+
+void *get_var(uint8_t var_id, uint8_t index)
+{
+	if (index >= cli_vars[var_id].length) return NULL;
+
+	switch (cli_vars[var_id].type) {
+		case UINT8_T:
+			return (uint8_t *)(cli_vars[var_id].ptr) + index;
+			break;
+		case UINT16_T:
+			return &((uint16_t *)(cli_vars[var_id].ptr))[index];
+			break;
+		case UINT32_T:
+			return (uint32_t *)(cli_vars[var_id].ptr) + index;
+			break;	
+		case INT8_T:
+			return &((int8_t *)(cli_vars[var_id].ptr))[index];
+			break;
+		case INT16_T:
+			return &((int16_t *)(cli_vars[var_id].ptr))[index];
+			break;
+		case INT32_T:
+			return &((int32_t *)(cli_vars[var_id].ptr))[index];
+			break;
+		default:
+			return NULL;
+			break;
+	}
+}
+
 char input_buffer[CLI_MAX_BUFFER_SIZE];
 uint8_t buffer_str_size = 0;
 char command_line[CLI_MAX_BUFFER_SIZE];
@@ -312,67 +385,67 @@ static void cli_car_stop() {
 	printf("CAR STOP!\n");
 }
 
-char str_VEL_syntax[] = "Syntax: VEL LEFT|RIGHT|ALL\n";
-char str_VEL_LEFT[] = "VEL LEFT";
-static void cli_vel_left(){
-	uint32_t left_vel = get_left_velocity();
-	printf("Vel (left): %zu\n", (unsigned int) left_vel);
-}
+// char str_VEL_syntax[] = "Syntax: VEL LEFT|RIGHT|ALL\n";
+// char str_VEL_LEFT[] = "VEL LEFT";
+// static void cli_vel_left(){
+// 	uint32_t left_vel = get_left_velocity();
+// 	printf("Vel (left): %zu\n", (unsigned int) left_vel);
+// }
 
-char str_VEL_RIGHT[] = "VEL RIGHT";
-static void cli_vel_right(){
-	uint32_t right_vel = get_right_velocity();
-	printf("Vel (right): %zu\n", (unsigned int) right_vel);
-}
+// char str_VEL_RIGHT[] = "VEL RIGHT";
+// static void cli_vel_right(){
+// 	uint32_t right_vel = get_right_velocity();
+// 	printf("Vel (right): %zu\n", (unsigned int) right_vel);
+// }
 
-char str_VEL_ALL[] = "VEL ALL";
-static void cli_vel_all(){
-	uint32_t left_vel = get_left_velocity();
-	uint32_t right_vel = get_right_velocity();
-	printf("Vel %zu left, %zu right\n", (unsigned int) left_vel,
-					(unsigned int) right_vel);
-}
+// char str_VEL_ALL[] = "VEL ALL";
+// static void cli_vel_all(){
+// 	uint32_t left_vel = get_left_velocity();
+// 	uint32_t right_vel = get_right_velocity();
+// 	printf("Vel %zu left, %zu right\n", (unsigned int) left_vel,
+// 					(unsigned int) right_vel);
+// }
 
-char str_ENC_syntax[] = "Syntax: ENC LEFT|RIGHT|ALL\n";
-char str_ENC_LEFT[] = "ENC LEFT";
-static void cli_enc_left(){
-	uint32_t left_enc_ticks = get_left_encoder_ticks();
-	printf("Ticks (left): %zu\n", (unsigned int) left_enc_ticks);
-}
+// char str_ENC_syntax[] = "Syntax: ENC LEFT|RIGHT|ALL\n";
+// char str_ENC_LEFT[] = "ENC LEFT";
+// static void cli_enc_left(){
+// 	uint32_t left_enc_ticks = get_left_encoder_ticks();
+// 	printf("Ticks (left): %zu\n", (unsigned int) left_enc_ticks);
+// }
 
-char str_ENC_RIGHT[] = "ENC RIGHT";
-static void cli_enc_right(){
-	uint32_t right_enc_ticks = get_right_encoder_ticks();
-	printf("Ticks (right): %zu\n", (unsigned int) right_enc_ticks);
-}
+// char str_ENC_RIGHT[] = "ENC RIGHT";
+// static void cli_enc_right(){
+// 	uint32_t right_enc_ticks = get_right_encoder_ticks();
+// 	printf("Ticks (right): %zu\n", (unsigned int) right_enc_ticks);
+// }
 
-char str_ENC_ALL[] = "ENC ALL";
-static void cli_enc_all(){
-	uint32_t left_enc_ticks = get_left_encoder_ticks();
-	uint32_t right_enc_ticks = get_right_encoder_ticks();
-	printf("Ticks %zu left, %zu right\n", (unsigned int) left_enc_ticks,
-			(unsigned int) right_enc_ticks);
-}
+// char str_ENC_ALL[] = "ENC ALL";
+// static void cli_enc_all(){
+// 	uint32_t left_enc_ticks = get_left_encoder_ticks();
+// 	uint32_t right_enc_ticks = get_right_encoder_ticks();
+// 	printf("Ticks %zu left, %zu right\n", (unsigned int) left_enc_ticks,
+// 			(unsigned int) right_enc_ticks);
+// }
 
-char str_MAP_syntax[] = "Syntax: MAP ALL\n";
-char str_MAP_ALL[] = "MAP ALL";
-static void cli_map_all() {
+// char str_MAP_syntax[] = "Syntax: MAP ALL\n";
+// char str_MAP_ALL[] = "MAP ALL";
+// static void cli_map_all() {
 
-  mapping_e last_map = get_mapping_info();
+//   mapping_e last_map = get_mapping_info();
   
-  for (int i = 0; i < MAX_MAP_STATES; i++)
-    {
-      printf("%i State: %d, Ticks left: %zu, Ticks right: %zu\n",
-	     (int) i,
-	     last_map.mapstates[i],
-	     (unsigned int) last_map.agg_left_ticks[i],
-	     (unsigned int) last_map.agg_right_ticks[i]);
-    }
+//   for (int i = 0; i < MAX_MAP_STATES; i++)
+//     {
+//       printf("%i State: %d, Ticks left: %zu, Ticks right: %zu\n",
+// 	     (int) i,
+// 	     last_map.mapstates[i],
+// 	     (unsigned int) last_map.agg_left_ticks[i],
+// 	     (unsigned int) last_map.agg_right_ticks[i]);
+//     }
 
-  printf("Large stline found %d ", (int) last_map.large_stline_pointer);
-  printf("End of circuit %d ", (int) last_map.rep_pointer);
+//   printf("Large stline found %d ", (int) last_map.large_stline_pointer);
+//   printf("End of circuit %d ", (int) last_map.rep_pointer);
 
-}
+// }
 
 char str_VER[] = "VER";
 static void cli_ver() {
@@ -381,8 +454,25 @@ static void cli_ver() {
 }
 
 
+char str_GET[] = "GET";
+static void cli_get() {
+	uint8_t var_id = atoi(command_line + 3);
+	uint8_t index = atoi(command_line + 7);
+	uint32_t value = *(uint32_t *)get_var(var_id, index);
+	printf("Get var %u %u %u\n", var_id, index, (unsigned int)value);
+}
+
+char str_SET[] = "SET";
+static void cli_set() {
+	uint8_t var_id = atoi(command_line + 3);
+	uint8_t index = atoi(command_line + 7);
+	int32_t value = atoi(command_line + 11);
+	set_var(var_id, index, (void *)&value);
+	printf("Set var %u %u %u\n", var_id, index, (unsigned int)value);
+}
+
 // This is all the available commands data as an array of command structures
-#define CLI_COMMANDS_LIST_SIZE 37
+#define CLI_COMMANDS_LIST_SIZE 39
 struct command_struct commands_list[] = {
 	{.text = str_BUZ_ON, .functionPtr = cli_buz_on, .is_a_candidate = 'y', .syntax_hint = str_BUZ_syntax},
 	{.text = str_BUZ_OFF, .functionPtr = cli_buz_off, .is_a_candidate = 'y', .syntax_hint = str_BUZ_syntax},
@@ -420,6 +510,8 @@ struct command_struct commands_list[] = {
 	{.text = str_ENC_RIGHT, .functionPtr = cli_enc_right, .is_a_candidate = 'y', .syntax_hint = str_ENC_syntax},
 	{.text = str_ENC_ALL, .functionPtr = cli_enc_all, .is_a_candidate = 'y', .syntax_hint = str_ENC_syntax},
 	{.text = str_MAP_ALL, .functionPtr = cli_map_all, .is_a_candidate = 'y', .syntax_hint = str_MAP_syntax},
+	{.text = str_GET, .functionPtr = cli_get, .is_a_candidate = 'y', .syntax_hint = NULL},
+	{.text = str_SET, .functionPtr = cli_set, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_VER, .functionPtr = cli_ver, .is_a_candidate = 'y', .syntax_hint = NULL}
 };
 
