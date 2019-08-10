@@ -50,29 +50,32 @@ void *get_var(uint8_t var_id, uint8_t index)
 {
 	if (index >= cli_vars[var_id].length) return NULL;
 
+	uint32_t result = 0;
+
 	switch (cli_vars[var_id].type) {
 		case UINT8_T:
-			return (uint8_t *)(cli_vars[var_id].ptr) + index;
+			result = (uint32_t)(*(((uint8_t *)(cli_vars[var_id].ptr)) + index));
 			break;
 		case UINT16_T:
-			return (uint16_t *)(cli_vars[var_id].ptr) + index;
+			result = (uint32_t)(*(((uint16_t *)(cli_vars[var_id].ptr)) + index));
 			break;
 		case UINT32_T:
-			return (uint32_t *)(cli_vars[var_id].ptr) + index;
-			break;	
+			result = (uint32_t)(*(((uint32_t *)(cli_vars[var_id].ptr)) + index));
+			break;
 		case INT8_T:
-			return (int8_t *)(cli_vars[var_id].ptr) + index;
+			result = (uint32_t)(*(((int8_t *)(cli_vars[var_id].ptr)) + index));
 			break;
 		case INT16_T:
-			return (int16_t *)(cli_vars[var_id].ptr) + index;
+			result = (uint32_t)(*(((int16_t *)(cli_vars[var_id].ptr)) + index));
 			break;
 		case INT32_T:
-			return (int32_t *)(cli_vars[var_id].ptr) +index;
+			result = (uint32_t)(*(((int32_t *)(cli_vars[var_id].ptr)) + index));
 			break;
 		default:
-			return NULL;
 			break;
 	}
+
+	return &result;
 }
 
 char input_buffer[CLI_MAX_BUFFER_SIZE];
@@ -196,7 +199,7 @@ char str_GET[] = "GET";
 static void cli_get() {
 	uint8_t var_id = atoi(command_line + 3);
 	uint8_t index = atoi(command_line + 7);
-	uint32_t value = *(uint32_t *)get_var(var_id, index);
+	uint32_t value = *((uint32_t *)get_var(var_id, index));
 	printf("Get var %u %u %u\n", var_id, index, (unsigned int)value);
 }
 
