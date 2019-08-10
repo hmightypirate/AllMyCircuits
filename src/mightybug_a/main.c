@@ -622,6 +622,8 @@ int main(void)
 	set_car_default_parameters();
 	setup_modules();
 
+	config_vars();
+
 	while (true) {
 		current_loop_millisecs = get_millisecs_since_start();
 

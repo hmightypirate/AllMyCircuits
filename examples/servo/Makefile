@@ -1,10 +1,12 @@
 sinclude ../../rules.mk
 
 
-CSRC = servo.c
+CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-servo.elf: $(OBJ)
+BIN = servo
+
+$(BIN).elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -16,9 +18,9 @@ clean_all:
 	-$(MAKE) -C libopencm3 clean
 
 
-%.bin: %.elf
+$(BIN).bin: $(BIN).elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: servo.bin
+bin: $(BIN).bin
 
-all: libopencm3 servo.bin
+all: libopencm3 $(BIN).bin

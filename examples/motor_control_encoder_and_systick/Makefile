@@ -1,10 +1,12 @@
 sinclude ../../rules.mk
 
 
-CSRC = motor_control_with_encoder_and_systick.c
+CSRC = $(wildcard *.c)
 OBJ = $(CSRC:.c=.o)
 
-motor_control_with_encoder_and_systick.elf: $(OBJ)
+BIN = motor_control_encoder_and_systick
+
+$(BIN).elf: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 .PHONY: clean
@@ -16,10 +18,9 @@ clean_all:
 	-$(MAKE) -C libopencm3 clean
 
 
-%.bin: %.elf
+$(BIN).bin: $(BIN).elf
 	$(OBJCOPY) -O binary $< $@
 
-bin: motor_control_with_encoder_and_systick.bin
+bin: $(BIN).bin
 
-all: libopencm3 motor_control_with_encoder_and_systick.bin
-
+all: libopencm3 $(BIN).bin
