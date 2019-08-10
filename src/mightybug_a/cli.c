@@ -2,6 +2,7 @@
 
 #define CLI_MAX_BUFFER_SIZE 64
 
+uint32_t result = 0;
 typedef struct {
 	void *ptr;
 	type_t type;
@@ -49,8 +50,6 @@ void set_var(uint8_t var_id, uint8_t index, void *value_ptr)
 void *get_var(uint8_t var_id, uint8_t index)
 {
 	if (index >= cli_vars[var_id].length) return NULL;
-
-	uint32_t result = 0;
 
 	switch (cli_vars[var_id].type) {
 		case UINT8_T:
