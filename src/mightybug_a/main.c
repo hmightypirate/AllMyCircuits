@@ -244,6 +244,10 @@ void calibration_state(void)
 
 void idle_state(void)
 {
+        /* reset synchro state */
+        reset_synchro();        
+	check_synchro_start();
+	
 	/* reset out of line measurements, resets calibration */
 	reset_all_inline();
 	reset_calibration_values();
@@ -500,6 +504,12 @@ void running_state(void)
 	if (TELEMETRY) {
 		print_telemetry(current_loop_millisecs);
 	}
+
+	if (FLAG_CIRCUIT_MAPPING)
+	  {
+	    // Add circuit mapping
+	    select_mapping_function();
+	  }	
 }
 
 void setup_keypad(void)
@@ -565,6 +575,9 @@ void setup_modules()
 
 	/* Setup keypad */
 	setup_keypad();
+
+	/* Setup mapping */
+	reset_circuit_mapping();
 }
 
 void execute_state(state_e state)

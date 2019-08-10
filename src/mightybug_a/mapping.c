@@ -1,5 +1,6 @@
 #include "mapping.h"
 
+
 // Mapping circuit vars
 mapping_e mapping_circuit;
 uint16_t curr_mapping_pointer = 0;
@@ -22,6 +23,9 @@ uint16_t sync_sector_end = 0;
 uint16_t sync_next_sector_idx = 0;
 uint8_t sync_change_flag = 0;
 
+// Flag to switch between mapping and synchro
+uint8_t switch_synchro_flag = 0;
+
 /*
 
 number of ticks ? / number of seconds (estimated given the velocity?)
@@ -40,12 +44,16 @@ number of ticks ? / number of seconds (estimated given the velocity?)
 // car goes slow/fast ? number of ticks should not differ but it might
 
 
+/*
+ * @brief adding a sector to the current mapping
+ */
 void adding_map_to_list(mapstate_e new_state)
 {
   if (curr_mapping_pointer < MAX_MAP_STATES) {
+    // Check if it is in the first sector 
       if (curr_mapping_pointer > 0) {
           if (mapping_circuit.mapstates[curr_mapping_pointer - 1] == new_state) {
-	    // Joining sectors (these might happen with UNKNOWN states)
+	    // Joining sectors (these might only happen with UNKNOWN states)
  	      mapping_circuit.agg_total_ticks[curr_mapping_pointer-1] += curr_agg_total_ticks;
 	      mapping_circuit.agg_left_ticks[curr_mapping_pointer-1] += curr_agg_left_ticks;
 	      mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] += curr_agg_right_ticks;
@@ -98,15 +106,15 @@ void do_circuit_mapping() {
     // difference between encoders
     int16_t diff_encoders = get_abs_diff_encoders();
 
-    // last ticks
+    // last ticks measured by the encoders
     uint32_t last_left_ticks = get_last_left_ticks();
     uint32_t last_right_ticks = get_last_right_ticks();
 
-    // It has reached a posible straight line state
+    // It has reached a possible straight line state
     if (diff_encoders < OUT_MAPSTLINE_STATE) {
         if (curr_mapstate != NONE &&
 	    curr_mapstate != ST_LINE) {
-	    // Adding a new state
+	    // Adding a new state if its size is greater than the minimum required
 	    if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
 	        // Adding a stline sector
                 adding_map_to_list(curr_mapstate);
@@ -118,6 +126,7 @@ void do_circuit_mapping() {
 	  }
 	  curr_mapstate = ST_LINE;
      }
+    // Check if it is a Right corner (left ticks greater than right ticks)
      else if (left_ticks > right_ticks) {
          // Check if we have reached a new state
 	 if (curr_mapstate != NONE &&
@@ -132,7 +141,7 @@ void do_circuit_mapping() {
 	     }
 	  }
 	  curr_mapstate = RIGHT_CORNER;
-
+      // It is a Left corner (right ticks greater than left ticks)
       } else {
 	  // Check if we have reached a new state
 	  if (curr_mapstate != NONE &&
@@ -150,6 +159,9 @@ void do_circuit_mapping() {
 	  
      curr_agg_left_ticks += last_left_ticks;
      curr_agg_right_ticks += last_right_ticks;
+
+     // Always update the total ticks as the mean of left and right ticks
+     // FIXME: this is not the correct way of doing this (better take into account angular, linear vels)
      curr_agg_total_ticks = (curr_agg_left_ticks + curr_agg_right_ticks)/2;
 }
 
@@ -183,7 +195,9 @@ void reset_circuit_mapping()
     reset_mapping_pointer();
 }
 
-
+/*
+ * @brief reset synchro information
+ */
 void reset_synchro(void)
 {
     meas_agg_ticks = 0;
@@ -200,6 +214,9 @@ void reset_synchro(void)
 }
  
 
+/*
+ * @brief obtain next sector
+ */
 void get_next_sector() {
 
     if (sync_sector_idx >= MAX_MAP_STATES) {
@@ -253,6 +270,9 @@ void get_next_sector() {
     }
 }
 
+/*
+ * @brief tries to synchronizes the ticks 
+ */
 void get_synchro(mapstate_e map_state)
 {
   sync_change_flag = 0;
@@ -262,7 +282,7 @@ void get_synchro(mapstate_e map_state)
   if (map_state != sync_sector_type &&
       sync_sector_type != UNKNOWN) {
     // Try to synchronize
-    // Check if it is starting a new state
+    // Check if it has started a new state
 
     diff_ticks = meas_total_ticks/2 - mapping_circuit.first_tick[sync_sector_idx];
     
@@ -287,18 +307,18 @@ void get_synchro(mapstate_e map_state)
 	    sync_change_flag = 1;
 	  }
       }
-} else if (map_state == sync_sector_type) {
-    diff_ticks = meas_total_ticks/2 - sync_sector_end;
-    if (diff_ticks < 0) {
-      diff_ticks *= -1;
-    }
+    } else if (map_state == sync_sector_type) {
+        diff_ticks = meas_total_ticks/2 - sync_sector_end;
+        if (diff_ticks < 0) {
+           diff_ticks *= -1;
+        }
 
-    if (diff_ticks < SYNCHRO_MAX_DRIFT)
-    {
-      meas_total_ticks = sync_sector_end * 2;
-      sync_change_flag = 1;
+        if (diff_ticks < SYNCHRO_MAX_DRIFT)
+       {
+          meas_total_ticks = sync_sector_end * 2;
+          sync_change_flag = 1;
+       }
     }
-  }
 }
 
  
@@ -415,7 +435,33 @@ void do_synchro_run(void)
 	      {
 	          meas_total_ticks += 2 * meas_agg_ticks;
 	      }
-	  }
-	    
-	
+	  }	
+}
+
+
+/*
+ * @brief check if we already performed the mapping
+ */
+void check_synchro_start(void)
+{
+  if (curr_mapping_pointer > 0)
+    {
+      switch_synchro_flag = 1;
+    }
+}
+
+
+/*
+ * @brief select the function mapping/synchro
+ */
+void select_mapping_function(void)
+{
+  if (switch_synchro_flag)
+    {
+        do_synchro_run();
+    }
+  else
+    {
+        do_circuit_mapping();
+    }
 }

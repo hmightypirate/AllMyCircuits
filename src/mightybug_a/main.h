@@ -17,3 +17,4 @@
 #include "target.h"
 #include "telemetry.h"
 #include "vbatt.h"
+#include "mapping.h"

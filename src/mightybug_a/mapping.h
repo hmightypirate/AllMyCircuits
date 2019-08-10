@@ -34,7 +34,9 @@ void reset_mapping_pointer(void);
 void reset_synchro(void);
 void do_circuit_mapping(void);
 void do_synchro_run(void);
+void check_synchro_start(void);
 
 mapping_e get_mapping_info(void);
+void select_mapping_function(void);
 
 #endif
