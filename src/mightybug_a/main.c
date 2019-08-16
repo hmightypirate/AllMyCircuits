@@ -97,12 +97,30 @@ void keypad_events(void)
 	}
 }
 
+void hyper_turbo_running_state()
+{
+  set_target_as_hyper_turbo();
+  jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+}
+
+
+
 void turbo_running_state()
 {
 	set_target_as_turbo();
-	reset_pids_turbo();
 
-	jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+	jukebox_setcurrent_song(NO_SONG);   
+	if (FLAG_CIRCUIT_MAPPING)
+	  {
+	    if (is_increase_vel_enable(ST_LINE))
+	      {
+		hyper_turbo_running_state();
+	      }
+	  }
+
+	
+	reset_pids_turbo();
+	
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 
@@ -112,10 +130,6 @@ void turbo_running_state()
 	just_run_state();
 }
 
-void hyper_turbo_running_state()
-{
-  set_target_as_hyper_turbo();
-}
 
 
 void brake_running_state()
@@ -136,6 +150,15 @@ void brake_running_state()
 void normal_running_state()
 {
 	set_target_as_normal();
+
+	if (FLAG_CIRCUIT_MAPPING)
+	  {
+	    if (is_increase_vel_enable(ST_LINE))
+	      {
+		hyper_turbo_running_state();
+	      }
+	  }
+	
 	if (ENABLE_INCDEC_NORMAL_FLAG) {
 		if (USE_ENCODERS_FOR_INCDEC) {
 			update_target_normal_with_encoders();
@@ -212,16 +235,7 @@ void check_rn_state(void)
 	        // Adding mapping velocity
 	        // checking velocity
 	  
-		turbo_running_state();
-
-		if (FLAG_CIRCUIT_MAPPING)
-		  {
-		    if (is_increase_vel_enable(ST_LINE))
-		      {
-			hyper_turbo_running_state();
-		      }
-		  }
-		
+		turbo_running_state();		
 		break;
 	case RUNNING_NORMAL:
 	        // FIXME
@@ -564,6 +578,7 @@ void set_car_default_parameters(void)
 	/* reset readings for turbo calculation */
 	reset_prop_readings();
 
+	/* Setup mapping */
 	if (FLAG_CIRCUIT_MAPPING) {
 		reset_circuit_mapping();
 	}
@@ -587,9 +602,6 @@ void setup_modules()
 
 	/* Setup keypad */
 	setup_keypad();
-
-	/* Setup mapping */
-	reset_circuit_mapping();
 }
 
 void execute_state(state_e state)
@@ -616,9 +628,9 @@ void execute_state(state_e state)
 	case DELAYED_START_STATE:
 		delayed_start_state();
 
-		// Reset pointer (starting from the beginning)
-		if (FLAG_CIRCUIT_MAPPING)
-		  reset_mapping_pointer();
+		//// Reset pointer (starting from the beginning)
+		//if (FLAG_CIRCUIT_MAPPING)
+		//  reset_mapping_pointer();
 		
 		break;
 	case CHANGE_MAP_STATE:

@@ -19,7 +19,7 @@ static const int16_t vel_maps[NUMBER_OF_MAPPINGS] = {
     // 650, 725, 800 // mapping vel normal
     //775, 800, 825 // for testing purposes
     //500, 600, 700
-  350, 400, 450
+  300, 300, 300
 };
 
 // Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro
@@ -35,7 +35,8 @@ static const int16_t vel_nool_maps[NUMBER_OF_MAPPINGS] = {
 
 static const int16_t pid_turbo_maps[NUMBER_OF_MAPPINGS * 3] = {
     200, 0, 300, // 350, 0, 600
-    200, 0, 300, 200, 0, 300};
+    200, 0, 300,
+    200, 0, 300};
 
 static const int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
     // 515, 515, 515
@@ -44,11 +45,11 @@ static const int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
     // 600, 650, 700 // mapping vel turbo
     // 675, 725, 775 // testing turbo
     //800, 900, 950
-  400, 500, 500
+  350, 350, 350
 };
 
 static const int16_t vel_hyper_turbo_maps[NUMBER_OF_MAPPINGS] = {
-    600, 600, 600
+    650, 650, 650
 };
 
 

@@ -356,19 +356,27 @@ static void cli_enc_all(){
 
 char str_MAP_syntax[] = "Syntax: MAP ALL\n";
 char str_MAP_ALL[] = "MAP ALL";
+
+int idx_map = 0;
 static void cli_map_all() {
 
   mapping_e last_map = get_mapping_info();
-  
-  for (int i = 0; i < MAX_MAP_STATES; i++)
-    {
+
+  if (idx_map > MAX_MAP_STATES) 
+    idx_map = 0;
+  //for (int i = 0; i < MAX_MAP_STATES; i++)
+  //  {
       printf("%i State: %d, Ticks left: %zu, Ticks right: %zu Total: %zu\n",
-	     (int) i,
-	     last_map.mapstates[i],
-	     (unsigned int) last_map.agg_left_ticks[i],
-	     (unsigned int) last_map.agg_right_ticks[i],
-	     (unsigned int) last_map.agg_total_ticks[i]);
-    }
+	     idx_map,
+	     last_map.mapstates[idx_map],
+	     (unsigned int) last_map.agg_left_ticks[idx_map],
+	     (unsigned int) last_map.agg_right_ticks[idx_map],
+	     (unsigned int) last_map.agg_total_ticks[idx_map]);
+
+      
+
+      //}
+      idx_map += 1;
 
   
 }

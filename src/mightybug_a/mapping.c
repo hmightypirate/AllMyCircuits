@@ -15,7 +15,7 @@ mapstate_e meas_sector_type = NONE;
 uint32_t meas_l_ticks = 0;
 uint32_t meas_r_ticks = 0;
 uint32_t meas_agg_ticks = 0;
-uint32_t meas_total_ticks = 0;
+int32_t meas_total_ticks = 0;
 mapstate_e sync_sector_type = NONE;
 uint32_t sync_sector_length = -1;
 uint16_t sync_sector_idx = 0;
@@ -236,7 +236,7 @@ void get_next_sector() {
     }
 
     if (mapping_circuit.mapstates[sync_sector_idx] != UNKNOWN &&
-        MAX_MAP_STATES > sync_sector_idx + 2 && 
+        MAX_MAP_STATES < sync_sector_idx + 2 && 
 	mapping_circuit.mapstates[sync_sector_idx + 1] == UNKNOWN &&
 	mapping_circuit.mapstates[sync_sector_idx + 2] == mapping_circuit.mapstates[sync_sector_idx]) {
         sync_next_sector_idx += 3;
@@ -339,6 +339,7 @@ void do_synchro_run(void)
 	uint32_t last_left_ticks = get_last_left_ticks();
 	uint32_t last_right_ticks = get_last_right_ticks();
 
+	// First sector
 	if (sync_sector_type == NONE)
 	  {
 	    get_next_sector(); // Get next sector
@@ -466,7 +467,6 @@ void update_mapping_function(void)
     }
 }
 
-
 /*
  * @brief get synchronization flag
  */
@@ -484,15 +484,37 @@ uint8_t is_increase_vel_enable(mapstate_e state)
   if (switch_synchro_flag)
     {
       // Check if it is in the required state
+      //if (sync_sector_type == state)
       if (sync_sector_type == state)
-	{
+	 {
 	  // Check it is safe to update the velocity
-	  if (meas_total_ticks/2 + TURBO_SYNCHRO_TICKS < sync_sector_end)
-	    {
+	   if (meas_total_ticks/2 + TURBO_SYNCHRO_TICKS < sync_sector_end)
+	   {
 	      return 1;
-	    }
+	   }
 	}
     }
 
   return 0;
+}
+
+
+uint16_t get_synchro_sector_idx(void)
+{
+  return sync_sector_idx;
+}
+
+uint16_t get_mapping_pointer_idx(void)
+{
+  return curr_mapping_pointer;
+}
+
+mapstate_e get_mapping_state(void)
+{
+  return curr_mapstate;
+}
+
+mapstate_e get_synchro_state(void)
+{
+  return sync_sector_type;
 }
