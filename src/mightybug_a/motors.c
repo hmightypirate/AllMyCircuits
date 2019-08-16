@@ -347,7 +347,7 @@ int32_t rpm_pid(uint8_t side, int32_t error)
 
 	rpm_last_error[side] = error;
 
-	control = rpm_proportional[side] * RPM_K_P + rpm_integral[side] * RPM_K_I + rpm_derivative[side] * RPM_K_D;
+	control = rpm_proportional[side] * rpm_k_p + rpm_integral[side] * rpm_k_i + rpm_derivative[side] * rpm_k_d;
 	control = control / 10;
 
 	if (control > 999) control = 999;

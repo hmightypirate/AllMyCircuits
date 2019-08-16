@@ -1,6 +1,7 @@
 #ifndef __MOTORS_H
 #define __MOTORS_H
 
+#include "configs.h"
 #include "commons.h"
 #include "encoder.h"
 #include "fsm.h"

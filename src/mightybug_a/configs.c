@@ -1,6 +1,13 @@
 #include "configs.h"
 #include "cli.h"
 
+
+
+uint8_t rpm_k_p = RPM_K_P;
+uint8_t rpm_k_i = RPM_K_I;
+uint8_t rpm_k_d = RPM_K_D;
+
+
 /* pid maps: k_p, k_i, k_d */
 int16_t pid_maps[NUMBER_OF_MAPPINGS * 3] = {
     250, 0, 300, // 400, 0, 500
@@ -69,4 +76,8 @@ void config_vars(void)
     add_config_var(vel_turbo_maps, 6, INT16_T, NUMBER_OF_MAPPINGS);
 
     add_config_var(vel_brake_maps, 7, INT16_T, NUMBER_OF_MAPPINGS * 3);
+
+    add_config_var(&rpm_k_p, 8, UINT8_T, 1);
+    add_config_var(&rpm_k_i, 9, UINT8_T, 1);
+    add_config_var(&rpm_k_d, 10, UINT8_T, 1);
 }

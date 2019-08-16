@@ -22,6 +22,10 @@ extern int16_t vel_brake_maps[NUMBER_OF_MAPPINGS];
 
 extern const uint8_t map_songs[NUMBER_OF_MAPPINGS];
 
+extern uint8_t rpm_k_p;
+extern uint8_t rpm_k_i;
+extern uint8_t rpm_k_d;
+
 void config_vars(void);
 
 #endif /* __CONFIGS_H */
