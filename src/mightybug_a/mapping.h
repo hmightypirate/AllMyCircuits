@@ -10,6 +10,7 @@
 #define OUT_MAPSTLINE_STATE 4 // diff in abs encoder ticks
 #define MIN_SECTOR_LENGTH 250 // minimum length of sector
 #define SYNCHRO_MAX_DRIFT 200
+#define TURBO_SYNCHRO_TICKS 200 // remaining ticks
 
 typedef enum {
   NONE,
@@ -32,11 +33,10 @@ typedef struct {
 void reset_circuit_mapping(void);
 void reset_mapping_pointer(void);
 void reset_synchro(void);
-void do_circuit_mapping(void);
-void do_synchro_run(void);
 void check_synchro_start(void);
-
+uint8_t is_increase_vel_enable(mapstate_e state);
 mapping_e get_mapping_info(void);
-void select_mapping_function(void);
+void update_mapping_function(void);
+uint8_t get_mapping_function(void);
 
 #endif

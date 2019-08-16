@@ -47,6 +47,11 @@ static const int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
   400, 500, 500
 };
 
+static const int16_t vel_hyper_turbo_maps[NUMBER_OF_MAPPINGS] = {
+    600, 600, 600
+};
+
+
 static const int16_t vel_brake_maps[NUMBER_OF_MAPPINGS] = {
     // 515, 515, 515
     // 575, 600, 625 //mapping 1st test

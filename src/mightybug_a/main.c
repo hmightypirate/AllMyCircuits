@@ -112,6 +112,12 @@ void turbo_running_state()
 	just_run_state();
 }
 
+void hyper_turbo_running_state()
+{
+  set_target_as_hyper_turbo();
+}
+
+
 void brake_running_state()
 {
 	set_target_as_brake();
@@ -202,9 +208,26 @@ void check_rn_state(void)
 
 	switch (running_state) {
 	case RUNNING_TURBO:
+	        // FIXME
+	        // Adding mapping velocity
+	        // checking velocity
+	  
 		turbo_running_state();
+
+		if (FLAG_CIRCUIT_MAPPING)
+		  {
+		    if (is_increase_vel_enable(ST_LINE))
+		      {
+			hyper_turbo_running_state();
+		      }
+		  }
+		
 		break;
 	case RUNNING_NORMAL:
+	        // FIXME
+	        // Adding mapping velocity
+	        // checking velocity
+	  
 		normal_running_state();
 		break;
 	case RUNNING_NOOL:
@@ -245,9 +268,7 @@ void calibration_state(void)
 void idle_state(void)
 {
         /* reset synchro state */
-        reset_synchro();        
-	check_synchro_start();
-	
+        reset_synchro();	
 	/* reset out of line measurements, resets calibration */
 	reset_all_inline();
 	reset_calibration_values();
@@ -317,10 +338,6 @@ void delayed_start_state(void)
 	if (current_loop_millisecs - delayed_start_time >
 	    DELAYED_START_WAIT_TIME) {
 		delayed_start_time = 0;
-
-		// Reset pointer (starting from the beginning)
-		if (FLAG_CIRCUIT_MAPPING)
-			reset_mapping_pointer();
 
 		if (FLAG_MAX_VEL_DELAY)
 			reset_veldelay();
@@ -455,11 +472,6 @@ void just_run_state()
 			update_running_state(LOST_LINE_EVENT);
 		}
 	}
-
-	// Do circuit mapping
-	if (FLAG_CIRCUIT_MAPPING) {
-		do_circuit_mapping();
-	}
 }
 
 void inertia_run_state(void)
@@ -508,7 +520,7 @@ void running_state(void)
 	if (FLAG_CIRCUIT_MAPPING)
 	  {
 	    // Add circuit mapping
-	    select_mapping_function();
+	    update_mapping_function();
 	  }	
 }
 
@@ -591,12 +603,23 @@ void execute_state(state_e state)
 		break;
 	case IDLE_STATE:
 		idle_state();
+
+		// Check if the mapping was already done and we must go to the synchro phase
+		if (FLAG_CIRCUIT_MAPPING)
+		  {
+		    check_synchro_start();
+		  }
 		break;
 	case OUT_OF_BATTERY_STATE:
 		out_of_battery_state();
 		break;
 	case DELAYED_START_STATE:
 		delayed_start_state();
+
+		// Reset pointer (starting from the beginning)
+		if (FLAG_CIRCUIT_MAPPING)
+		  reset_mapping_pointer();
+		
 		break;
 	case CHANGE_MAP_STATE:
 		change_map_state();

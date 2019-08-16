@@ -440,7 +440,7 @@ void do_synchro_run(void)
 
 
 /*
- * @brief check if we already performed the mapping
+ * @brief check if we already performed the mapping and we must start the synchronization
  */
 void check_synchro_start(void)
 {
@@ -454,7 +454,7 @@ void check_synchro_start(void)
 /*
  * @brief select the function mapping/synchro
  */
-void select_mapping_function(void)
+void update_mapping_function(void)
 {
   if (switch_synchro_flag)
     {
@@ -464,4 +464,35 @@ void select_mapping_function(void)
     {
         do_circuit_mapping();
     }
+}
+
+
+/*
+ * @brief get synchronization flag
+ */
+uint8_t get_mapping_function(void)
+{
+  return switch_synchro_flag;
+}
+
+
+/* 
+ * @brief indicate if we can safely increase the velocity
+ */
+uint8_t is_increase_vel_enable(mapstate_e state)
+{
+  if (switch_synchro_flag)
+    {
+      // Check if it is in the required state
+      if (sync_sector_type == state)
+	{
+	  // Check it is safe to update the velocity
+	  if (meas_total_ticks/2 + TURBO_SYNCHRO_TICKS < sync_sector_end)
+	    {
+	      return 1;
+	    }
+	}
+    }
+
+  return 0;
 }
