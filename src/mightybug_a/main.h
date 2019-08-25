@@ -11,6 +11,7 @@
 #include "mapping.h"
 #include "motors.h"
 #include "pid.h"
+#include "target_pid.h"
 #include "pidvelmap.h"
 #include "sensors.h"
 #include "setup.h"

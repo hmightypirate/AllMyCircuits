@@ -572,6 +572,9 @@ void set_car_default_parameters(void)
 	/* reset pid */
 	reset_pid();
 
+	/* reset pid for target velocity in normal mode */
+	reset_pid_target();
+
 	/* default map of constants of pid */
 	reset_pids_normal();
 

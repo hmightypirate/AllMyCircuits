@@ -70,4 +70,8 @@
 #define DEBUG_INERTIA_TEST 0
 #define INERTIA_MODE_LIMIT_TIME 1000
 
+/* Flag to use a pid updating target velocity in normal mode */
+#define USE_PID_FOR_TARGET_VELOCITY 1
+
+
 #endif /* __COMMONS_H */
