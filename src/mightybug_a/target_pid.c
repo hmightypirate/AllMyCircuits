@@ -2,7 +2,7 @@
 
 static uint16_t k_p = 500; // Proportional constant
 static uint16_t k_i = 0;   // Integral constant
-static uint16_t k_d = 1500;   // Derivative constant
+static uint16_t k_d = 1000;   // Derivative constant
 
 static int32_t integral = 0;
 static int16_t derivative = 0;
