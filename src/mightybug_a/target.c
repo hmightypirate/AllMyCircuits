@@ -89,11 +89,10 @@ void update_target_normal_with_encoders()
 
 	  next_vel =
 	    vel_maps[get_current_pidvel_map()] + step_qty * diff_acc;
-	}
-	
+	}	
 
 	// FIXME Check why is this snippet commented?
-	/*
+       	/*
 	    if (next_vel < MIN_VEL_MOTOR_INC_MODE)
 	      {
 		next_vel = MIN_VEL_MOTOR_INC_MODE;

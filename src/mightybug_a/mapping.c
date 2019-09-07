@@ -335,14 +335,14 @@ void get_synchro(mapstate_e map_state)
  */ 
 void do_synchro_run(void)
 {
-	// aggregated ticks
+	// aggregated ticks of the last x ms
 	uint32_t left_ticks = get_left_encoder_ticks();
 	uint32_t right_ticks = get_right_encoder_ticks();
 
 	// difference between encoders
 	int16_t diff_encoders = get_abs_diff_encoders();
 
-	// last ticks
+	// last ticks (last ms)
 	uint32_t last_left_ticks = get_last_left_ticks();
 	uint32_t last_right_ticks = get_last_right_ticks();
 
@@ -358,8 +358,7 @@ void do_synchro_run(void)
 		  meas_sector_type != ST_LINE) {
 	         if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
 		     // Get synchro
-
-		   get_synchro(meas_sector_type);
+		     get_synchro(meas_sector_type);
 
 		     if (sync_change_flag) {
 		        sync_sector_idx = sync_next_sector_idx;
@@ -380,18 +379,17 @@ void do_synchro_run(void)
 	else if (left_ticks > right_ticks)
 	  {
 	     if (meas_sector_type != NONE &&
-		  meas_sector_type != RIGHT_CORNER) {
+		 meas_sector_type != RIGHT_CORNER) {
 	         if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
 		     // Get synchro
-		   get_synchro(meas_sector_type);
+		     get_synchro(meas_sector_type);
 
 		     if (sync_change_flag) {
 		        sync_sector_idx = sync_next_sector_idx;
 
 			// Get next sector
 			get_next_sector();
-         	     }
-		
+         	     }		
 	          }
 		 meas_l_ticks = 0;
 		 meas_r_ticks = 0;
@@ -406,7 +404,7 @@ void do_synchro_run(void)
 		  meas_sector_type != LEFT_CORNER) {
 	         if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
 		     // Get synchro
-		   get_synchro(meas_sector_type);
+		     get_synchro(meas_sector_type);
 
 		     if (sync_change_flag) {
 		        sync_sector_idx = sync_next_sector_idx;
