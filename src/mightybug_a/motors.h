@@ -15,8 +15,8 @@
 #define MOTOR_RIGHT 1
 
 // RPM PID constants
-#define RPM_K_P 0
-#define RPM_K_I 1 
+#define RPM_K_P 50
+#define RPM_K_I 10 
 #define RPM_K_D 0
 
 // TODO: More intuitive names
@@ -63,5 +63,9 @@ int32_t get_next_constrained_target_velocity(int32_t vel);
 void increase_pointer_vel_delay(int32_t last_vel);
 
 int32_t rpm_pid(uint8_t side, int32_t error);
+void reset_rpm_pid_values(void);
+
+void set_left_motor_velocity(int32_t velocity);
+void set_right_motor_velocity(int32_t velocity);
 
 #endif /* __MOTORS_H */

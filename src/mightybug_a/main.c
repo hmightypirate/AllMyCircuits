@@ -172,6 +172,7 @@ void stop_running_state()
 		update_running_state(SET_NORMAL_MODE_STATE);
 	}
 	stop_motors();
+	reset_rpm_pid_values();
 
 	jukebox_setcurrent_song(OUT_OF_LINE_SONG);
 
@@ -411,22 +412,28 @@ void set_vel_antiwheelie(uint32_t current_loop_millisecs)
 {
 	if ((current_loop_millisecs - running_loop_millisecs) <
 	    MAX_ANTIWHEELIE_TIME) {
-		set_target_velocity(MAX_ANTIWHEELIE_VELOCITY);
+		//set_target_velocity(MAX_ANTIWHEELIE_VELOCITY);
+		set_left_motor_velocity(MAX_ANTIWHEELIE_VELOCITY);
+		set_right_motor_velocity(MAX_ANTIWHEELIE_VELOCITY);
 	}
 }
 
 void just_run_state()
 {
 
-	if (ANTIWHEELIE_AT_START) {
-		set_vel_antiwheelie(current_loop_millisecs);
-	}
+	// if (ANTIWHEELIE_AT_START) {
+	// 	set_vel_antiwheelie(current_loop_millisecs);
+	// }
 
 	/* line pid control */
 	int control = 0;
 	control = pid(line_error);
 
 	motor_control_rpm_from_line_pid(control);
+
+	if (ANTIWHEELIE_AT_START) {
+		set_vel_antiwheelie(current_loop_millisecs);
+	}
 
 	// Set the current ms (inline)
 	if (!is_out_of_line()) {

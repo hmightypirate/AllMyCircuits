@@ -355,3 +355,12 @@ int32_t rpm_pid(uint8_t side, int32_t error)
 
 	return control;
 }
+
+void reset_rpm_pid_values()
+{
+	for (int side = 0; side < 2; side++) {
+		rpm_proportional[side] = 0;
+		rpm_integral[side] = 0;
+		rpm_derivative[side] = 0;
+	}
+}
