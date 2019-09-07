@@ -43,6 +43,10 @@ static int32_t right_encoder_acc = 0;
 
 static uint16_t encoder_array_index = 0;
 
+volatile uint32_t left_ticks_counter = 0;
+volatile uint32_t right_ticks_counter = 0;
+
+
 /*
  * @brief get the absolute diff between encoders
  */
@@ -206,24 +210,33 @@ void update_encoder_ticks()
 
 	measures_done += 1;
 
-	// Get left encoder
-	uint32_t timer_tmp = (uint32_t)timer_get_counter(LEFT_ENCODER_TIMER);
-	left_encoder_array[encoder_array_index] =
-	    encoder_measurement(timer_tmp);
+	if (USE_ENCODER_TIMER) {
+		// Get left encoder
+		uint32_t timer_tmp = (uint32_t)timer_get_counter(LEFT_ENCODER_TIMER);
+		left_encoder_array[encoder_array_index] =
+	    	encoder_measurement(timer_tmp);
 
-	// Get right encoder
-	timer_tmp = (uint32_t)timer_get_counter(RIGHT_ENCODER_TIMER);
-	right_encoder_array[encoder_array_index] =
-	    encoder_measurement(timer_tmp);
+		// Get right encoder
+		timer_tmp = (uint32_t)timer_get_counter(RIGHT_ENCODER_TIMER);
+		right_encoder_array[encoder_array_index] =
+	    	encoder_measurement(timer_tmp);
 
-	// Reset the timers
-	timer_set_counter(LEFT_ENCODER_TIMER, 0);
-	timer_set_counter(RIGHT_ENCODER_TIMER, 0);
+		// Reset the timers
+		timer_set_counter(LEFT_ENCODER_TIMER, 0);
+		timer_set_counter(RIGHT_ENCODER_TIMER, 0);
+	} else {
+		left_encoder_array[encoder_array_index] = left_ticks_counter;
+		left_ticks_counter = 0;
 
+		right_encoder_array[encoder_array_index] = right_ticks_counter;
+		right_ticks_counter = 0;
+	}
 	// Update current_tick
 	encoder_array_index += 1;
 	encoder_array_index %= ENCODER_BUFFER_LEN;
 }
+
+
 
 /*
  * @brief obtain last measurement pointer to encoder ticks
@@ -307,6 +320,9 @@ void exti15_10_isr(void)
 	edge_ch1_left_ms_time = get_millisecs_since_start();
 
 	if (last_left_interrupt == CH2) {
+
+		left_ticks_counter++;
+
 		add_left_encoder_time(
 		    (MILLISEC_SLICES *
 		     (edge_ch1_left_ms_time - edge_ch2_left_ms_time)) +
@@ -323,6 +339,9 @@ void exti3_isr(void)
 	edge_ch2_left_ms_time = get_millisecs_since_start();
 
 	if (last_left_interrupt == CH1) {
+
+		left_ticks_counter++;
+
 		add_left_encoder_time(
 		    (MILLISEC_SLICES *
 		     (edge_ch2_left_ms_time - edge_ch1_left_ms_time)) +
@@ -339,7 +358,10 @@ void exti9_5_isr(void)
 		edge_ch1_right_clk_time = systick_get_value();
 		edge_ch1_right_ms_time = get_millisecs_since_start();
 
-		if (last_left_interrupt == CH2) {
+		if (last_right_interrupt == CH2) {
+			
+			right_ticks_counter++;
+
 			add_right_encoder_time(
 			    (MILLISEC_SLICES *
 			     (edge_ch1_right_ms_time - edge_ch2_right_ms_time)) +
@@ -352,7 +374,10 @@ void exti9_5_isr(void)
 		edge_ch2_right_clk_time = systick_get_value();
 		edge_ch2_right_ms_time = get_millisecs_since_start();
 
-		if (last_left_interrupt == CH1) {
+		if (last_right_interrupt == CH1) {
+
+			right_ticks_counter++;
+
 			add_right_encoder_time(
 			    (MILLISEC_SLICES *
 			     (edge_ch2_right_ms_time - edge_ch1_right_ms_time)) +
