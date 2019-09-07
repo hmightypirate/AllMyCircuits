@@ -50,7 +50,7 @@ number of ticks ? / number of seconds (estimated given the velocity?)
 void adding_map_to_list(mapstate_e new_state)
 {
   if (curr_mapping_pointer < MAX_MAP_STATES) {
-    // Check if it is in the first sector 
+      // Check if it is in the first sector 
       if (curr_mapping_pointer > 0) {
           if (mapping_circuit.mapstates[curr_mapping_pointer - 1] == new_state) {
 	    // Joining sectors (these might only happen with UNKNOWN states)
@@ -59,7 +59,7 @@ void adding_map_to_list(mapstate_e new_state)
 	      mapping_circuit.agg_right_ticks[curr_mapping_pointer-1] += curr_agg_right_ticks;
 
 	  } else {
-	    // Not aggregating sectors
+       	      // Not aggregating sectors
 	      mapping_circuit.agg_total_ticks[curr_mapping_pointer] = curr_agg_total_ticks;
 	      mapping_circuit.agg_left_ticks[curr_mapping_pointer] = curr_agg_left_ticks;
 	      mapping_circuit.agg_right_ticks[curr_mapping_pointer] = curr_agg_right_ticks;
@@ -220,6 +220,7 @@ void reset_synchro(void)
 void get_next_sector() {
 
     if (sync_sector_idx >= MAX_MAP_STATES) {
+        // Reached maximum number of states (do not adding a new state)
 	sync_next_sector_idx = sync_sector_idx;
 	sync_sector_type = mapping_circuit.mapstates[MAX_MAP_STATES -1];
 	sync_sector_length = mapping_circuit.agg_total_ticks[MAX_MAP_STATES - 1];
@@ -228,6 +229,7 @@ void get_next_sector() {
     }
 		
     if (mapping_circuit.mapstates[sync_sector_idx + 1] == NONE) {
+        // Reached the last mapped state
 	sync_next_sector_idx = sync_sector_idx;
 	sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
 	sync_sector_length = mapping_circuit.agg_total_ticks[sync_sector_idx];
@@ -239,21 +241,26 @@ void get_next_sector() {
         MAX_MAP_STATES < sync_sector_idx + 2 && 
 	mapping_circuit.mapstates[sync_sector_idx + 1] == UNKNOWN &&
 	mapping_circuit.mapstates[sync_sector_idx + 2] == mapping_circuit.mapstates[sync_sector_idx]) {
+
+        //  Three sectors can be joined in one if the the sectors in the ends are the same and the intermediate is unknown.
         sync_next_sector_idx += 3;
 	sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
-	sync_sector_end = (mapping_circuit.first_tick[sync_sector_idx +2] +
+	sync_sector_length = (mapping_circuit.agg_total_ticks[sync_sector_idx] +
+			      mapping_circuit.agg_total_ticks[sync_sector_idx + 1] +
+			      mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
+	sync_sector_end = (mapping_circuit.first_tick[sync_sector_idx + 2] +
 		  mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
-	sync_sector_end = (mapping_circuit.agg_total_ticks[sync_sector_idx] +
-		  mapping_circuit.agg_total_ticks[sync_sector_idx + 1] +
-	          mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
 
+	// Check if there are more sector that can be joined in one
 	while(1) {
 	    if (sync_next_sector_idx + 2 < MAX_MAP_STATES &&
 	          mapping_circuit.mapstates[sync_next_sector_idx] == UNKNOWN &&
 		  mapping_circuit.mapstates[sync_next_sector_idx + 1] ==
 		  mapping_circuit.mapstates[sync_sector_idx]) {
 
-	         sync_sector_end += (mapping_circuit.agg_total_ticks[sync_next_sector_idx] + mapping_circuit.agg_total_ticks[sync_next_sector_idx + 1]);
+	         sync_sector_length += (mapping_circuit.agg_total_ticks[sync_next_sector_idx] + mapping_circuit.agg_total_ticks[sync_next_sector_idx + 1]);
+
+		 sync_sector_end = (mapping_circuit.first_tick[sync_next_sector_idx + 1] + mapping_circuit.agg_total_ticks[sync_next_sector_idx + 1]);
 
 		sync_next_sector_idx += 2;
 	
