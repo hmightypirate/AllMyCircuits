@@ -45,6 +45,10 @@ void print_telemetry(int millis)
 	  printf("%u,",(unsigned int)get_mapping_state());
 	if (SHOW_SYNCHRO_STATE)
 	  printf("%u,",(unsigned int)get_synchro_state());
+	if (SHOW_RPM_LEFT)
+	  printf("%u,", (unsigned int)get_current_left_rpm());
+	if (SHOW_RPM_RIGHT)
+	  printf("%u,", (unsigned int)get_current_right_rpm());	
 	  
 	  
 	
