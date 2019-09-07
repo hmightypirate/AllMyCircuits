@@ -339,7 +339,7 @@ void exti9_5_isr(void)
 		edge_ch1_right_clk_time = systick_get_value();
 		edge_ch1_right_ms_time = get_millisecs_since_start();
 
-		if (last_left_interrupt == CH2) {
+		if (last_right_interrupt == CH2) {
 			add_right_encoder_time(
 			    (MILLISEC_SLICES *
 			     (edge_ch1_right_ms_time - edge_ch2_right_ms_time)) +
@@ -352,7 +352,7 @@ void exti9_5_isr(void)
 		edge_ch2_right_clk_time = systick_get_value();
 		edge_ch2_right_ms_time = get_millisecs_since_start();
 
-		if (last_left_interrupt == CH1) {
+		if (last_right_interrupt == CH1) {
 			add_right_encoder_time(
 			    (MILLISEC_SLICES *
 			     (edge_ch2_right_ms_time - edge_ch1_right_ms_time)) +
