@@ -5,6 +5,7 @@
 #include "encoder.h"
 #include "motors.h"
 #include "pidvelmap.h"
+#include "target_pid.h"
 #include <stdint.h>
 
 void update_sequential_readings(int16_t error, int16_t last_error);

@@ -15,6 +15,7 @@ uint8_t get_map_song(uint8_t id_map);
 
 /* Target velocity modes */
 void set_target_as_turbo(void);
+void set_target_as_hyper_turbo(void);
 void set_target_as_brake(void);
 void set_target_as_normal(void);
 void set_target_as_nool(void);

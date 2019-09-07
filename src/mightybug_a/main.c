@@ -60,20 +60,20 @@ void check_running_mode_inline()
 	switch (get_running_state()) {
 	case RUNNING_NORMAL:
 
-		if (get_inline_change()) {
+		if (get_inline_change() && FORCE_STATECHANGE_ALL_INLINE) {
 			update_running_state(SET_TURBO_MODE_STATE);
 		}
 
 		break;
 
 	case RUNNING_TURBO:
-		if (get_inline_change()) {
+		if (get_inline_change() && FORCE_STATECHANGE_ALL_INLINE) {
 			update_running_state(NEAR_CORNER_EVENT);
 		}
 
 		break;
 	case RUNNING_BRAKE:
-		if (get_inline_change()) {
+		if (get_inline_change() && FORCE_STATECHANGE_ALL_INLINE) {
 			update_running_state(SET_NORMAL_MODE_STATE);
 		}
 		break;
@@ -97,12 +97,30 @@ void keypad_events(void)
 	}
 }
 
+void hyper_turbo_running_state()
+{
+  set_target_as_hyper_turbo();
+  jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+}
+
+
+
 void turbo_running_state()
 {
 	set_target_as_turbo();
-	reset_pids_turbo();
 
-	jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+	jukebox_setcurrent_song(NO_SONG);   
+	if (FLAG_CIRCUIT_MAPPING)
+	  {
+	    if (is_increase_vel_enable(ST_LINE))
+	      {
+		hyper_turbo_running_state();
+	      }
+	  }
+
+	
+	reset_pids_turbo();
+	
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 
@@ -111,6 +129,8 @@ void turbo_running_state()
 
 	just_run_state();
 }
+
+
 
 void brake_running_state()
 {
@@ -130,6 +150,15 @@ void brake_running_state()
 void normal_running_state()
 {
 	set_target_as_normal();
+
+	if (FLAG_CIRCUIT_MAPPING)
+	  {
+	    if (is_increase_vel_enable(ST_LINE))
+	      {
+		hyper_turbo_running_state();
+	      }
+	  }
+	
 	if (ENABLE_INCDEC_NORMAL_FLAG) {
 		if (USE_ENCODERS_FOR_INCDEC) {
 			update_target_normal_with_encoders();
@@ -202,9 +231,17 @@ void check_rn_state(void)
 
 	switch (running_state) {
 	case RUNNING_TURBO:
-		turbo_running_state();
+	        // FIXME
+	        // Adding mapping velocity
+	        // checking velocity
+	  
+		turbo_running_state();		
 		break;
 	case RUNNING_NORMAL:
+	        // FIXME
+	        // Adding mapping velocity
+	        // checking velocity
+	  
 		normal_running_state();
 		break;
 	case RUNNING_NOOL:
@@ -244,6 +281,8 @@ void calibration_state(void)
 
 void idle_state(void)
 {
+        /* reset synchro state */
+        reset_synchro();	
 	/* reset out of line measurements, resets calibration */
 	reset_all_inline();
 	reset_calibration_values();
@@ -313,10 +352,6 @@ void delayed_start_state(void)
 	if (current_loop_millisecs - delayed_start_time >
 	    DELAYED_START_WAIT_TIME) {
 		delayed_start_time = 0;
-
-		// Reset pointer (starting from the beginning)
-		if (FLAG_CIRCUIT_MAPPING)
-			reset_mapping_pointer();
 
 		if (FLAG_MAX_VEL_DELAY)
 			reset_veldelay();
@@ -451,11 +486,6 @@ void just_run_state()
 			update_running_state(LOST_LINE_EVENT);
 		}
 	}
-
-	// Do circuit mapping
-	if (FLAG_CIRCUIT_MAPPING) {
-		do_circuit_mapping();
-	}
 }
 
 void inertia_run_state(void)
@@ -500,6 +530,12 @@ void running_state(void)
 	if (TELEMETRY) {
 		print_telemetry(current_loop_millisecs);
 	}
+
+	if (FLAG_CIRCUIT_MAPPING)
+	  {
+	    // Add circuit mapping
+	    update_mapping_function();
+	  }	
 }
 
 void setup_keypad(void)
@@ -536,12 +572,16 @@ void set_car_default_parameters(void)
 	/* reset pid */
 	reset_pid();
 
+	/* reset pid for target velocity in normal mode */
+	reset_pid_target();
+
 	/* default map of constants of pid */
 	reset_pids_normal();
 
 	/* reset readings for turbo calculation */
 	reset_prop_readings();
 
+	/* Setup mapping */
 	if (FLAG_CIRCUIT_MAPPING) {
 		reset_circuit_mapping();
 	}
@@ -578,12 +618,23 @@ void execute_state(state_e state)
 		break;
 	case IDLE_STATE:
 		idle_state();
+
+		// Check if the mapping was already done and we must go to the synchro phase
+		if (FLAG_CIRCUIT_MAPPING)
+		  {
+		    check_synchro_start();
+		  }
 		break;
 	case OUT_OF_BATTERY_STATE:
 		out_of_battery_state();
 		break;
 	case DELAYED_START_STATE:
 		delayed_start_state();
+
+		//// Reset pointer (starting from the beginning)
+		//if (FLAG_CIRCUIT_MAPPING)
+		//  reset_mapping_pointer();
+		
 		break;
 	case CHANGE_MAP_STATE:
 		change_map_state();

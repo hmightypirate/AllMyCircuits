@@ -51,7 +51,7 @@ uint8_t is_enable_avg_readings()
 }
 
 /*
- * @brief obtain the mean of absulte position readings
+ * @brief obtain the mean of absolute position readings
  */
 int16_t get_avg_abs_readings()
 {

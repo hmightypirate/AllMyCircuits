@@ -60,6 +60,13 @@ void set_target_as_turbo(void)
 	set_target_velocity(vel_turbo_maps[get_current_pidvel_map()]);
 }
 
+
+void set_target_as_hyper_turbo(void)
+{
+    set_target_velocity(vel_hyper_turbo_maps[get_current_pidvel_map()]);
+}
+
+
 /*
  * @brief resets current target velocity with the brake velocity
  *
