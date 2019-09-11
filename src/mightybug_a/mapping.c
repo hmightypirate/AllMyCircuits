@@ -126,7 +126,7 @@ void do_circuit_mapping() {
 	  }
 	  curr_mapstate = ST_LINE;
      }
-    // Check if it is a Right corner (left ticks greater than right ticks)
+     // Check if it is a Right corner (left ticks greater than right ticks)
      else if (left_ticks > right_ticks) {
          // Check if we have reached a new state
 	 if (curr_mapstate != NONE &&
@@ -251,7 +251,7 @@ void get_next_sector() {
 	sync_sector_end = (mapping_circuit.first_tick[sync_sector_idx + 2] +
 		  mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
 
-	// Check if there are more sector that can be joined in one
+	// Check if there are more sectors that can be joined in one
 	while(1) {
 	    if (sync_next_sector_idx + 2 < MAX_MAP_STATES &&
 	          mapping_circuit.mapstates[sync_next_sector_idx] == UNKNOWN &&

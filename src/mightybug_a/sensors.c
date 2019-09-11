@@ -41,7 +41,7 @@ static uint16_t read_adc_naiive(uint8_t channel)
  *        that using this function
  */
 void hard_reset_sensors()
-{
+-{
 	for (int i = 0; i < NUM_SENSORS; i++) {
 		black_sensors[i] = BLACK_MEASURE;
 		white_sensors[i] = WHITE_MEASURE;
