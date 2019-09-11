@@ -230,14 +230,7 @@ int get_line_position(uint16_t *value)
 					  black_sensors[i]);
 		value[i] = rescale_in_range(value[i], white_sensors[i],
 					    black_sensors[i], K_SENSOR);
-	}
 
-	// Probably not the best place for this
-	if (INTERPOLATE_BAD_MEASURES)
-	  value = interpolate_wrong_values(value);
-
-	// Splitting in two because "value" could be modified when interpolating sensors
-	for (int i = 0; i < NUM_SENSORS; i++) {
 		avg_sensors += ((uint32_t)value[i]) * (i + 1) * SEP_SENSORS;
 		sum_sensors += value[i];
 	}
