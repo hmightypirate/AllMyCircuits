@@ -41,7 +41,7 @@ static uint16_t read_adc_naiive(uint8_t channel)
  *        that using this function
  */
 void hard_reset_sensors()
--{
+{
 	for (int i = 0; i < NUM_SENSORS; i++) {
 		black_sensors[i] = BLACK_MEASURE;
 		white_sensors[i] = WHITE_MEASURE;
@@ -70,6 +70,72 @@ void reset_calibration_values()
 	sensors_calibrated_count = 0;
 }
 
+
+/*
+ * @brief interpolate values of invalid measures
+ *
+ */
+uint16_t *interpolate_wrong_values(uint16_t *value)
+{
+  // get max value
+  uint8_t idx_max_sensor = 0;
+  uint16_t max_sensor_value = 0;
+
+  uint16_t min_sensor_value = 65555;
+  
+  
+  for (int i=0; i < NUM_SENSORS; i++)
+    {
+      if (value[i] > max_sensor_value)
+	{
+	  max_sensor_value = value[i];
+	  idx_max_sensor = i;   
+	}
+
+      if (value[i] < min_sensor_value)
+	{
+	  min_sensor_value = value[i];
+	}
+    }
+
+  // Interpolating right
+  for (int i=idx_max_sensor+1; i < NUM_SENSORS; i++)
+    {
+      if (i + 1 < NUM_SENSORS)
+	{
+	  if (value[i] > value[i-1])
+	    {
+	      value[i] = (value[i-1] + value[i+1])/2;
+	    }
+	}
+
+      else if (value[i] > value[i-1])
+	{
+	  value[i] = min_sensor_value;
+	}
+    }
+
+  // Interpolating left
+  for (int i=idx_max_sensor-1; i >= 0; i--)
+    {
+      if (i - 1 > 0)
+	{
+	  if (value[i] > value[i+1])
+	    {
+	      value[i] = (value[i-1] + value[i+1])/2;
+	    }
+	}
+
+      else if (value[i] > value[i+1])
+	{
+	  value[i] = min_sensor_value;
+	}
+    }
+  
+  return value;
+}
+
+
 /*
  * @brief obtain one measure of all the sensors
  *
@@ -80,6 +146,9 @@ void read_line_sensors(uint16_t *sensor_value)
 	for (int i = 0; i < NUM_SENSORS; i++) {
 		sensor_value[i] = read_adc_naiive(i);
 	}
+
+	if (INTERPOLATE_BAD_MEASURES)
+	  sensor_value = interpolate_wrong_values(sensor_value);
 }
 
 static uint16_t trunc_to_range(uint16_t value, uint16_t min, uint16_t max)
@@ -125,6 +194,8 @@ void set_drift_side(int pos)
 		last_drift = RIGHT_DRIFT;
 }
 
+
+
 /*
  * @brief transform sensor measures in line position
  *
@@ -147,6 +218,7 @@ int get_line_position(uint16_t *value)
 	former_detected_all_inline = detected_all_inline;
 	detected_all_inline = 0;
 
+
 	for (int i = 0; i < NUM_SENSORS; i++) {
 		// Check whites/blacks detected
 		if (value[i] > threshold[i])
@@ -158,11 +230,18 @@ int get_line_position(uint16_t *value)
 					  black_sensors[i]);
 		value[i] = rescale_in_range(value[i], white_sensors[i],
 					    black_sensors[i], K_SENSOR);
+	}
 
+	// Probably not the best place for this
+	if (INTERPOLATE_BAD_MEASURES)
+	  value = interpolate_wrong_values(value);
+
+	// Splitting in two because "value" could be modified when interpolating sensors
+	for (int i = 0; i < NUM_SENSORS; i++) {
 		avg_sensors += ((uint32_t)value[i]) * (i + 1) * SEP_SENSORS;
 		sum_sensors += value[i];
 	}
-
+	
 	// all sensors are black
 	if ((whites_detected == 0 && (FINISH_ALL_INLINE || FORCE_STATECHANGE_ALL_INLINE || FORCE_TELEMETRY_ALL_INLINE) && FOLLOW_BLACK_LINE) ||
 	     (blacks_detected == 0 && (FINISH_ALL_INLINE || FORCE_STATECHANGE_ALL_INLINE || FORCE_TELEMETRY_ALL_INLINE) && FOLLOW_WHITE_LINE)) {
