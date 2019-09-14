@@ -61,7 +61,7 @@
 #define STEP_NORMAL_QTY_INC 40
 
 /* anti-wheelie at start variables */
-#define ANTIWHEELIE_AT_START 0
+#define ANTIWHEELIE_AT_START 1
 #define MAX_ANTIWHEELIE_VELOCITY 350
 #define MAX_ANTIWHEELIE_TIME 500
 
