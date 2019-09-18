@@ -100,6 +100,8 @@ void keypad_events(void)
 void hyper_turbo_running_state()
 {
   set_target_as_hyper_turbo();
+
+  
   jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 }
 
@@ -116,6 +118,11 @@ void turbo_running_state()
 	      {
 		hyper_turbo_running_state();
 	      }
+
+	    if (get_end_of_mapping()) {
+	      jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
+	    }
+
 	  }
 
 	
@@ -157,6 +164,11 @@ void normal_running_state()
 	      {
 		hyper_turbo_running_state();
 	      }
+
+	    if (get_end_of_mapping()) {
+	      jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
+	    }
+
 	  }
 	
 	if (ENABLE_INCDEC_NORMAL_FLAG) {
@@ -170,7 +182,8 @@ void normal_running_state()
 	}
 	reset_pids_normal();
 
-	jukebox_setcurrent_song(NO_SONG);
+	if (!FLAG_CIRCUIT_MAPPING)
+	  jukebox_setcurrent_song(NO_SONG);
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(TENOR_BEAT_ORDER);
 
@@ -213,8 +226,8 @@ void recovery_running_state()
 
 	// set_target_as_normal();
 	// reset_pids_normal();
-  if (USE_RECOVERY_VELOCITY)
-    set_target_as_recovery();
+        if (USE_RECOVERY_VELOCITY)
+           set_target_as_recovery();
 
 	set_led_mode(LED_1, BLINK);
 	set_led_mode(LED_2, BLINK);

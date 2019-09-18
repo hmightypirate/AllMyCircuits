@@ -26,6 +26,10 @@ uint8_t sync_change_flag = 0;
 // Flag to switch between mapping and synchro
 uint8_t switch_synchro_flag = 0;
 
+// Flag to indicate that the end of mapping has been reached
+uint8_t end_of_mapping = 0;
+
+
 /*
 
 number of ticks ? / number of seconds (estimated given the velocity?)
@@ -225,6 +229,8 @@ void get_next_sector() {
 	sync_sector_type = mapping_circuit.mapstates[MAX_MAP_STATES -1];
 	sync_sector_length = mapping_circuit.agg_total_ticks[MAX_MAP_STATES - 1];
 	sync_sector_end = mapping_circuit.first_tick[MAX_MAP_STATES-1] + sync_sector_length;
+
+	end_of_mapping = 1;
 	return;
     }
 		
@@ -234,6 +240,8 @@ void get_next_sector() {
 	sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
 	sync_sector_length = mapping_circuit.agg_total_ticks[sync_sector_idx];
 	sync_sector_end = mapping_circuit.first_tick[sync_sector_idx] + sync_sector_length;
+	end_of_mapping = 1;
+	
 	return;
     }
 
@@ -503,6 +511,11 @@ uint8_t is_increase_vel_enable(mapstate_e state)
   return 0;
 }
 
+
+uint8_t get_end_of_mapping(void)
+{
+  return end_of_mapping;
+}
 
 uint16_t get_synchro_sector_idx(void)
 {

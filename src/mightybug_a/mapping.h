@@ -12,6 +12,8 @@
 #define SYNCHRO_MAX_DRIFT 200
 #define TURBO_SYNCHRO_TICKS 400 // remaining ticks
 
+#define DO_CIRCULAR_MAPPING 1
+
 typedef enum {
   NONE,
   UNKNOWN,
@@ -42,5 +44,6 @@ uint16_t get_synchro_sector_idx(void);
 uint16_t get_mapping_pointer_idx(void);
 mapstate_e get_mapping_state(void);
 mapstate_e get_synchro_state(void);
+uint8_t get_end_of_mapping(void);
 
 #endif
