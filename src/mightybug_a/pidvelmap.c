@@ -94,6 +94,18 @@ void set_target_as_normal(void)
 	set_target_velocity(vel_maps[get_current_pidvel_map()]);
 }
 
+
+/*
+ * @brief resets current target velocity with the recovery velocity
+ *
+ */
+void set_target_as_recovery(void)
+{
+	set_target_velocity(vel_recovery_maps[get_current_pidvel_map()]);
+}
+
+
+
 /*
  * @brief get current map song
  *

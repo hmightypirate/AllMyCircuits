@@ -81,7 +81,7 @@ uint16_t *interpolate_wrong_values(uint16_t *value)
   uint8_t idx_max_sensor = 0;
   uint16_t max_sensor_value = 0;
 
-  uint16_t min_sensor_value = 65555;
+  uint16_t min_sensor_value = (uint16_t) 65555;
   
   
   for (int i=0; i < NUM_SENSORS; i++)

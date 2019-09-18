@@ -73,5 +73,7 @@
 /* Flag to use a pid updating target velocity in normal mode */
 #define USE_PID_FOR_TARGET_VELOCITY 1
 
+/* Flag to use the recovery velocity when entering recovery state */
+#define USE_RECOVERY_VELOCITY 1
 
 #endif /* __COMMONS_H */
