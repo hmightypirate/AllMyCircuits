@@ -29,6 +29,10 @@ uint8_t switch_synchro_flag = 0;
 // Flag to indicate that the end of mapping has been reached
 uint8_t end_of_mapping = 0;
 
+// Circular mapping structs
+int32_t end_sector_largest_rect = 0;
+int32_t size_largest_rect = 0;
+int32_t finish_mapping_largest_rect = 0;
 
 /*
 
@@ -99,6 +103,59 @@ mapping_e get_mapping_info() {
 
 
 /*
+ * @brief obtain straight line
+ */
+void check_circular_stline(uint16_t search_pointer) {
+
+  int32_t last_sector = -1;
+  int32_t sector_size = 0;
+
+  for (int i = search_pointer; i >= 0; i--) {
+    if (mapping_circuit.mapstates[i] == UNKNOWN) {
+      if (sector_size > 0)
+	{
+	  sector_size += mapping_circuit.agg_total_ticks[i];
+	}
+    }
+    else if (mapping_circuit.mapstates[i] == ST_LINE) {
+      if (last_sector < 0)
+	{
+	  last_sector = search_pointer;
+	}
+      sector_size += mapping_circuit.agg_total_ticks[i];
+    }
+    else
+      break;
+  }
+
+  if (last_sector > 0) {
+      if (sector_size > CIRCULAR_TICKS_MINSTLINE) {
+	  if (sector_size > size_largest_rect) {
+	    if ((sector_size - size_largest_rect) < CIRCULAR_TICKS_STLINE_DIFF) {
+	      // Probably repeating the rect (taking the straight line)
+	      finish_mapping_largest_rect = last_sector + 1;
+
+	      // TODO: go to synchro mode
+	      
+	    }
+	  }
+	  else {
+	    // A new largest rect
+	    size_largest_rect = sector_size;
+	    end_sector_largest_rect = last_sector;
+	  }
+      }
+
+      else {
+	// The first rect
+ 	size_largest_rect = sector_size;
+	end_sector_largest_rect = last_sector;	
+      }
+  }
+}
+
+
+/*
  * @brief circuit map
  */
 void do_circuit_mapping() {
@@ -139,6 +196,14 @@ void do_circuit_mapping() {
 	     if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
 	         // Adding a right corner sector
 		 adding_map_to_list(curr_mapstate);
+
+		 // TODO: Check for straight line
+
+		 if (DO_CIRCULAR_MAPPING) {
+		   if (curr_mapping_pointer > 1)
+		     check_circular_stline(curr_mapping_pointer - 2);
+		   }
+		 
 	     } else {
 	         // Adding an unknown sector
 	         adding_map_to_list(UNKNOWN);
@@ -153,6 +218,14 @@ void do_circuit_mapping() {
 	      if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
 	          // Adding a right corner sector
 	          adding_map_to_list(curr_mapstate);
+
+		  // TODO: Check for straight line
+		  if (DO_CIRCULAR_MAPPING) {
+		    
+		    if (curr_mapping_pointer > 1)
+		      check_circular_stline(curr_mapping_pointer - 2);
+		  }
+		  
 	       } else {
 	           // Adding an unknown sector
 	           adding_map_to_list(UNKNOWN);
@@ -510,7 +583,6 @@ uint8_t is_increase_vel_enable(mapstate_e state)
 
   return 0;
 }
-
 
 uint8_t get_end_of_mapping(void)
 {

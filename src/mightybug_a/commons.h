@@ -68,7 +68,7 @@
 /* if this flag is set, both motors will receive target velocity till they reach
  * and end of line */
 #define DEBUG_INERTIA_TEST 0
-#define INERTIA_MODE_LIMIT_TIME 1000
+#define INERTIA_MODE_LIMIT_TIME 0
 
 /* Flag to use a pid updating target velocity in normal mode */
 #define USE_PID_FOR_TARGET_VELOCITY 1
