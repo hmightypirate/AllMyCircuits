@@ -19,5 +19,6 @@ void set_target_as_hyper_turbo(void);
 void set_target_as_brake(void);
 void set_target_as_normal(void);
 void set_target_as_nool(void);
+void set_target_as_recovery(void);
 
 #endif // __PIDVELMAP_H

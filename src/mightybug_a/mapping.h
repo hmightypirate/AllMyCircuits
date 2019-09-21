@@ -10,7 +10,7 @@
 #define OUT_MAPSTLINE_STATE 6 // diff in abs encoder ticks
 #define MIN_SECTOR_LENGTH 250 // minimum length of sector
 #define SYNCHRO_MAX_DRIFT 200
-#define TURBO_SYNCHRO_TICKS 300 // remaining ticks
+#define TURBO_SYNCHRO_TICKS 400 // remaining ticks
 
 typedef enum {
   NONE,

@@ -13,8 +13,14 @@ int16_t vel_maps[NUMBER_OF_MAPPINGS] = {
     // 650, 725, 800 // mapping vel normal
     //775, 800, 825 // for testing purposes
     //500, 600, 700 
-    300, 400, 425
+  //300, 400, 425
+  300, 400, 450 // Record circuito (aguanta pero le cuesta)
 };
+
+int16_t vel_recovery_maps[NUMBER_OF_MAPPINGS] = {
+  200, 200, 200
+};
+  
 
 // Best mapping 600/525; 650/525/35 (1 vuelta -morro corto), 650/515/25 (morro
 // corto stripped)
@@ -37,11 +43,14 @@ int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
     // 600, 650, 700 // mapping vel turbo
     // 675, 725, 775 // testing turbo
     //800, 900, 950
-    300, 375, 400
+    //300, 375, 400
+  //300, 375, 425
+  300, 375, 450 // Record circuito (aguanta pero le cuesta)
 };
 
 int16_t vel_hyper_turbo_maps[NUMBER_OF_MAPPINGS] = {
-    650, 650, 650
+  //650, 650, 650
+  750, 750, 700
 };
 
 int16_t vel_brake_maps[NUMBER_OF_MAPPINGS] = {

@@ -213,6 +213,8 @@ void recovery_running_state()
 
 	// set_target_as_normal();
 	// reset_pids_normal();
+  if (USE_RECOVERY_VELOCITY)
+    set_target_as_recovery();
 
 	set_led_mode(LED_1, BLINK);
 	set_led_mode(LED_2, BLINK);
