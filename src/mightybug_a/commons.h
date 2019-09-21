@@ -36,7 +36,9 @@
 #define RUNNING_STATE_PITCH 0
 
 /* Wait time in out of line */
+
 #define MAX_RUNNING_RECOVERY_TIME 25 // ms
+#define MIN_TIME_TO_SUCCESS_LINE_RECOVER 100 // ms
 
 /* Hysteresis values for changing state whilst running  */
 #define SELECT_RUNNING_STATE_USING_ENCODERS 1

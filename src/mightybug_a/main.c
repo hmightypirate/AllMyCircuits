@@ -7,6 +7,7 @@ uint32_t current_loop_millisecs = 0;
 uint32_t pidvel_map_ms = 0;
 
 uint32_t last_ms_inline = 0;
+uint32_t last_ms_outline = 0;
 uint32_t running_loop_millisecs = 0;
 
 int32_t line_error = 0;
@@ -22,6 +23,7 @@ void go_to_normal(void)
 	reset_sequential_readings();
 	update_running_state(SET_NORMAL_MODE_STATE);
 }
+
 /*
  * @brief get next sub-state (running)
  *
@@ -490,7 +492,9 @@ void just_run_state()
 
 	// Set the current ms (inline)
 	if (!is_out_of_line()) {
-		last_ms_inline = current_loop_millisecs;
+		if (current_loop_millisecs - last_ms_outline > MIN_TIME_TO_SUCCESS_LINE_RECOVER) {
+			last_ms_inline = current_loop_millisecs;
+		}
 		if (get_running_state() == RUNNING_RECOVERY) {
 			if (last_rn_state == RUNNING_NORMAL)
 				update_running_state(SET_NORMAL_MODE_STATE);
@@ -508,6 +512,7 @@ void just_run_state()
 			if (get_running_state()!=RUNNING_RECOVERY) {
 				last_rn_state = get_running_state();
 			}
+			last_ms_outline = current_loop_millisecs;
 			update_running_state(LOST_LINE_EVENT);
 		}
 	}
