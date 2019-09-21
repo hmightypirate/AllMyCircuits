@@ -70,18 +70,29 @@ void update_target_normal_with_encoders()
 		diff_acc = get_left_acc() - get_right_acc();
 	}
 
-	int32_t step_qty = 0;
+	int32_t next_vel = vel_maps[get_current_pidvel_map()];
+	
+	if (USE_PID_FOR_TARGET_VELOCITY) {
+	  int32_t step_qty = pid_target(diff_acc);
 
-	if (diff_acc > 0) {
-		step_qty = STEP_NORMAL_QTY_INC;
+	  next_vel =
+	    vel_maps[get_current_pidvel_map()] + step_qty;
+	  
 	} else {
-		step_qty = STEP_NORMAL_QTY_DEC;
-	}
+	  int32_t step_qty = 0;
 
-	int32_t next_vel =
+	  if (diff_acc > 0) {
+	    step_qty = STEP_NORMAL_QTY_INC;
+	  } else {
+	    step_qty = STEP_NORMAL_QTY_DEC;
+	  }
+
+	  next_vel =
 	    vel_maps[get_current_pidvel_map()] + step_qty * diff_acc;
+	}	
 
-	/*
+	// FIXME Check why is this snippet commented?
+       	/*
 	    if (next_vel < MIN_VEL_MOTOR_INC_MODE)
 	      {
 		next_vel = MIN_VEL_MOTOR_INC_MODE;

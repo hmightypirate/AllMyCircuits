@@ -164,8 +164,8 @@ int get_line_position(uint16_t *value)
 	}
 
 	// all sensors are black
-	if ((whites_detected == 0 && (FINISH_ALL_INLINE || FORCE_STATECHANGE_ALL_INLINE) && FOLLOW_BLACK_LINE) ||
-	     (blacks_detected == 0 && (FINISH_ALL_INLINE || FORCE_STATECHANGE_ALL_INLINE) && FOLLOW_WHITE_LINE)) {
+	if ((whites_detected == 0 && (FINISH_ALL_INLINE || FORCE_STATECHANGE_ALL_INLINE || FORCE_TELEMETRY_ALL_INLINE) && FOLLOW_BLACK_LINE) ||
+	     (blacks_detected == 0 && (FINISH_ALL_INLINE || FORCE_STATECHANGE_ALL_INLINE || FORCE_TELEMETRY_ALL_INLINE) && FOLLOW_WHITE_LINE)) {
 	  detected_all_inline = 1;
 
 	  // specific to stopping the car

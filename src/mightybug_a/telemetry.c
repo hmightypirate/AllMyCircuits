@@ -35,5 +35,22 @@ void print_telemetry(int millis)
 		printf("%d,", (int)get_target_velocity());
 	if (SHOW_SENSOR_INLINE)
 	  printf("%u,", (unsigned int)get_inline_change());
+	if (SHOW_SYNCHRO_FLAG)
+	  printf("%u,", (unsigned int)get_mapping_function());
+	if (SHOW_SYNCHRO_POINTER)
+	  printf("%u,",(unsigned int)get_synchro_sector_idx());
+	if (SHOW_MAPPING_POINTER)
+	  printf("%u,",(unsigned int)get_mapping_pointer_idx());
+	if (SHOW_MAPPING_STATE)
+	  printf("%u,",(unsigned int)get_mapping_state());
+	if (SHOW_SYNCHRO_STATE)
+	  printf("%u,",(unsigned int)get_synchro_state());
+	if (SHOW_RPM_LEFT)
+	  printf("%u,", (unsigned int)get_current_left_rpm());
+	if (SHOW_RPM_RIGHT)
+	  printf("%u,", (unsigned int)get_current_right_rpm());	
+	  
+	  
+	
 	printf("\n");
 }

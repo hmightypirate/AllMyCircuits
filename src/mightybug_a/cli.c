@@ -211,8 +211,34 @@ static void cli_set() {
 	printf("Set var %u %u %u\n", var_id, index, (unsigned int)value);
 }
 
+char str_MAP_ALL[] = "MAP ALL";
+
+int idx_map = 0;
+static void cli_map_all() {
+
+  mapping_e last_map = get_mapping_info();
+
+  if (idx_map > MAX_MAP_STATES) 
+    idx_map = 0;
+  //for (int i = 0; i < MAX_MAP_STATES; i++)
+  //  {
+      printf("%i State: %d, Ticks left: %zu, Ticks right: %zu Total: %zu\n",
+	     idx_map,
+	     last_map.mapstates[idx_map],
+	     (unsigned int) last_map.agg_left_ticks[idx_map],
+	     (unsigned int) last_map.agg_right_ticks[idx_map],
+	     (unsigned int) last_map.agg_total_ticks[idx_map]);
+
+      
+
+      //}
+      idx_map += 1;
+
+  
+}
+
 // This is all the available commands data as an array of command structures
-#define CLI_COMMANDS_LIST_SIZE 9
+#define CLI_COMMANDS_LIST_SIZE 10
 struct command_struct commands_list[] = {
 	{.text = str_BAT, .functionPtr = cli_bat, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_CLK_GET, .functionPtr = cli_clk_get, .is_a_candidate = 'y', .syntax_hint = NULL},
@@ -222,7 +248,8 @@ struct command_struct commands_list[] = {
 	{.text = str_LIN_BLACKS, .functionPtr = cli_lin_blacks, .is_a_candidate = 'y', .syntax_hint = str_LIN_syntax},
 	{.text = str_GET, .functionPtr = cli_get, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_SET, .functionPtr = cli_set, .is_a_candidate = 'y', .syntax_hint = NULL},
-	{.text = str_VER, .functionPtr = cli_ver, .is_a_candidate = 'y', .syntax_hint = NULL}
+	{.text = str_VER, .functionPtr = cli_ver, .is_a_candidate = 'y', .syntax_hint = NULL},
+	{.text = str_MAP_ALL, .functionPtr = cli_map_all, .is_a_candidate = 'y', .syntax_hint = NULL}
 };
 
 

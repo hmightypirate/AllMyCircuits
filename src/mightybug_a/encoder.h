@@ -3,8 +3,14 @@
 
 #include "commons.h"
 #include "setup.h"
+#include "cron.h"
 #include <inttypes.h>
 #include <stdio.h>
+
+#define TICKS_PER_MOTOR_REVOLUTION 12
+#define MOTOR_WHEEL_DEMULTIPLIER 10
+#define RPM_FROM_TIME_CONSTANT 360000000
+#define ENCODER_EDGE_TIMES_NUM_SAMPLES 3
 
 /* wheel perimeter in mm * 0.01 */
 #define WHEEL_PERIMETER 1050
@@ -34,5 +40,9 @@ int32_t get_right_acc(void);
 int16_t get_abs_diff_encoders(void);
 uint32_t get_last_left_ticks(void);
 uint32_t get_last_right_ticks(void);
+
+void reset_encoders_edge_times(void);
+uint16_t get_current_left_rpm(void);
+uint16_t get_current_right_rpm(void);
 
 #endif /* __ENCODER_H */

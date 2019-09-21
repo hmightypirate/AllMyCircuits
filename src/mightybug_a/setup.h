@@ -2,6 +2,7 @@
 #define __SETUP_H
 
 #include "commons.h"
+#include "encoder.h"
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/cm3/scb.h>
 #include <libopencm3/cm3/systick.h>
@@ -10,6 +11,10 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/exti.h>
+
+#define USE_ENCODER_TIMER 1
+#define MILLISEC_SLICES 72000
 
 /*
  *Active if alternate functions of pins are used
@@ -27,7 +32,7 @@
 /*
  * Usart parameters
  */
-#define USART_BAUDRATE 115200 // 921600 //115200
+#define USART_BAUDRATE 115200 //460800 //921600 // 921600 //115200
 #define USART_DATABITS 9
 #define USART_STOPBITS USART_STOPBITS_1
 #define USART_MODE USART_MODE_TX_RX
@@ -83,9 +88,9 @@
 #define LEFT_MOTOR_IN2_PIN GPIO12
 
 #define RIGHT_MOTOR_IN1_PORT GPIOB
-#define RIGHT_MOTOR_IN1_PIN GPIO8
+#define RIGHT_MOTOR_IN1_PIN GPIO9
 #define RIGHT_MOTOR_IN2_PORT GPIOB
-#define RIGHT_MOTOR_IN2_PIN GPIO9
+#define RIGHT_MOTOR_IN2_PIN GPIO8
 
 /* MOTOR PWM
 Both motors are controlled with one timer
