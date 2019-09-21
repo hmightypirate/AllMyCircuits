@@ -106,6 +106,15 @@ void hyper_turbo_running_state()
 }
 
 
+void hyper_turbo_running_corner_state()
+{
+  set_target_as_hyper_turbo_corner();
+
+  
+  jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+}
+
+
 
 void turbo_running_state()
 {
@@ -158,19 +167,6 @@ void normal_running_state()
 {
 	set_target_as_normal();
 
-	if (FLAG_CIRCUIT_MAPPING)
-	  {
-	    if (is_increase_vel_enable(ST_LINE))
-	      {
-		hyper_turbo_running_state();
-	      }
-
-	    if (get_end_of_mapping()) {
-	      jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
-	    }
-
-	  }
-	
 	if (ENABLE_INCDEC_NORMAL_FLAG) {
 		if (USE_ENCODERS_FOR_INCDEC) {
 			update_target_normal_with_encoders();
@@ -180,6 +176,20 @@ void normal_running_state()
 			}
 		}
 	}
+
+	if (FLAG_CIRCUIT_MAPPING)
+	  {
+	    if (is_increase_vel_enable(ST_LINE))
+	      {
+		hyper_turbo_running_corner_state();
+	      }
+
+	    if (get_end_of_mapping()) {
+	      jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
+	    }
+
+	  }
+       		
 	reset_pids_normal();
 
 	if (!FLAG_CIRCUIT_MAPPING)
