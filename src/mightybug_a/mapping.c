@@ -137,7 +137,7 @@ void jump_to_circular_synchro(int32_t last_sector) {
   meas_r_ticks = extra_ticks;
   meas_agg_ticks = extra_ticks;
   meas_total_ticks = (mapping_circuit.first_tick[sync_sector_idx] + extra_ticks) * 2;
-  
+
   get_next_sector();
 }
   
@@ -167,7 +167,7 @@ void check_circular_stline(uint16_t search_pointer) {
       break;
   }
 
-  // Only continue this process if there is a straight line (and it is not the already processed one)
+  // Only continue this process if there is a straight line (and it is not the already detected one)
   if ((last_sector > 0) && ((last_sector + 1) != end_sector_largest_rect)) {
     // rect hast to be of a minimum size
     if (sector_size > CIRCULAR_TICKS_MINSTLINE) {
@@ -193,7 +193,7 @@ void check_circular_stline(uint16_t search_pointer) {
 	if ((size_largest_rect-sector_size) < CIRCULAR_TICKS_STLINE_DIFF) {
 	  // Probably repeating the rect (taking the straight line)
 	  jump_to_circular_synchro(last_sector);
-	}	    
+	}
       }
     }
   }
@@ -469,115 +469,110 @@ void get_synchro(mapstate_e map_state)
   @brief obtain current state estimation using stored mapping information
 
  */ 
-void do_synchro_run(void)
-{
-	// aggregated ticks of the last x ms
-	uint32_t left_ticks = get_left_encoder_ticks();
-	uint32_t right_ticks = get_right_encoder_ticks();
+void do_synchro_run(void) {
+  
+  // aggregated ticks of the last x ms
+  uint32_t left_ticks = get_left_encoder_ticks();
+  uint32_t right_ticks = get_right_encoder_ticks();
 
-	// difference between encoders
-	int16_t diff_encoders = get_abs_diff_encoders();
+  // difference between encoders
+  int16_t diff_encoders = get_abs_diff_encoders();
+	
+  // last ticks (last ms)
+  uint32_t last_left_ticks = get_last_left_ticks();
+  uint32_t last_right_ticks = get_last_right_ticks();
 
-	// last ticks (last ms)
-	uint32_t last_left_ticks = get_last_left_ticks();
-	uint32_t last_right_ticks = get_last_right_ticks();
+  // First sector
+  if (sync_sector_type == NONE) {
+    get_next_sector(); // Get next sector
+  }
 
-	// First sector
-	if (sync_sector_type == NONE)
-	  {
-	    get_next_sector(); // Get next sector
-	  }
+  // It has reached a posible straight line state
+  if (diff_encoders < OUT_MAPSTLINE_STATE) {
+    if (meas_sector_type != NONE &&
+	meas_sector_type != ST_LINE) {
+      if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
+	// Get synchro
+	get_synchro(meas_sector_type);
 
-	// It has reached a posible straight line state
-	if (diff_encoders < OUT_MAPSTLINE_STATE) {
-	     if (meas_sector_type != NONE &&
-		  meas_sector_type != ST_LINE) {
-	         if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
-		     // Get synchro
-		     get_synchro(meas_sector_type);
+	if (sync_change_flag) {
+	  sync_sector_idx = sync_next_sector_idx;
 
-		     if (sync_change_flag) {
-		        sync_sector_idx = sync_next_sector_idx;
-
-			// Get next sector
-			get_next_sector();
+	  // Get next sector
+	  get_next_sector();
 			
-         	     }
-	          }
-		 meas_l_ticks = 0;
-		 meas_r_ticks = 0;
-		 meas_agg_ticks = 0; 
-	      }
+	}
+      }
+      meas_l_ticks = 0;
+      meas_r_ticks = 0;
+      meas_agg_ticks = 0; 
+    }
 
-	     meas_sector_type = ST_LINE;
-	 }
+    meas_sector_type = ST_LINE;
+  }
 
-	else if (left_ticks > right_ticks)
-	  {
-	     if (meas_sector_type != NONE &&
-		 meas_sector_type != RIGHT_CORNER) {
-	         if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
-		     // Get synchro
-		     get_synchro(meas_sector_type);
+  else if (left_ticks > right_ticks) {
+    if (meas_sector_type != NONE &&
+	meas_sector_type != RIGHT_CORNER) {
+      if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
+	// Get synchro
+	get_synchro(meas_sector_type);
 
-		     if (sync_change_flag) {
-		        sync_sector_idx = sync_next_sector_idx;
+	if (sync_change_flag) {
+	  sync_sector_idx = sync_next_sector_idx;
 
-			// Get next sector
-			get_next_sector();
-         	     }		
-	          }
-		 meas_l_ticks = 0;
-		 meas_r_ticks = 0;
-		 meas_agg_ticks = 0; 
-	      }
+	  // Get next sector
+	  get_next_sector();
+	}		
+      }
+      meas_l_ticks = 0;
+      meas_r_ticks = 0;
+      meas_agg_ticks = 0; 
+    }
 
-	     meas_sector_type = RIGHT_CORNER;
-	  }
-	else
-	  {
-	     if (meas_sector_type != NONE &&
-		  meas_sector_type != LEFT_CORNER) {
-	         if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
-		     // Get synchro
-		     get_synchro(meas_sector_type);
+    meas_sector_type = RIGHT_CORNER;
+  }
+  else {
+    if (meas_sector_type != NONE &&
+	meas_sector_type != LEFT_CORNER) {
+      if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
+	// Get synchro
+	get_synchro(meas_sector_type);
 
-		     if (sync_change_flag) {
-		        sync_sector_idx = sync_next_sector_idx;
+	if (sync_change_flag) {
+	  sync_sector_idx = sync_next_sector_idx;
+	  
+	  // Get next sector
+	  get_next_sector();
+	}		
+      }
+      meas_l_ticks = 0;
+      meas_r_ticks = 0;
+      meas_agg_ticks = 0; 
+    }
 
-			// Get next sector
-			get_next_sector();
-         	     }		
-	          }
-		 meas_l_ticks = 0;
-		 meas_r_ticks = 0;
-		 meas_agg_ticks = 0; 
-	      }
+    meas_sector_type = LEFT_CORNER;
+  }
 
-	     meas_sector_type = LEFT_CORNER;
-	   }
+  meas_l_ticks += last_left_ticks;
+  meas_r_ticks += last_right_ticks;
+  meas_agg_ticks = (meas_l_ticks + meas_r_ticks)/2;
+  // should divide by 2 but numbers could be very small
+  meas_total_ticks += (last_left_ticks + last_right_ticks);
 
-	meas_l_ticks += last_left_ticks;
-	meas_r_ticks += last_right_ticks;
-	meas_agg_ticks = (meas_l_ticks + meas_r_ticks)/2;
-	// should divide by 2 but numbers could be very small
-	meas_total_ticks += (last_left_ticks + last_right_ticks);
+  if (meas_total_ticks/2 > sync_sector_end &&
+      sync_sector_type != meas_sector_type) {
+    meas_total_ticks = sync_sector_end * 2;
 
-	if (meas_total_ticks/2 > sync_sector_end &&
-	    sync_sector_type != meas_sector_type)
-	  {
-	    meas_total_ticks = sync_sector_end * 2;
+    // Get next state but do not syncronize
+    sync_sector_idx = sync_next_sector_idx;
 
-	    // Get next state but do not syncronize
-	    sync_sector_idx = sync_next_sector_idx;
+    get_next_sector();
 
-	    get_next_sector();
-
-	    if (meas_sector_type == sync_sector_type)
-	      {
-	          meas_total_ticks += 2 * meas_agg_ticks;
-	      }
-	  }	
+    if (meas_sector_type == sync_sector_type) {
+      meas_total_ticks += 2 * meas_agg_ticks;
+    }
+  }	
 }
 
 
