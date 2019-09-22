@@ -167,34 +167,35 @@ void check_circular_stline(uint16_t search_pointer) {
       break;
   }
 
-  // Only continue this process if there is a straight line
-  if (last_sector > 0) {
-      if (sector_size > CIRCULAR_TICKS_MINSTLINE) {
-	  if (sector_size > size_largest_rect) {
-	    if ((sector_size - size_largest_rect) < CIRCULAR_TICKS_STLINE_DIFF) {
-	      // Probably repeating the rect (taking the straight line)
-	      jump_to_circular_synchro(last_sector);
-	    }
-	    else {
-	      // A new largest rect
-	      size_largest_rect = sector_size;
-	      end_sector_largest_rect = last_sector + 1;
+  // Only continue this process if there is a straight line (and it is not the already processed one)
+  if ((last_sector > 0) && ((last_sector + 1) != end_sector_largest_rect)) {
+    // rect hast to be of a minimum size
+    if (sector_size > CIRCULAR_TICKS_MINSTLINE) {
 
-	      }
-	  }
-	  else {
-	    if ((size_largest_rect-sector_size) < CIRCULAR_TICKS_STLINE_DIFF) {
-	      // Probably repeating the rect (taking the straight line)
-	      jump_to_circular_synchro(last_sector);
-	    }	    
-	  }
-      }
-
-      else {
-	// The first rect
- 	size_largest_rect = sector_size;
+      if (size_largest_rect == 0) {
+	// first rect detected
+	size_largest_rect = sector_size;
 	end_sector_largest_rect = last_sector + 1;	
       }
+      else if (sector_size > size_largest_rect) {
+	if ((sector_size - size_largest_rect) < CIRCULAR_TICKS_STLINE_DIFF) {
+	  // Probably repeating the rect (taking the straight line)
+	  jump_to_circular_synchro(last_sector);
+	}
+	else {
+	  // A new largest rect
+	  size_largest_rect = sector_size;
+	  end_sector_largest_rect = last_sector + 1;
+	  
+	}
+      }
+      else {
+	if ((size_largest_rect-sector_size) < CIRCULAR_TICKS_STLINE_DIFF) {
+	  // Probably repeating the rect (taking the straight line)
+	  jump_to_circular_synchro(last_sector);
+	}	    
+      }
+    }
   }
 }
 
