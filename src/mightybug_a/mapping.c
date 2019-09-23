@@ -121,10 +121,10 @@ void jump_to_circular_synchro(int32_t last_sector) {
   for (int i = end_sector_largest_rect + 1; i < curr_mapping_pointer + 1; i++) {
     if (extra_ticks > mapping_circuit.agg_total_ticks[i]) {
       extra_ticks -= mapping_circuit.agg_total_ticks[i];
-      approx_sync_sector = i;
+      approx_sync_sector = i + 1;
       
     } else {
-      break;                    
+      break;
     }
   }
 
