@@ -179,7 +179,7 @@ void normal_running_state()
 		}
 	}
 
-	if (FLAG_CIRCUIT_MAPPING)
+	if (FLAG_CIRCUIT_MAPPING && ALLOW_MAPPING_IN_CORNERS)
 	  {
 	    if (is_increase_vel_enable(ST_LINE))
 	      {

@@ -13,6 +13,7 @@
 #define TURBO_SYNCHRO_TICKS 400 // remaining ticks
 
 #define DO_CIRCULAR_MAPPING 0
+#define ALLOW_MAPPING_IN_CORNERS 1
 #define CIRCULAR_TICKS_STLINE_DIFF 150  // 150 ticks of difference of the largest rect
 #define CIRCULAR_TICKS_MINSTLINE 500 // 500 ticks of mininmum straight line
 
