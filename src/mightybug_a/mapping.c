@@ -245,7 +245,8 @@ void do_circuit_mapping() {
 	// Search for largst rect
 	if (DO_CIRCULAR_MAPPING) {
 	  if (curr_mapping_pointer > 1)
-	    check_circular_stline(curr_mapping_pointer - 2);
+      if (mapping_circuit.mapstates[curr_mapping_pointer - 1] != ST_LINE && mapping_circuit.mapstates[curr_mapping_pointer - 1] != UNKNOWN)
+	      check_circular_stline(curr_mapping_pointer - 2);
 	}
 	
       } else {
