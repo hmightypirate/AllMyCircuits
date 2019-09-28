@@ -12,7 +12,7 @@
 #define SYNCHRO_MAX_DRIFT 200
 #define TURBO_SYNCHRO_TICKS 400 // remaining ticks
 
-#define DO_CIRCULAR_MAPPING 0
+#define DO_CIRCULAR_MAPPING 1
 #define ALLOW_MAPPING_IN_CORNERS 0
 #define CIRCULAR_TICKS_STLINE_DIFF 250  // 150 ticks of difference of the largest rect
 #define CIRCULAR_TICKS_MINSTLINE 2500 // 500 ticks of mininmum straight line
@@ -48,7 +48,8 @@ uint16_t get_mapping_pointer_idx(void);
 mapstate_e get_mapping_state(void);
 mapstate_e get_synchro_state(void);
 uint8_t get_end_of_mapping(void);
-void get_next_sector(void); 
+void get_next_sector(void);
+int32_t get_largest_rect(void);
 
 
 #endif
