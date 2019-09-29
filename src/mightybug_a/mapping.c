@@ -124,8 +124,8 @@ void jump_to_circular_synchro(int32_t last_sector) {
   }
   
   // advancing the ticks in the synchro sectors to the appr sector	      
-  uint16_t approx_sync_sector = end_sector_largest_rect + 1;
-  for (int i = end_sector_largest_rect + 1; i < curr_mapping_pointer + 1; i++) {
+  uint16_t approx_sync_sector = end_sector_largest_rect;
+  for (int i = end_sector_largest_rect; i < curr_mapping_pointer + 1; i++) {
     if (extra_ticks > mapping_circuit.agg_total_ticks[i]) {
       extra_ticks -= mapping_circuit.agg_total_ticks[i];
       approx_sync_sector = i + 1;
@@ -193,10 +193,11 @@ void check_circular_stline(uint16_t search_pointer) {
 	  // A new largest rect
 	  size_largest_rect = sector_size;
 	  end_sector_largest_rect = last_sector + 1;
-	  
 	}
       }
       else {
+	// New rect is shorter than the stored rect
+	// checking if it has reached the same rect
 	if ((size_largest_rect-sector_size) < CIRCULAR_TICKS_STLINE_DIFF) {
 	  // Probably repeating the rect (taking the straight line)
 	  jump_to_circular_synchro(last_sector);
