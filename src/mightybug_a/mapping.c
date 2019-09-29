@@ -166,7 +166,7 @@ void check_circular_stline(uint16_t search_pointer) {
     }
     else if (mapping_circuit.mapstates[i] == ST_LINE) {
       if (last_sector < 0) {
-	last_sector = search_pointer;
+	last_sector = i;
       }
       sector_size += mapping_circuit.agg_total_ticks[i];
     }
