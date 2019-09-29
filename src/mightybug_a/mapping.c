@@ -117,7 +117,6 @@ void jump_to_circular_synchro(int32_t last_sector) {
   finish_mapping_largest_rect = last_sector + 1;
   
   // go to synchro mode
-
   int32_t extra_ticks = 0;
   for (int i = last_sector + 1; i <= curr_mapping_pointer; i++) {
     extra_ticks += mapping_circuit.agg_total_ticks[i];
@@ -230,8 +229,15 @@ void do_circuit_mapping() {
 	curr_mapstate != ST_LINE) {
       // Adding a new state if its size is greater than the minimum required
       if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
-	// Adding a stline sector
+	// Adding current sector
 	adding_map_to_list(curr_mapstate);
+
+	// Search for largst rect
+	if (DO_CIRCULAR_MAPPING) {
+	  if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE) && (curr_mapstate != UNKNOWN))
+	    check_circular_stline(curr_mapping_pointer - 2);
+	}
+	
       } else {
 	// Adding an unknown sector
 	//FIXME adding a new sector here
@@ -247,12 +253,12 @@ void do_circuit_mapping() {
 	curr_mapstate != RIGHT_CORNER) {
 
       if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
-	// Adding a right corner sector
+	// Adding a sector that has the minimum length
 	adding_map_to_list(curr_mapstate);
 
 	// Search for largst rect
 	if (DO_CIRCULAR_MAPPING) {
-	  if (curr_mapping_pointer > 1)
+	  if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE) && (curr_mapstate != UNKNOWN))
 	      check_circular_stline(curr_mapping_pointer - 2);
 	}
 	
@@ -274,6 +280,7 @@ void do_circuit_mapping() {
 	// Search for largest rect
 	if (DO_CIRCULAR_MAPPING) {		    
 	  if (curr_mapping_pointer > 1)
+	    if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE) && (curr_mapstate != UNKNOWN))
 	      check_circular_stline(curr_mapping_pointer - 2);
 	}
 		  
