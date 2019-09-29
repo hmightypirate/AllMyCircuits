@@ -234,7 +234,7 @@ void do_circuit_mapping() {
 
 	// Search for largst rect
 	if (DO_CIRCULAR_MAPPING) {
-	  if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE) && (curr_mapstate != UNKNOWN))
+	  if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE))
 	    check_circular_stline(curr_mapping_pointer - 2);
 	}
 	
@@ -258,7 +258,7 @@ void do_circuit_mapping() {
 
 	// Search for largst rect
 	if (DO_CIRCULAR_MAPPING) {
-	  if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE) && (curr_mapstate != UNKNOWN))
+	  if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE))
 	      check_circular_stline(curr_mapping_pointer - 2);
 	}
 	
@@ -280,7 +280,7 @@ void do_circuit_mapping() {
 	// Search for largest rect
 	if (DO_CIRCULAR_MAPPING) {		    
 	  if (curr_mapping_pointer > 1)
-	    if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE) && (curr_mapstate != UNKNOWN))
+	    if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE))
 	      check_circular_stline(curr_mapping_pointer - 2);
 	}
 		  
