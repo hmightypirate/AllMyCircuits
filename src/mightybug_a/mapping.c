@@ -175,7 +175,7 @@ void check_circular_stline(uint16_t search_pointer) {
   }
 
   // Only continue this process if there is a straight line (and it is not the already detected one)
-  if ((last_sector > 0) && ((last_sector + 1) != end_sector_largest_rect)) {
+  if ((last_sector >= 0) && ((last_sector + 1) != end_sector_largest_rect)) {
     // rect hast to be of a minimum size
     if (sector_size > CIRCULAR_TICKS_MINSTLINE) {
 
@@ -252,7 +252,6 @@ void do_circuit_mapping() {
 	// Search for largst rect
 	if (DO_CIRCULAR_MAPPING) {
 	  if (curr_mapping_pointer > 1)
-      if (mapping_circuit.mapstates[curr_mapping_pointer - 1] != ST_LINE && mapping_circuit.mapstates[curr_mapping_pointer - 1] != UNKNOWN)
 	      check_circular_stline(curr_mapping_pointer - 2);
 	}
 	
@@ -274,7 +273,7 @@ void do_circuit_mapping() {
 	// Search for largest rect
 	if (DO_CIRCULAR_MAPPING) {		    
 	  if (curr_mapping_pointer > 1)
-	    check_circular_stline(curr_mapping_pointer - 2);
+	      check_circular_stline(curr_mapping_pointer - 2);
 	}
 		  
       } else {
