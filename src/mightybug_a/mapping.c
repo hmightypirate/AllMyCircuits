@@ -30,8 +30,12 @@ uint8_t switch_synchro_flag = 0;
 uint8_t end_of_mapping = 0;
 
 // Circular mapping structs
+
+// end_sector_largest_rect should point to the id of the next sector after the largest straight line in the first pass
 int32_t end_sector_largest_rect = 0;
 int32_t size_largest_rect = 0;
+
+// finish_mapping_largest_rect should point to the id of the next sector after the largest straight line in the second pass
 int32_t finish_mapping_largest_rect = 0;
 
 int32_t get_largest_rect()
@@ -123,11 +127,12 @@ void jump_to_circular_synchro(int32_t last_sector) {
   }
   
   // advancing the ticks in the synchro sectors to the appr sector	      
-  uint16_t approx_sync_sector = end_sector_largest_rect;
-  for (int i = end_sector_largest_rect; i < curr_mapping_pointer + 1; i++) {
+  uint16_t approx_sync_sector = end_sector_largest_rect - 1;
+  for (int i = end_sector_largest_rect; i < finish_mapping_largest_rect; i++) {
     if (extra_ticks > mapping_circuit.agg_total_ticks[i]) {
       extra_ticks -= mapping_circuit.agg_total_ticks[i];
-      approx_sync_sector = i + 1;
+      // only advance a sector if the car has traversed the whole sector distance
+      approx_sync_sector = i;
       
     } else {
       break;
@@ -138,11 +143,14 @@ void jump_to_circular_synchro(int32_t last_sector) {
   switch_synchro_flag = 1;
   sync_sector_idx = approx_sync_sector;
   sync_next_sector_idx = sync_sector_idx;
-  
+
+  // Ticks of the next sector already advanced
   meas_l_ticks = extra_ticks;
   meas_r_ticks = extra_ticks;
   meas_agg_ticks = extra_ticks;
-  meas_total_ticks = (mapping_circuit.first_tick[sync_sector_idx] + extra_ticks) * 2;
+
+  // The car is going to advance to the next sector (picking preemptively the first tick of the next sector)
+  meas_total_ticks = (mapping_circuit.first_tick[sync_sector_idx + 1] + extra_ticks) * 2;
 
   get_next_sector();
 }
@@ -154,7 +162,10 @@ void jump_to_circular_synchro(int32_t last_sector) {
  */
 void check_circular_stline(uint16_t search_pointer) {
 
+  // last sector should point to the last sector of an straight line
   int32_t last_sector = -1;
+
+  // sector size should contain the length of an straight line
   int32_t sector_size = 0;
 
   for (int i = search_pointer; i >= 0; i--) {
@@ -181,11 +192,11 @@ void check_circular_stline(uint16_t search_pointer) {
       if (size_largest_rect == 0) {
 	// first rect detected
 	size_largest_rect = sector_size;
-	end_sector_largest_rect = last_sector + 1;	
+	end_sector_largest_rect = last_sector + 1;
       }
       else if (sector_size > size_largest_rect) {
 	if ((sector_size - size_largest_rect) < CIRCULAR_TICKS_STLINE_DIFF) {
-	  // Probably repeating the rect (taking the straight line)
+	  // Probably repeating the largest rect (taking the straight line)
 	  jump_to_circular_synchro(last_sector);
 	}
 	else {
