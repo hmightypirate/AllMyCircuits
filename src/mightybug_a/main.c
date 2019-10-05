@@ -189,7 +189,6 @@ void normal_running_state()
 	    if (get_end_of_mapping()) {
 	      jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
 	    }
-
 	  }
        		
 	reset_pids_normal();
