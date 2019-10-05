@@ -3,7 +3,7 @@
 
 #include "cron.h"
 #include "setup.h"
-#include <stdio.h>
+#include "printf.h"
 
 #define LED_1 0
 #define LED_2 1

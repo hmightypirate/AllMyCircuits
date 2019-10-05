@@ -87,17 +87,10 @@ bool is_command_received() {
 	return command_received;
 }
 
-/**
- * _write let use printf to write to serial port
- */
-int _write(int file, char *ptr, int len) {
 
-	if (file == 1) {
-		write_dma(ptr, len);
-	}
-
-	errno = EIO;
-	return -1;
+void _putchar(char character)
+{
+  write_dma(&character, 1);
 }
 
 static void copy_buffer_to_command() {
