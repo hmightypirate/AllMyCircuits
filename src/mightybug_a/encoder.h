@@ -5,7 +5,7 @@
 #include "setup.h"
 #include "cron.h"
 #include <inttypes.h>
-#include <stdio.h>
+#include "printf.h"
 
 #define TICKS_PER_MOTOR_REVOLUTION 12
 #define MOTOR_WHEEL_DEMULTIPLIER 10

@@ -2,7 +2,6 @@
 #define __LIBMUSIC_H
 
 #include <errno.h>
-#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -10,6 +9,8 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
+
+#include "printf.h"
 
 #define LIBMUSIC_TICKS_PER_SECOND 1000
 

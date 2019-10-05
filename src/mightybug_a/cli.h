@@ -14,9 +14,10 @@
 #include "vbatt.h"
 #include <ctype.h>
 #include <libopencm3/stm32/usart.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "printf.h"
 
 typedef enum {
 	UINT8_T,

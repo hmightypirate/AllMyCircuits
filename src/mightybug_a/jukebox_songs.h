@@ -2,7 +2,7 @@
 #define __JUKEBOX_SONGS_H
 
 #include "libmusic.h"
-#include <stdio.h>
+#include "printf.h"
 
 struct Song {
 	int length;

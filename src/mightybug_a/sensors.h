@@ -4,7 +4,7 @@
 #include "commons.h"
 #include "fsm.h"
 #include "setup.h"
-#include <stdio.h>
+#include "printf.h"
 
 /* Number of sensors */
 #define NUM_SENSORS 8
