@@ -412,7 +412,7 @@ void get_next_sector() {
   }
 
   if (mapping_circuit.mapstates[sync_sector_idx] != UNKNOWN &&
-      MAX_MAP_STATES < sync_sector_idx + 2 && 
+      sync_sector_idx + 2 < MAX_MAP_STATES && 
       mapping_circuit.mapstates[sync_sector_idx + 1] == UNKNOWN &&
       mapping_circuit.mapstates[sync_sector_idx + 2] == mapping_circuit.mapstates[sync_sector_idx]) {
     
