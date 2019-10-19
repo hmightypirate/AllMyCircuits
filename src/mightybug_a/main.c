@@ -232,17 +232,9 @@ void check_rn_state(void)
 
 	switch (running_state) {
 	case RUNNING_TURBO:
-		// FIXME
-		// Adding mapping velocity
-		// checking velocity
-
 		turbo_running_state();
 		break;
 	case RUNNING_NORMAL:
-		// FIXME
-		// Adding mapping velocity
-		// checking velocity
-
 		normal_running_state();
 		break;
 	case RUNNING_NOOL:
