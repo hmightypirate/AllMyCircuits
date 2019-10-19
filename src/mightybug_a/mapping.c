@@ -705,7 +705,7 @@ uint8_t get_mapping_function(void)
 /*
  * @brief indicate if we can safely increase the velocity
  */
-uint8_t is_increase_vel_enable(mapstate_e state)
+uint8_t is_hyper_turbo_safe(mapstate_e state)
 {
 
 	if (switch_synchro_flag) {

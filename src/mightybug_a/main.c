@@ -105,7 +105,7 @@ void turbo_running_state()
 
 	jukebox_setcurrent_song(NO_SONG);
 	if (FLAG_CIRCUIT_MAPPING) {
-		if (is_increase_vel_enable(ST_LINE)) {
+		if (is_hyper_turbo_safe(ST_LINE)) {
 			set_target_as_hyper_turbo();
 			jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 		}
@@ -156,7 +156,7 @@ void normal_running_state()
 	}
 
 	if (FLAG_CIRCUIT_MAPPING && ALLOW_MAPPING_IN_CORNERS) {
-		if (is_increase_vel_enable(ST_LINE)) {
+		if (is_hyper_turbo_safe(ST_LINE)) {
 			set_target_as_hyper_turbo_corner();
 			jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 		}
