@@ -43,7 +43,7 @@
 #define SEP_SENSORS 100
 
 // Interpolate sensors when they have bad measures. It will improve performance with disconnected sensors, but it will hinder debugging
-#define INTERPOLATE_BAD_MEASURES 1
+#define INTERPOLATE_BAD_MEASURES 0
 
 /* Callibration functions */
 uint8_t get_calibrated_sensors_count(void);

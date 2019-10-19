@@ -141,12 +141,12 @@ void jump_to_circular_synchro(int32_t last_sector) {
   }
   
   // advancing the ticks in the synchro sectors to the appr sector	      
-  uint16_t approx_sync_sector = end_sector_largest_rect - 1;
+  uint16_t approx_sync_sector = end_sector_largest_rect;
   for (int i = end_sector_largest_rect; i < finish_mapping_largest_rect; i++) {
     if (extra_ticks > mapping_circuit.agg_total_ticks[i]) {
       extra_ticks -= mapping_circuit.agg_total_ticks[i];
       // only advance a sector if the car has traversed the whole sector distance
-      approx_sync_sector = i;
+      approx_sync_sector = i + 1;
       
     } else {
       break;
