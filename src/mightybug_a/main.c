@@ -281,6 +281,12 @@ void idle_state(void)
 	reset_calibration_values();
 	stop_motors();
 
+	// Check if the mapping was already done and we must go to the
+	// synchro phase
+	if (FLAG_CIRCUIT_MAPPING) {
+		check_synchro_start();
+	}
+
 	delayed_start_time = 0;
 	running_loop_millisecs = 0;
 
@@ -614,12 +620,6 @@ void execute_state(state_e state)
 		break;
 	case IDLE_STATE:
 		idle_state();
-
-		// Check if the mapping was already done and we must go to the
-		// synchro phase
-		if (FLAG_CIRCUIT_MAPPING) {
-			check_synchro_start();
-		}
 		break;
 	case OUT_OF_BATTERY_STATE:
 		out_of_battery_state();
