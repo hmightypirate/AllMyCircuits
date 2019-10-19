@@ -42,7 +42,7 @@ void check_synchro_start(void);
 uint8_t is_hyper_turbo_safe(mapstate_e state);
 mapping_e get_mapping_info(void);
 void update_mapping_function(void);
-uint8_t get_mapping_function(void);
+uint8_t get_synchro_flag(void);
 uint16_t get_synchro_sector_idx(void);
 uint16_t get_mapping_pointer_idx(void);
 mapstate_e get_mapping_state(void);

@@ -697,7 +697,7 @@ void update_mapping_function(void)
 /*
  * @brief get synchronization flag
  */
-uint8_t get_mapping_function(void)
+uint8_t get_synchro_flag(void)
 {
 	return switch_synchro_flag;
 }
