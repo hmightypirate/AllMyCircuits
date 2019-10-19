@@ -56,7 +56,7 @@ int16_t vel_hyper_turbo_maps[NUMBER_OF_MAPPINGS] = {
 
 int16_t vel_hyper_turbo_corner_maps[NUMBER_OF_MAPPINGS] = {
   //650, 650, 650
-  550, 525, 550
+  400, 525, 550
 };
 
 
