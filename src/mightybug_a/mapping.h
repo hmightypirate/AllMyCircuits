@@ -14,25 +14,25 @@
 
 #define DO_CIRCULAR_MAPPING 1
 #define ALLOW_MAPPING_IN_CORNERS 1
-#define CIRCULAR_TICKS_STLINE_DIFF 150  // 150 ticks of difference of the largest rect
+#define CIRCULAR_TICKS_STLINE_DIFF                                             \
+	150 // 150 ticks of difference of the largest rect
 #define CIRCULAR_TICKS_MINSTLINE 2000 // 500 ticks of mininmum straight line
 
 typedef enum {
-  NONE,
-  UNKNOWN,
-  LEFT_CORNER,
-  RIGHT_CORNER,
-  ST_LINE,
-  MAX_MAP_EVENTS
+	NONE,
+	UNKNOWN,
+	LEFT_CORNER,
+	RIGHT_CORNER,
+	ST_LINE,
+	MAX_MAP_EVENTS
 } mapstate_e;
 
-
 typedef struct {
-  int32_t agg_total_ticks[MAX_MAP_STATES];
-  int32_t agg_left_ticks[MAX_MAP_STATES];
-  int32_t agg_right_ticks[MAX_MAP_STATES];
-  int32_t first_tick[MAX_MAP_STATES];
-  mapstate_e mapstates[MAX_MAP_STATES];
+	int32_t agg_total_ticks[MAX_MAP_STATES];
+	int32_t agg_left_ticks[MAX_MAP_STATES];
+	int32_t agg_right_ticks[MAX_MAP_STATES];
+	int32_t first_tick[MAX_MAP_STATES];
+	mapstate_e mapstates[MAX_MAP_STATES];
 } mapping_e;
 
 void reset_circuit_mapping(void);
