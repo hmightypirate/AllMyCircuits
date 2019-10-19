@@ -38,7 +38,7 @@ typedef struct {
 void reset_circuit_mapping(void);
 void reset_mapping_pointer(void);
 void reset_synchro(void);
-void check_synchro_start(void);
+void update_synchro_mapping_flag(void);
 uint8_t is_hyper_turbo_safe(mapstate_e state);
 mapping_e get_mapping_info(void);
 void update_mapping(void);

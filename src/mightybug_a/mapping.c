@@ -675,7 +675,7 @@ void synchro_mapping(void)
  * @brief check if we already performed the mapping and we must start the
  * synchronization
  */
-void check_synchro_start(void)
+void update_synchro_mapping_flag(void)
 {
 	if (curr_mapping_pointer > 0) {
 		synchro_mapping_flag = 1;

@@ -284,7 +284,7 @@ void idle_state(void)
 	// Check if the mapping was already done and we must go to the
 	// synchro phase
 	if (FLAG_CIRCUIT_MAPPING) {
-		check_synchro_start();
+		update_synchro_mapping_flag();
 	}
 
 	delayed_start_time = 0;
