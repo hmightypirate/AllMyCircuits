@@ -563,6 +563,43 @@ void get_synchro(mapstate_e map_state)
 	}
 }
 
+void check_sector_synchronization(mapstate_e state)
+{
+	if (meas_sector_type != NONE && meas_sector_type != state) {
+		if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
+			// Get synchro
+			get_synchro(meas_sector_type);
+
+			if (sync_change_flag) {
+				sync_sector_idx = sync_next_sector_idx;
+
+				// Get next sector
+				get_next_sector();
+			}
+		}
+		meas_l_ticks = 0;
+		meas_r_ticks = 0;
+		meas_agg_ticks = 0;
+	}
+}
+
+void check_sector_synchronization_change()
+{
+	if (meas_total_ticks / 2 > sync_sector_end &&
+	    sync_sector_type != meas_sector_type) {
+		meas_total_ticks = sync_sector_end * 2;
+
+		// Get next state but do not syncronize
+		sync_sector_idx = sync_next_sector_idx;
+
+		get_next_sector();
+
+		if (meas_sector_type == sync_sector_type) {
+			meas_total_ticks += 2 * meas_agg_ticks;
+		}
+	}
+}
+
 /*
   @brief obtain current state estimation using stored mapping information
 
@@ -588,65 +625,13 @@ void synchro_mapping(void)
 
 	// It has reached a posible straight line state
 	if (diff_encoders < OUT_MAPSTLINE_STATE) {
-		if (meas_sector_type != NONE && meas_sector_type != ST_LINE) {
-			if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
-				// Get synchro
-				get_synchro(meas_sector_type);
-
-				if (sync_change_flag) {
-					sync_sector_idx = sync_next_sector_idx;
-
-					// Get next sector
-					get_next_sector();
-				}
-			}
-			meas_l_ticks = 0;
-			meas_r_ticks = 0;
-			meas_agg_ticks = 0;
-		}
-
+		check_sector_synchronization(ST_LINE);
 		meas_sector_type = ST_LINE;
-	}
-
-	else if (left_ticks > right_ticks) {
-		if (meas_sector_type != NONE &&
-		    meas_sector_type != RIGHT_CORNER) {
-			if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
-				// Get synchro
-				get_synchro(meas_sector_type);
-
-				if (sync_change_flag) {
-					sync_sector_idx = sync_next_sector_idx;
-
-					// Get next sector
-					get_next_sector();
-				}
-			}
-			meas_l_ticks = 0;
-			meas_r_ticks = 0;
-			meas_agg_ticks = 0;
-		}
-
+	} else if (left_ticks > right_ticks) {
+		check_sector_synchronization(RIGHT_CORNER);
 		meas_sector_type = RIGHT_CORNER;
 	} else {
-		if (meas_sector_type != NONE &&
-		    meas_sector_type != LEFT_CORNER) {
-			if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
-				// Get synchro
-				get_synchro(meas_sector_type);
-
-				if (sync_change_flag) {
-					sync_sector_idx = sync_next_sector_idx;
-
-					// Get next sector
-					get_next_sector();
-				}
-			}
-			meas_l_ticks = 0;
-			meas_r_ticks = 0;
-			meas_agg_ticks = 0;
-		}
-
+		check_sector_synchronization(LEFT_CORNER);
 		meas_sector_type = LEFT_CORNER;
 	}
 
@@ -656,19 +641,7 @@ void synchro_mapping(void)
 	// should divide by 2 but numbers could be very small
 	meas_total_ticks += (last_left_ticks + last_right_ticks);
 
-	if (meas_total_ticks / 2 > sync_sector_end &&
-	    sync_sector_type != meas_sector_type) {
-		meas_total_ticks = sync_sector_end * 2;
-
-		// Get next state but do not syncronize
-		sync_sector_idx = sync_next_sector_idx;
-
-		get_next_sector();
-
-		if (meas_sector_type == sync_sector_type) {
-			meas_total_ticks += 2 * meas_agg_ticks;
-		}
-	}
+  check_sector_synchronization_change();
 }
 
 /*
