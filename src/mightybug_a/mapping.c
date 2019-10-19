@@ -685,7 +685,7 @@ void check_synchro_start(void)
 /*
  * @brief select the function mapping/synchro
  */
-void update_mapping_function(void)
+void update_mapping(void)
 {
 	if (switch_synchro_flag) {
 		do_synchro_run();

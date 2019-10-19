@@ -536,7 +536,7 @@ void running_state(void)
 
 	if (FLAG_CIRCUIT_MAPPING) {
 		// Add circuit mapping
-		update_mapping_function();
+		update_mapping();
 	}
 }
 
