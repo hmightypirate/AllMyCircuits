@@ -626,11 +626,6 @@ void execute_state(state_e state)
 		break;
 	case DELAYED_START_STATE:
 		delayed_start_state();
-
-		//// Reset pointer (starting from the beginning)
-		// if (FLAG_CIRCUIT_MAPPING)
-		//  reset_mapping_pointer();
-
 		break;
 	case CHANGE_MAP_STATE:
 		change_map_state();
