@@ -516,7 +516,7 @@ void get_next_sector()
 /*
  * @brief tries to synchronizes the ticks
  */
-void get_synchro(mapstate_e map_state)
+void round_synchro(mapstate_e map_state)
 {
 	sync_change_flag = 0;
 
@@ -568,7 +568,7 @@ void check_sector_synchronization(mapstate_e state)
 	if (meas_sector_type != NONE && meas_sector_type != state) {
 		if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
 			// Get synchro
-			get_synchro(meas_sector_type);
+			round_synchro(meas_sector_type);
 
 			if (sync_change_flag) {
 				sync_sector_idx = sync_next_sector_idx;
@@ -670,7 +670,7 @@ void update_mapping(void)
 /*
  * @brief get synchronization flag
  */
-uint8_t get_synchro_flag(void)
+uint8_t round_synchro_flag(void)
 {
 	return synchro_mapping_flag;
 }
@@ -701,7 +701,7 @@ uint8_t get_end_of_mapping(void)
 	return end_of_mapping;
 }
 
-uint16_t get_synchro_sector_idx(void)
+uint16_t round_synchro_sector_idx(void)
 {
 	return sync_sector_idx;
 }
@@ -716,7 +716,7 @@ mapstate_e get_mapping_state(void)
 	return curr_mapstate;
 }
 
-mapstate_e get_synchro_state(void)
+mapstate_e round_synchro_state(void)
 {
 	return sync_sector_type;
 }
