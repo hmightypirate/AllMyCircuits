@@ -176,7 +176,7 @@ void jump_to_circular_synchro(int32_t last_sector) {
  */
 void check_circular_stline(uint16_t search_pointer) {
 
-  // last sector should point to the last sector of an straight line
+  // last sector should point to the last sector of a straight line
   int32_t last_sector = -1;
 
   // sector size should contain the length of an straight line
