@@ -99,20 +99,6 @@ void keypad_events(void)
 	}
 }
 
-void hyper_turbo_running_state()
-{
-	set_target_as_hyper_turbo();
-
-	jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
-}
-
-void hyper_turbo_running_corner_state()
-{
-	set_target_as_hyper_turbo_corner();
-
-	jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
-}
-
 void turbo_running_state()
 {
 	set_target_as_turbo();
@@ -120,7 +106,8 @@ void turbo_running_state()
 	jukebox_setcurrent_song(NO_SONG);
 	if (FLAG_CIRCUIT_MAPPING) {
 		if (is_increase_vel_enable(ST_LINE)) {
-			hyper_turbo_running_state();
+			set_target_as_hyper_turbo();
+			jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 		}
 
 		if (get_end_of_mapping()) {
@@ -170,7 +157,8 @@ void normal_running_state()
 
 	if (FLAG_CIRCUIT_MAPPING && ALLOW_MAPPING_IN_CORNERS) {
 		if (is_increase_vel_enable(ST_LINE)) {
-			hyper_turbo_running_corner_state();
+			set_target_as_hyper_turbo_corner();
+			jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 		}
 
 		if (get_end_of_mapping()) {
