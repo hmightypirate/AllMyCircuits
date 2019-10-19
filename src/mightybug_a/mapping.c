@@ -23,7 +23,7 @@ uint16_t sync_next_sector_idx = 0;
 uint8_t sync_change_flag = 0;
 
 // Flag to switch between mapping and synchro
-uint8_t switch_synchro_flag = 0;
+uint8_t synchro_mapping_flag = 0;
 
 // Flag to indicate that the end of mapping has been reached
 uint8_t end_of_mapping = 0;
@@ -179,7 +179,7 @@ void jump_to_circular_synchro(int32_t last_sector)
 	}
 
 	// preparing the data for synchro
-	switch_synchro_flag = 1;
+	synchro_mapping_flag = 1;
 	sync_sector_idx = approx_sync_sector;
 	sync_next_sector_idx = sync_sector_idx;
 
@@ -263,7 +263,7 @@ void check_circular_stline(uint16_t search_pointer)
 /*
  * @brief circuit map
  */
-void do_circuit_mapping()
+void record_mapping()
 {
 
 	// aggregated ticks
@@ -567,7 +567,7 @@ void get_synchro(mapstate_e map_state)
   @brief obtain current state estimation using stored mapping information
 
  */
-void do_synchro_run(void)
+void synchro_mapping(void)
 {
 
 	// aggregated ticks of the last x ms
@@ -678,7 +678,7 @@ void do_synchro_run(void)
 void check_synchro_start(void)
 {
 	if (curr_mapping_pointer > 0) {
-		switch_synchro_flag = 1;
+		synchro_mapping_flag = 1;
 	}
 }
 
@@ -687,10 +687,10 @@ void check_synchro_start(void)
  */
 void update_mapping(void)
 {
-	if (switch_synchro_flag) {
-		do_synchro_run();
+	if (synchro_mapping_flag) {
+		synchro_mapping();
 	} else {
-		do_circuit_mapping();
+		record_mapping();
 	}
 }
 
@@ -699,7 +699,7 @@ void update_mapping(void)
  */
 uint8_t get_synchro_flag(void)
 {
-	return switch_synchro_flag;
+	return synchro_mapping_flag;
 }
 
 /*
@@ -708,7 +708,7 @@ uint8_t get_synchro_flag(void)
 uint8_t is_hyper_turbo_safe(mapstate_e state)
 {
 
-	if (switch_synchro_flag) {
+	if (synchro_mapping_flag) {
 		// Check if it is in the required state
 		// if (sync_sector_type == state)
 		if (sync_sector_type == state) {
