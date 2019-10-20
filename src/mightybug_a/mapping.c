@@ -374,6 +374,65 @@ void reset_synchro(void)
 	sync_change_flag = 0;
 }
 
+void load_synchro_sector(uint16_t index)
+{
+	sync_sector_type = mapping_circuit.mapstates[index];
+	sync_sector_length = mapping_circuit.agg_total_ticks[index];
+	sync_sector_end =
+	    mapping_circuit.first_tick[index] + sync_sector_length;
+}
+
+void join_and_load_next_sectors()
+{
+	//  Three sectors can be joined in one if the the sectors in the
+	//  ends are the same and the intermediate is unknown.
+	sync_next_sector_idx += 3;
+	sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
+	sync_sector_length =
+	    (mapping_circuit.agg_total_ticks[sync_sector_idx] +
+	     mapping_circuit.agg_total_ticks[sync_sector_idx + 1] +
+	     mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
+	sync_sector_end =
+	    (mapping_circuit.first_tick[sync_sector_idx + 2] +
+	     mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
+
+	// Check if there are more sectors that can be joined in one
+	while (1) {
+		if (sync_next_sector_idx + 2 < MAX_MAP_STATES &&
+		    mapping_circuit.mapstates[sync_next_sector_idx] ==
+			UNKNOWN &&
+		    mapping_circuit.mapstates[sync_next_sector_idx + 1] ==
+			mapping_circuit.mapstates[sync_sector_idx]) {
+
+			sync_sector_length +=
+			    (mapping_circuit
+				 .agg_total_ticks[sync_next_sector_idx] +
+			     mapping_circuit
+				 .agg_total_ticks[sync_next_sector_idx + 1]);
+
+			sync_sector_end =
+			    (mapping_circuit
+				 .first_tick[sync_next_sector_idx + 1] +
+			     mapping_circuit
+				 .agg_total_ticks[sync_next_sector_idx + 1]);
+
+			sync_next_sector_idx += 2;
+
+		} else {
+			break;
+		}
+	}
+}
+
+bool can_join_next_sectors()
+{
+	return (mapping_circuit.mapstates[sync_sector_idx] != UNKNOWN &&
+	    sync_sector_idx + 2 < MAX_MAP_STATES &&
+	    mapping_circuit.mapstates[sync_sector_idx + 1] == UNKNOWN &&
+	    mapping_circuit.mapstates[sync_sector_idx + 2] ==
+		mapping_circuit.mapstates[sync_sector_idx]);
+}
+
 /*
  * @brief obtain next sector
  */
@@ -386,23 +445,18 @@ void get_next_sector()
 			sync_sector_idx = end_sector_largest_rect;
 			sync_next_sector_idx = sync_sector_idx;
 
-			// updating the total ticks (as it has overflowed)
+			// updating the total ticks (as it has
+			// overflowed)
 			meas_total_ticks =
 			    (mapping_circuit.first_tick[sync_sector_idx] * 2);
 		}
 	}
 
 	if (sync_sector_idx >= MAX_MAP_STATES) {
-		// Reached maximum number of states (do not adding a new state)
+		// Reached maximum number of states (do not adding a new
+		// state)
 		sync_next_sector_idx = sync_sector_idx;
-		sync_sector_type =
-		    mapping_circuit.mapstates[MAX_MAP_STATES - 1];
-		sync_sector_length =
-		    mapping_circuit.agg_total_ticks[MAX_MAP_STATES - 1];
-		sync_sector_end =
-		    mapping_circuit.first_tick[MAX_MAP_STATES - 1] +
-		    sync_sector_length;
-
+		load_synchro_sector(MAX_MAP_STATES - 1);
 		end_of_mapping = 1;
 		return;
 	}
@@ -410,70 +464,16 @@ void get_next_sector()
 	if (mapping_circuit.mapstates[sync_sector_idx + 1] == NONE) {
 		// Reached the last mapped state
 		sync_next_sector_idx = sync_sector_idx;
-		sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
-		sync_sector_length =
-		    mapping_circuit.agg_total_ticks[sync_sector_idx];
-		sync_sector_end = mapping_circuit.first_tick[sync_sector_idx] +
-				  sync_sector_length;
+		load_synchro_sector(sync_sector_idx);
 		end_of_mapping = 1;
-
 		return;
 	}
 
-	if (mapping_circuit.mapstates[sync_sector_idx] != UNKNOWN &&
-	    sync_sector_idx + 2 < MAX_MAP_STATES &&
-	    mapping_circuit.mapstates[sync_sector_idx + 1] == UNKNOWN &&
-	    mapping_circuit.mapstates[sync_sector_idx + 2] ==
-		mapping_circuit.mapstates[sync_sector_idx]) {
-
-		//  Three sectors can be joined in one if the the sectors in the
-		//  ends are the same and the intermediate is unknown.
-		sync_next_sector_idx += 3;
-		sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
-		sync_sector_length =
-		    (mapping_circuit.agg_total_ticks[sync_sector_idx] +
-		     mapping_circuit.agg_total_ticks[sync_sector_idx + 1] +
-		     mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
-		sync_sector_end =
-		    (mapping_circuit.first_tick[sync_sector_idx + 2] +
-		     mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
-
-		// Check if there are more sectors that can be joined in one
-		while (1) {
-			if (sync_next_sector_idx + 2 < MAX_MAP_STATES &&
-			    mapping_circuit.mapstates[sync_next_sector_idx] ==
-				UNKNOWN &&
-			    mapping_circuit
-				    .mapstates[sync_next_sector_idx + 1] ==
-				mapping_circuit.mapstates[sync_sector_idx]) {
-
-				sync_sector_length +=
-				    (mapping_circuit.agg_total_ticks
-					 [sync_next_sector_idx] +
-				     mapping_circuit
-					 .agg_total_ticks[sync_next_sector_idx +
-							  1]);
-
-				sync_sector_end =
-				    (mapping_circuit
-					 .first_tick[sync_next_sector_idx + 1] +
-				     mapping_circuit
-					 .agg_total_ticks[sync_next_sector_idx +
-							  1]);
-
-				sync_next_sector_idx += 2;
-
-			} else {
-				break;
-			}
-		}
+	if (can_join_next_sectors()) {
+		join_and_load_next_sectors();
 	} else {
 		sync_next_sector_idx = sync_sector_idx + 1;
-		sync_sector_type = mapping_circuit.mapstates[sync_sector_idx];
-		sync_sector_length =
-		    mapping_circuit.agg_total_ticks[sync_sector_idx];
-		sync_sector_end = mapping_circuit.first_tick[sync_sector_idx] +
-				  sync_sector_length;
+		load_synchro_sector(sync_sector_idx);
 	}
 }
 
