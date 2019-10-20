@@ -66,7 +66,7 @@ TODO - Instructions
 
 ## Flashing the project
 
-The project can be flashed in a Blue/Black pill boards or in one of the mightybug-a boards. All the mightybuga boards are compatible with the latest version of the software. To flash the software use the instructions in the root of the project [LINK](../../Readme.md)
+The project can be flashed in a Blue/Black pill boards or in one of the mightybug-a boards. All the mightybuga boards are compatible with the latest version of the software. To flash the software use the instructions in the root of the project [LINK](../../README.md)
 
 ## Using the serial port for debugging
 
