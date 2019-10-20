@@ -76,7 +76,7 @@ void increase_sector_data(uint16_t index, int32_t left_ticks, int32_t right_tick
 /*
  * @brief adding a sector to the current mapping
  */
-void add_map_to_list(mapstate_e new_state)
+void add_sector_to_list(mapstate_e new_state)
 {
 
 	if (curr_mapping_pointer >= MAX_MAP_STATES) {
@@ -229,10 +229,10 @@ void check_circular_stline(uint16_t search_pointer)
 void add_sector()
 {
 	if (curr_agg_total_ticks < MIN_SECTOR_LENGTH) {
-		add_map_to_list(UNKNOWN);
+		add_sector_to_list(UNKNOWN);
 	} else {
 		// Adding a sector that has the minimum length
-		add_map_to_list(curr_mapstate);
+		add_sector_to_list(curr_mapstate);
 
 		// Search for largst rect
 		if (DO_CIRCULAR_MAPPING) {
