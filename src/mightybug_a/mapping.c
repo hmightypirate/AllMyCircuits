@@ -157,13 +157,14 @@ void jump_to_circular_synchro(int32_t last_sector)
 
 	finish_mapping_largest_rect = last_sector + 1;
 
-	// go to synchro mode
+	// get ticks run after largest st line
 	int32_t extra_ticks = 0;
 	for (int i = last_sector + 1; i <= curr_mapping_pointer; i++) {
 		extra_ticks += mapping_circuit.agg_total_ticks[i];
 	}
 
 	// advancing the ticks in the synchro sectors to the appr sector
+	// check if we already complete some sectors after st line
 	uint16_t approx_sync_sector = end_sector_largest_rect;
 	for (int i = end_sector_largest_rect; i < finish_mapping_largest_rect;
 	     i++) {
