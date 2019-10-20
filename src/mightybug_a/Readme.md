@@ -66,11 +66,13 @@ TODO - Instructions
 
 ## Flashing the project
 
-The project can be flashed in a Blue/Black pill boards or in one of the mightybuga boards. All the mightybuga boards are compatible with the latest version of the software. To flash the software
+The project can be flashed in a Blue/Black pill boards or in one of the mightybuga boards. All the mightybuga boards are compatible with the latest version of the software. To flash the software - TODO
 
 
 
 ## Cli Commands
+
+TODO
 
 
 ## Relevant files - (Needs Update)
@@ -80,9 +82,6 @@ The project can be flashed in a Blue/Black pill boards or in one of the mightybu
 - motor.h: motor configuration (basically there is a flag when the motor velocities are inverted in the microncontroller)
 - pid.h: pid configuration
 - sensors.h: black/white sensor values can be configured here. The FOLLOW_BLACK_LINE flag can be used to configure the car to follow white lines (if it is set to 0)
-
-
-
 
 
 ## Changelog
