@@ -54,6 +54,25 @@ int32_t get_finish_mapping_largest_rect()
 	return finish_mapping_largest_rect;
 }
 
+void set_sector_data(uint16_t index, mapstate_e type, int32_t first_tick,
+		     int32_t left_ticks, int32_t right_ticks,
+		     int32_t total_ticks)
+{
+	mapping_circuit.agg_total_ticks[index] = total_ticks;
+	mapping_circuit.agg_left_ticks[index] = left_ticks;
+	mapping_circuit.agg_right_ticks[index] = right_ticks;
+	mapping_circuit.first_tick[index] = first_tick;
+	mapping_circuit.mapstates[index] = type;
+}
+
+void add_sector_data(uint16_t index, int32_t left_ticks, int32_t right_ticks,
+		     int32_t total_ticks)
+{
+	mapping_circuit.agg_total_ticks[index] += total_ticks;
+	mapping_circuit.agg_left_ticks[index] += left_ticks;
+	mapping_circuit.agg_right_ticks[index] += right_ticks;
+}
+
 /*
  * @brief adding a sector to the current mapping
  */
@@ -65,50 +84,26 @@ void adding_map_to_list(mapstate_e new_state)
 		if (curr_mapping_pointer > 0) {
 			if (mapping_circuit.mapstates[curr_mapping_pointer -
 						      1] == new_state) {
-				// Joining sectors (these might only happen with
-				// UNKNOWN states)
-				mapping_circuit
-				    .agg_total_ticks[curr_mapping_pointer -
-						     1] += curr_agg_total_ticks;
-				mapping_circuit
-				    .agg_left_ticks[curr_mapping_pointer - 1] +=
-				    curr_agg_left_ticks;
-				mapping_circuit
-				    .agg_right_ticks[curr_mapping_pointer -
-						     1] += curr_agg_right_ticks;
-
+				// Joining same type of sectors (these might
+				// only happen with UNKNOWN states)
+				add_sector_data(curr_mapping_pointer - 1,
+						curr_agg_left_ticks,
+						curr_agg_right_ticks,
+						curr_agg_total_ticks);
 			} else {
 				// Not aggregating sectors
-				mapping_circuit
-				    .agg_total_ticks[curr_mapping_pointer] =
-				    curr_agg_total_ticks;
-				mapping_circuit
-				    .agg_left_ticks[curr_mapping_pointer] =
-				    curr_agg_left_ticks;
-				mapping_circuit
-				    .agg_right_ticks[curr_mapping_pointer] =
-				    curr_agg_right_ticks;
-				mapping_circuit
-				    .first_tick[curr_mapping_pointer] =
-				    first_tick_sector;
-				mapping_circuit
-				    .mapstates[curr_mapping_pointer] =
-				    new_state;
+				set_sector_data(
+				    curr_mapping_pointer, new_state,
+				    first_tick_sector, curr_agg_left_ticks,
+				    curr_agg_right_ticks, curr_agg_total_ticks);
 				curr_mapping_pointer += 1;
 			}
 		} else {
 			// First sector
-			mapping_circuit.agg_total_ticks[curr_mapping_pointer] =
-			    curr_agg_total_ticks;
-			mapping_circuit.agg_left_ticks[curr_mapping_pointer] =
-			    curr_agg_left_ticks;
-			mapping_circuit.agg_right_ticks[curr_mapping_pointer] =
-			    curr_agg_right_ticks;
-			mapping_circuit.first_tick[curr_mapping_pointer] =
-			    first_tick_sector;
-			mapping_circuit.mapstates[curr_mapping_pointer] =
-			    new_state;
-
+			set_sector_data(curr_mapping_pointer, new_state,
+					first_tick_sector, curr_agg_left_ticks,
+					curr_agg_right_ticks,
+					curr_agg_total_ticks);
 			curr_mapping_pointer += 1;
 		}
 	}
