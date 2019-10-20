@@ -40,7 +40,7 @@ int32_t last_circular_synchro = 0;
 // the largest straight line in the second pass
 int32_t finish_mapping_largest_rect = 0;
 
-int32_t get_largest_rect()
+int32_t get_largest_rect_size()
 {
 	return size_largest_rect;
 }

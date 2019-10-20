@@ -49,7 +49,7 @@ mapstate_e get_mapping_state(void);
 mapstate_e get_synchro_state(void);
 uint8_t get_end_of_mapping(void);
 void get_next_sector(void);
-int32_t get_largest_rect(void);
+int32_t get_largest_rect_size(void);
 int32_t get_end_sector_largest_rect();
 int32_t get_finish_mapping_largest_rect();
 int32_t get_current_synchro_sector();
