@@ -520,7 +520,7 @@ void round_synchro(mapstate_e map_state)
 		// Check if it has started a new state
 
 		diff_ticks = abs(meas_total_ticks / 2 -
-			     mapping_circuit.first_tick[sync_sector_idx]);
+				 mapping_circuit.first_tick[sync_sector_idx]);
 
 		if (diff_ticks < SYNCHRO_MAX_DRIFT) {
 			meas_total_ticks =
@@ -529,7 +529,8 @@ void round_synchro(mapstate_e map_state)
 		}
 		// check if it has finished the current state
 		else {
-			diff_ticks = abs(meas_total_ticks / 2 - sync_sector_end);
+			diff_ticks =
+			    abs(meas_total_ticks / 2 - sync_sector_end);
 
 			if (diff_ticks < SYNCHRO_MAX_DRIFT) {
 				meas_total_ticks = sync_sector_end * 2;
@@ -624,7 +625,7 @@ void synchro_mapping(void)
 	// should divide by 2 but numbers could be very small
 	meas_total_ticks += (last_left_ticks + last_right_ticks);
 
-  check_sector_synchronization_change();
+	check_sector_synchronization_change();
 }
 
 /*
