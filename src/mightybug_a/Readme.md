@@ -52,17 +52,18 @@ The additional dependency if you are using this option is "docker".
 
 In the root of the project type:
 
+
+For building 
 ```
-docker build
+AllMyCircuits$ sudo docker run -v $(pwd):/home/src/ buga_builder src/mightybug_a/ all
 ```
 
-and run the container with
-
+For cleaning the code (typically needed before rebuilding the project)
 ```
-docker run
-```
+AllMyCircuits$ sudo docker run -v $(pwd):/home/src/ buga_builder src/mightybug_a/ clean
 
-TODO - Instructions 
+
+You can find more instructions about using docker in the wiki [link](https://github.com/hmightypirate/AllMyCircuits/wiki/%5BNotes%5D-Use-a-dockerized-compiler)
 
 ## Flashing the project
 
