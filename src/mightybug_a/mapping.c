@@ -76,36 +76,28 @@ void add_sector_data(uint16_t index, int32_t left_ticks, int32_t right_ticks,
 /*
  * @brief adding a sector to the current mapping
  */
-void adding_map_to_list(mapstate_e new_state)
+void add_map_to_list(mapstate_e new_state)
 {
 
-	if (curr_mapping_pointer < MAX_MAP_STATES) {
-		// Check if it is in the first sector
-		if (curr_mapping_pointer > 0) {
-			if (mapping_circuit.mapstates[curr_mapping_pointer -
-						      1] == new_state) {
-				// Joining same type of sectors (these might
-				// only happen with UNKNOWN states)
-				add_sector_data(curr_mapping_pointer - 1,
-						curr_agg_left_ticks,
-						curr_agg_right_ticks,
-						curr_agg_total_ticks);
-			} else {
-				// Not aggregating sectors
-				set_sector_data(
-				    curr_mapping_pointer, new_state,
-				    first_tick_sector, curr_agg_left_ticks,
-				    curr_agg_right_ticks, curr_agg_total_ticks);
-				curr_mapping_pointer += 1;
-			}
-		} else {
-			// First sector
-			set_sector_data(curr_mapping_pointer, new_state,
-					first_tick_sector, curr_agg_left_ticks,
-					curr_agg_right_ticks,
-					curr_agg_total_ticks);
-			curr_mapping_pointer += 1;
-		}
+	if (curr_mapping_pointer >= MAX_MAP_STATES) {
+		return;
+	}
+
+	// Check if it is in the first sector
+	// or same kind of previous stored sector
+	if ((curr_mapping_pointer == 0) ||
+	    (mapping_circuit.mapstates[curr_mapping_pointer - 1] ==
+	     new_state)) {
+		// New sector
+		set_sector_data(curr_mapping_pointer, new_state,
+				first_tick_sector, curr_agg_left_ticks,
+				curr_agg_right_ticks, curr_agg_total_ticks);
+		curr_mapping_pointer += 1;
+	} else {
+		// Join to previous sector (these might
+		// only happen with UNKNOWN states)
+		add_sector_data(curr_mapping_pointer - 1, curr_agg_left_ticks,
+				curr_agg_right_ticks, curr_agg_total_ticks);
 	}
 
 	first_tick_sector += curr_agg_total_ticks;
@@ -258,7 +250,7 @@ void record_mapping()
 			// minimum required
 			if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
 				// Adding current sector
-				adding_map_to_list(curr_mapstate);
+				add_map_to_list(curr_mapstate);
 
 				// Search for largst rect
 				if (DO_CIRCULAR_MAPPING) {
@@ -271,7 +263,7 @@ void record_mapping()
 			} else {
 				// Adding an unknown sector
 				// FIXME adding a new sector here
-				adding_map_to_list(UNKNOWN);
+				add_map_to_list(UNKNOWN);
 			}
 		}
 		curr_mapstate = ST_LINE;
@@ -283,7 +275,7 @@ void record_mapping()
 
 			if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
 				// Adding a sector that has the minimum length
-				adding_map_to_list(curr_mapstate);
+				add_map_to_list(curr_mapstate);
 
 				// Search for largst rect
 				if (DO_CIRCULAR_MAPPING) {
@@ -295,7 +287,7 @@ void record_mapping()
 
 			} else {
 				// Adding an unknown sector
-				adding_map_to_list(UNKNOWN);
+				add_map_to_list(UNKNOWN);
 			}
 		}
 		curr_mapstate = RIGHT_CORNER;
@@ -305,7 +297,7 @@ void record_mapping()
 		if (curr_mapstate != NONE && curr_mapstate != LEFT_CORNER) {
 			if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
 				// Adding a right corner sector
-				adding_map_to_list(curr_mapstate);
+				add_map_to_list(curr_mapstate);
 
 				// Search for largest rect
 				if (DO_CIRCULAR_MAPPING) {
@@ -320,7 +312,7 @@ void record_mapping()
 
 			} else {
 				// Adding an unknown sector
-				adding_map_to_list(UNKNOWN);
+				add_map_to_list(UNKNOWN);
 			}
 		}
 		curr_mapstate = LEFT_CORNER;
