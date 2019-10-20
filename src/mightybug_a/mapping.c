@@ -34,7 +34,6 @@ uint8_t end_of_mapping = 0;
 // largest straight line in the first pass
 int32_t end_sector_largest_rect = 0;
 int32_t size_largest_rect = 0;
-int32_t last_circular_synchro = 0;
 
 // finish_mapping_largest_rect should point to the id of the next sector after
 // the largest straight line in the second pass
@@ -53,11 +52,6 @@ int32_t get_end_sector_largest_rect()
 int32_t get_finish_mapping_largest_rect()
 {
 	return finish_mapping_largest_rect;
-}
-
-int32_t get_current_synchro_sector()
-{
-	return last_circular_synchro;
 }
 
 /*
@@ -414,8 +408,6 @@ void reset_synchro(void)
  */
 void get_next_sector()
 {
-
-	last_circular_synchro = sync_sector_idx;
 
 	if (DO_CIRCULAR_MAPPING) {
 		// Check if we have finished the lap
