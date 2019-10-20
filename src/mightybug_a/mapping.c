@@ -516,13 +516,7 @@ void check_sector_synchronization_change()
  */
 void synchro_mapping(void)
 {
-
-	// aggregated ticks of the last x ms
-	uint32_t left_ticks = get_left_encoder_ticks();
-	uint32_t right_ticks = get_right_encoder_ticks();
-
-	// difference between encoders
-	int16_t diff_encoders = get_abs_diff_encoders();
+	mapstate_e new_measured_sector_type = get_sector_type_from_encoder_ticks();
 
 	// last ticks (last ms)
 	uint32_t last_left_ticks = get_last_left_ticks();
@@ -533,17 +527,8 @@ void synchro_mapping(void)
 		get_next_sector(); // Get next sector
 	}
 
-	// It has reached a posible straight line state
-	if (diff_encoders < OUT_MAPSTLINE_STATE) {
-		check_sector_synchronization(ST_LINE);
-		meas_sector_type = ST_LINE;
-	} else if (left_ticks > right_ticks) {
-		check_sector_synchronization(RIGHT_CORNER);
-		meas_sector_type = RIGHT_CORNER;
-	} else {
-		check_sector_synchronization(LEFT_CORNER);
-		meas_sector_type = LEFT_CORNER;
-	}
+	check_sector_synchronization(new_measured_sector_type);
+	meas_sector_type = new_measured_sector_type;
 
 	meas_l_ticks += last_left_ticks;
 	meas_r_ticks += last_right_ticks;
