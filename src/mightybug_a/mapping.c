@@ -55,22 +55,6 @@ int32_t get_finish_mapping_largest_rect()
 }
 
 /*
-
-number of ticks ? / number of seconds (estimated given the velocity?)
-
-*/
-
-// number of mapping
-// 2 states: doing mapping and running
-// doing mapping
-// running
-
-// mapping by time/encoders, taking into account current velocity (running
-// safely) during mapping, point to a former state ?
-
-// car goes slow/fast ? number of ticks should not differ but it might
-
-/*
  * @brief adding a sector to the current mapping
  */
 void adding_map_to_list(mapstate_e new_state)
