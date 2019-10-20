@@ -65,7 +65,7 @@ void set_sector_data(uint16_t index, mapstate_e type, int32_t first_tick,
 	mapping_circuit.mapstates[index] = type;
 }
 
-void add_sector_data(uint16_t index, int32_t left_ticks, int32_t right_ticks,
+void increase_sector_data(uint16_t index, int32_t left_ticks, int32_t right_ticks,
 		     int32_t total_ticks)
 {
 	mapping_circuit.agg_total_ticks[index] += total_ticks;
@@ -96,7 +96,7 @@ void add_map_to_list(mapstate_e new_state)
 	} else {
 		// Join to previous sector (these might
 		// only happen with UNKNOWN states)
-		add_sector_data(curr_mapping_pointer - 1, curr_agg_left_ticks,
+		increase_sector_data(curr_mapping_pointer - 1, curr_agg_left_ticks,
 				curr_agg_right_ticks, curr_agg_total_ticks);
 	}
 
