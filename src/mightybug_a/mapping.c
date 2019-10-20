@@ -226,12 +226,25 @@ void check_circular_stline(uint16_t search_pointer)
 	}
 }
 
-/*
- * @brief circuit map
- */
-void record_mapping()
+void add_sector()
 {
+	if (curr_agg_total_ticks < MIN_SECTOR_LENGTH) {
+		add_map_to_list(UNKNOWN);
+	} else {
+		// Adding a sector that has the minimum length
+		add_map_to_list(curr_mapstate);
 
+		// Search for largst rect
+		if (DO_CIRCULAR_MAPPING) {
+			if ((curr_mapping_pointer > 1) &&
+			    (curr_mapstate != ST_LINE))
+				check_circular_stline(curr_mapping_pointer - 2);
+		}
+	}
+}
+
+mapstate_e get_sector_type_from_encoder_ticks()
+{
 	// aggregated ticks
 	uint32_t left_ticks = get_left_encoder_ticks();
 	uint32_t right_ticks = get_right_encoder_ticks();
@@ -239,91 +252,33 @@ void record_mapping()
 	// difference between encoders
 	int16_t diff_encoders = get_abs_diff_encoders();
 
-	// last ticks measured by the encoders
-	uint32_t last_left_ticks = get_last_left_ticks();
-	uint32_t last_right_ticks = get_last_right_ticks();
-
-	// It has reached a possible straight line state
 	if (diff_encoders < OUT_MAPSTLINE_STATE) {
-		if (curr_mapstate != NONE && curr_mapstate != ST_LINE) {
-			// Adding a new state if its size is greater than the
-			// minimum required
-			if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
-				// Adding current sector
-				add_map_to_list(curr_mapstate);
-
-				// Search for largst rect
-				if (DO_CIRCULAR_MAPPING) {
-					if ((curr_mapping_pointer > 1) &&
-					    (curr_mapstate != ST_LINE))
-						check_circular_stline(
-						    curr_mapping_pointer - 2);
-				}
-
-			} else {
-				// Adding an unknown sector
-				// FIXME adding a new sector here
-				add_map_to_list(UNKNOWN);
-			}
-		}
-		curr_mapstate = ST_LINE;
-	}
-	// Check if it is a right corner (left ticks greater than right ticks)
-	else if (left_ticks > right_ticks) {
-		// Check if we have reached a new state
-		if (curr_mapstate != NONE && curr_mapstate != RIGHT_CORNER) {
-
-			if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
-				// Adding a sector that has the minimum length
-				add_map_to_list(curr_mapstate);
-
-				// Search for largst rect
-				if (DO_CIRCULAR_MAPPING) {
-					if ((curr_mapping_pointer > 1) &&
-					    (curr_mapstate != ST_LINE))
-						check_circular_stline(
-						    curr_mapping_pointer - 2);
-				}
-
-			} else {
-				// Adding an unknown sector
-				add_map_to_list(UNKNOWN);
-			}
-		}
-		curr_mapstate = RIGHT_CORNER;
-		// It is a Left corner (right ticks greater than left ticks)
+		return ST_LINE;
+	} else if (left_ticks > right_ticks) {
+		return RIGHT_CORNER;
 	} else {
-		// Check if we have reached a new state
-		if (curr_mapstate != NONE && curr_mapstate != LEFT_CORNER) {
-			if (curr_agg_total_ticks > MIN_SECTOR_LENGTH) {
-				// Adding a right corner sector
-				add_map_to_list(curr_mapstate);
-
-				// Search for largest rect
-				if (DO_CIRCULAR_MAPPING) {
-					if (curr_mapping_pointer > 1)
-						if ((curr_mapping_pointer >
-						     1) &&
-						    (curr_mapstate != ST_LINE))
-							check_circular_stline(
-							    curr_mapping_pointer -
-							    2);
-				}
-
-			} else {
-				// Adding an unknown sector
-				add_map_to_list(UNKNOWN);
-			}
-		}
-		curr_mapstate = LEFT_CORNER;
+		return LEFT_CORNER;
 	}
 
-	curr_agg_left_ticks += last_left_ticks;
-	curr_agg_right_ticks += last_right_ticks;
+	return UNKNOWN;
+}
 
-	// Always update the total ticks as the mean of left and right ticks
-	// FIXME: this is not the correct way of doing this (better take into
-	// account angular, linear vels)
+/*
+ * @brief circuit map
+ */
+void record_mapping()
+{
+	mapstate_e new_measured_sector_type =
+	    get_sector_type_from_encoder_ticks();
+
+	if (curr_mapstate != NONE &&
+	    curr_mapstate != new_measured_sector_type) {
+		add_sector();
+	}
+
+	curr_mapstate = new_measured_sector_type;
+	curr_agg_left_ticks += get_last_left_ticks();
+	curr_agg_right_ticks += get_last_right_ticks();
 	curr_agg_total_ticks = (curr_agg_left_ticks + curr_agg_right_ticks) / 2;
 }
 
@@ -427,10 +382,10 @@ void join_and_load_next_sectors()
 bool can_join_next_sectors()
 {
 	return (mapping_circuit.mapstates[sync_sector_idx] != UNKNOWN &&
-	    sync_sector_idx + 2 < MAX_MAP_STATES &&
-	    mapping_circuit.mapstates[sync_sector_idx + 1] == UNKNOWN &&
-	    mapping_circuit.mapstates[sync_sector_idx + 2] ==
-		mapping_circuit.mapstates[sync_sector_idx]);
+		sync_sector_idx + 2 < MAX_MAP_STATES &&
+		mapping_circuit.mapstates[sync_sector_idx + 1] == UNKNOWN &&
+		mapping_circuit.mapstates[sync_sector_idx + 2] ==
+		    mapping_circuit.mapstates[sync_sector_idx]);
 }
 
 /*
