@@ -101,9 +101,6 @@ void add_sector_to_list(mapstate_e new_state)
 	}
 
 	first_tick_sector += curr_agg_total_ticks;
-	curr_agg_total_ticks = 0;
-	curr_agg_left_ticks = 0;
-	curr_agg_right_ticks = 0;
 }
 
 /*
@@ -273,6 +270,10 @@ void record_mapping()
 
 	if (curr_mapstate != new_measured_sector_type) {
 		add_sector();
+
+		curr_agg_total_ticks = 0;
+		curr_agg_left_ticks = 0;
+		curr_agg_right_ticks = 0;
 	}
 
 	curr_mapstate = new_measured_sector_type;
