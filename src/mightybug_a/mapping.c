@@ -84,9 +84,9 @@ void add_sector_to_list(mapstate_e new_state)
 	}
 
 	// Check if it is in the first sector
-	// or same kind of previous stored sector
+	// or different kind of previous stored sector
 	if ((curr_mapping_pointer == 0) ||
-	    (mapping_circuit.mapstates[curr_mapping_pointer - 1] ==
+	    (mapping_circuit.mapstates[curr_mapping_pointer - 1] !=
 	     new_state)) {
 		// New sector
 		set_sector_data(curr_mapping_pointer, new_state,
