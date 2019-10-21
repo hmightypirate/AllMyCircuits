@@ -271,8 +271,7 @@ void record_mapping()
 	mapstate_e new_measured_sector_type =
 	    get_sector_type_from_encoder_ticks();
 
-	if (curr_mapstate != NONE &&
-	    curr_mapstate != new_measured_sector_type) {
+	if (curr_mapstate != new_measured_sector_type) {
 		add_sector();
 	}
 
