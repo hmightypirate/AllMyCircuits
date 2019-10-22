@@ -222,8 +222,8 @@ static void cli_map_all() {
 	     (unsigned int) last_map.agg_right_ticks[idx_map],
 	     (unsigned int) last_map.agg_total_ticks[idx_map],
 	     get_largest_rect_size(),
-	     get_end_sector_largest_rect(),
-	     get_finish_mapping_largest_rect());
+	     get_start_loop_sector(),
+	     get_end_loop_sector());
 
       
 

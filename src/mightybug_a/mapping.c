@@ -30,28 +30,30 @@ uint8_t end_of_mapping = 0;
 
 // Circular mapping structs
 
-// end_sector_largest_rect should point to the id of the next sector after the
+// start_loop_sector should point to the id of the next sector after the
 // largest straight line in the first pass
-int32_t end_sector_largest_rect = 0;
+int32_t start_loop_sector = 0;
 int32_t size_largest_rect = 0;
+int16_t largest_st_line_last_sector = -1;
+int32_t largest_st_line_size = 0;
 
-// finish_mapping_largest_rect should point to the id of the next sector after
+// end_loop_sector should point to the id of the next sector after
 // the largest straight line in the second pass
-int32_t finish_mapping_largest_rect = 0;
+int32_t end_loop_sector = 0;
 
 int32_t get_largest_rect_size()
 {
 	return size_largest_rect;
 }
 
-int32_t get_end_sector_largest_rect()
+int32_t get_start_loop_sector()
 {
-	return end_sector_largest_rect;
+	return start_loop_sector;
 }
 
-int32_t get_finish_mapping_largest_rect()
+int32_t get_end_loop_sector()
 {
-	return finish_mapping_largest_rect;
+	return end_loop_sector;
 }
 
 void set_sector_data(uint16_t index, mapstate_e type, int32_t first_tick,
@@ -117,29 +119,21 @@ mapping_e get_mapping_info()
  */
 void jump_to_circular_synchro(int32_t last_sector)
 {
-
-	finish_mapping_largest_rect = last_sector + 1;
+	start_loop_sector = largest_st_line_last_sector + 1;
+	end_loop_sector = last_sector + 1;
 
 	// get ticks run after largest st line
 	int32_t extra_ticks = 0;
-	for (int i = last_sector + 1; i <= curr_mapping_pointer; i++) {
+	for (int i = end_loop_sector; i <= curr_mapping_pointer; i++) {
 		extra_ticks += mapping_circuit.agg_total_ticks[i];
 	}
 
 	// advancing the ticks in the synchro sectors to the appr sector
 	// check if we already complete some sectors after st line
-	uint16_t approx_sync_sector = end_sector_largest_rect;
-	for (int i = end_sector_largest_rect; i < finish_mapping_largest_rect;
-	     i++) {
-		if (extra_ticks > mapping_circuit.agg_total_ticks[i]) {
-			extra_ticks -= mapping_circuit.agg_total_ticks[i];
-			// only advance a sector if the car has traversed the
-			// whole sector distance
-			approx_sync_sector = i + 1;
-
-		} else {
-			break;
-		}
+	uint16_t approx_sync_sector = start_loop_sector;
+	while (extra_ticks >
+	       mapping_circuit.agg_total_ticks[approx_sync_sector]) {
+		extra_ticks -= mapping_circuit.agg_total_ticks[approx_sync_sector++];
 	}
 
 	// preparing the data for synchro
@@ -163,64 +157,61 @@ void jump_to_circular_synchro(int32_t last_sector)
 /*
  * @brief obtain straight line
  */
-void check_circular_stline(uint16_t search_pointer)
+void check_circular_stline(int16_t index)
 {
 
 	// last sector should point to the last sector of a straight line
-	int32_t last_sector = -1;
+	int16_t new_st_line_last_sector = -1;
 
 	// sector size should contain the length of a straight line
-	int32_t sector_size = 0;
+	int32_t new_st_line_size = 0;
 
-	for (int i = search_pointer; i >= 0; i--) {
-		if (mapping_circuit.mapstates[i] == UNKNOWN) {
-			if (sector_size > 0) {
-				sector_size +=
-				    mapping_circuit.agg_total_ticks[i];
+	for (; index >= 0; index--) {
+		if (mapping_circuit.mapstates[index] == UNKNOWN) {
+			if (new_st_line_size > 0) {
+				new_st_line_size +=
+				    mapping_circuit.agg_total_ticks[index];
 			}
-		} else if (mapping_circuit.mapstates[i] == ST_LINE) {
-			if (last_sector < 0) {
-				last_sector = i;
+		} else if (mapping_circuit.mapstates[index] == ST_LINE) {
+			if (new_st_line_last_sector < 0) {
+				new_st_line_last_sector = index;
 			}
-			sector_size += mapping_circuit.agg_total_ticks[i];
+			new_st_line_size +=
+			    mapping_circuit.agg_total_ticks[index];
 		} else
 			break;
 	}
 
-	// Only continue this process if there is a straight line (and it is not
-	// the already detected one)
-	if ((last_sector >= 0) &&
-	    ((last_sector + 1) != end_sector_largest_rect)) {
-		// rect hast to be of a minimum size
-		if (sector_size > CIRCULAR_TICKS_MINSTLINE) {
+	if (new_st_line_last_sector == -1) {
+		// no st_line detected
+		return;
+	}
 
-			if (size_largest_rect == 0) {
-				// first rect detected
-				size_largest_rect = sector_size;
-				end_sector_largest_rect = last_sector + 1;
-			} else if (sector_size > size_largest_rect) {
-				if ((sector_size - size_largest_rect) <
-				    CIRCULAR_TICKS_STLINE_DIFF) {
-					// Probably repeating the largest rect
-					// (taking the straight line)
-					jump_to_circular_synchro(last_sector);
-				} else {
-					// A new largest rect
-					size_largest_rect = sector_size;
-					end_sector_largest_rect =
-					    last_sector + 1;
-				}
-			} else {
-				// New rect is shorter than the stored rect
-				// checking if it has reached the same rect
-				if ((size_largest_rect - sector_size) <
-				    CIRCULAR_TICKS_STLINE_DIFF) {
-					// Probably repeating the rect (taking
-					// the straight line)
-					jump_to_circular_synchro(last_sector);
-				}
-			}
-		}
+	if (new_st_line_size < CIRCULAR_TICKS_MINSTLINE) {
+		// rect hast to be of a minimum size
+		return;
+	}
+
+	if (new_st_line_last_sector == largest_st_line_last_sector) {
+		// Only continue this process if there is a straight line (and
+		// it is not the already detected one)
+		return;
+	}
+
+	if (largest_st_line_last_sector == -1) {
+		// first st_line detected
+		largest_st_line_size = new_st_line_size;
+		return;
+	}
+
+	if (abs(new_st_line_size - largest_st_line_size) <
+	    CIRCULAR_TICKS_MINSTLINE) {
+		// Probably it is repeating the same st_line
+		jump_to_circular_synchro(new_st_line_last_sector);
+	} else if (new_st_line_size > largest_st_line_size) {
+		// new largest st_line
+		largest_st_line_last_sector = new_st_line_last_sector;
+		largest_st_line_size = new_st_line_size;
 	}
 }
 
@@ -397,8 +388,8 @@ void get_next_sector()
 
 	if (DO_CIRCULAR_MAPPING) {
 		// Check if we have finished the lap
-		if (sync_sector_idx >= finish_mapping_largest_rect) {
-			sync_sector_idx = end_sector_largest_rect;
+		if (sync_sector_idx >= end_loop_sector) {
+			sync_sector_idx = start_loop_sector;
 			sync_next_sector_idx = sync_sector_idx;
 
 			// updating the total ticks (as it has
