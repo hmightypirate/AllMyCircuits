@@ -10,7 +10,7 @@ uint32_t curr_agg_total_ticks = 0;
 uint32_t first_tick_sector = 0;
 
 // Synchro mapping vars
-mapstate_e meas_sector_type = NONE;
+mapstate_e measured_sector_type = NONE;
 uint32_t meas_l_ticks = 0;
 uint32_t meas_r_ticks = 0;
 uint32_t meas_agg_ticks = 0;
@@ -312,7 +312,7 @@ void reset_synchro(void)
 	meas_total_ticks = 0;
 	meas_l_ticks = 0;
 	meas_r_ticks = 0;
-	meas_sector_type = NONE;
+	measured_sector_type = NONE;
 	sync_sector_type = NONE;
 	sync_sector_length = -1;
 	sync_sector_idx = 0;
@@ -452,7 +452,7 @@ void round_synchro()
 
 void check_sector_synchronization(mapstate_e state)
 {
-	if (meas_sector_type != NONE && meas_sector_type != state) {
+	if (measured_sector_type != NONE && measured_sector_type != state) {
 		if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
 			// Get synchro
 			round_synchro();
@@ -473,7 +473,7 @@ void check_sector_synchronization(mapstate_e state)
 void check_sector_synchronization_change()
 {
 	if (meas_total_ticks / 2 > sync_sector_end &&
-	    sync_sector_type != meas_sector_type) {
+	    sync_sector_type != measured_sector_type) {
 		meas_total_ticks = sync_sector_end * 2;
 
 		// Get next state but do not syncronize
@@ -481,7 +481,7 @@ void check_sector_synchronization_change()
 
 		get_next_sector();
 
-		if (meas_sector_type == sync_sector_type) {
+		if (measured_sector_type == sync_sector_type) {
 			meas_total_ticks += 2 * meas_agg_ticks;
 		}
 	}
@@ -506,7 +506,7 @@ void synchro_mapping(void)
 	}
 
 	check_sector_synchronization(new_measured_sector_type);
-	meas_sector_type = new_measured_sector_type;
+	measured_sector_type = new_measured_sector_type;
 
 	meas_l_ticks += last_left_ticks;
 	meas_r_ticks += last_right_ticks;
