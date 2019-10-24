@@ -20,7 +20,6 @@ uint32_t sync_sector_length = -1;
 uint16_t sync_sector_idx = 0;
 uint16_t sync_sector_end = 0;
 uint16_t sync_next_sector_idx = 0;
-uint8_t sync_change_flag = 0;
 
 // Flag to switch between mapping and synchro
 uint8_t synchro_mapping_flag = 0;
@@ -316,7 +315,6 @@ void reset_synchro(void)
 	sync_sector_idx = 0;
 	sync_sector_end = 0;
 	sync_next_sector_idx = 0;
-	sync_change_flag = 0;
 }
 
 void load_synchro_sector(uint16_t index)
@@ -421,8 +419,6 @@ void get_next_sector()
  */
 void round_synchro()
 {
-	sync_change_flag = 0;
-
 	if (sync_sector_type == UNKNOWN)
 		return;
 
