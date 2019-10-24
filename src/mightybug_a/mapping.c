@@ -92,14 +92,15 @@ void add_sector_to_list(sector_type_e new_state)
 		// New sector
 		set_sector_data(curr_mapping_pointer, new_state,
 				absolute_mean_ticks, current_sector_left_ticks,
-				current_sector_right_ticks, current_sector_mean_ticks);
+				current_sector_right_ticks,
+				current_sector_mean_ticks);
 		curr_mapping_pointer += 1;
 	} else {
 		// Join to previous sector (these might
 		// only happen with UNKNOWN states)
-		increase_sector_data(curr_mapping_pointer - 1,
-				     current_sector_left_ticks, current_sector_right_ticks,
-				     current_sector_mean_ticks);
+		increase_sector_data(
+		    curr_mapping_pointer - 1, current_sector_left_ticks,
+		    current_sector_right_ticks, current_sector_mean_ticks);
 	}
 
 	absolute_mean_ticks += current_sector_mean_ticks;
@@ -268,7 +269,8 @@ void record_mapping()
 	current_measured_sector_type = new_measured_sector_type;
 	current_sector_left_ticks += get_last_left_ticks();
 	current_sector_right_ticks += get_last_right_ticks();
-	current_sector_mean_ticks = (current_sector_left_ticks + current_sector_right_ticks) / 2;
+	current_sector_mean_ticks =
+	    (current_sector_left_ticks + current_sector_right_ticks) / 2;
 }
 
 /*
