@@ -110,7 +110,7 @@ void turbo_running_state()
 			jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 		}
 
-		if (get_end_of_mapping()) {
+		if (get_end_of_linear_mapping_run()) {
 			jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
 		}
 	}
@@ -161,7 +161,7 @@ void normal_running_state()
 			jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 		}
 
-		if (get_end_of_mapping()) {
+		if (get_end_of_linear_mapping_run()) {
 			jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
 		}
 	}

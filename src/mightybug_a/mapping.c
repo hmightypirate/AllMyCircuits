@@ -26,7 +26,7 @@ uint8_t sync_change_flag = 0;
 uint8_t synchro_mapping_flag = 0;
 
 // Flag to indicate that the end of mapping has been reached
-uint8_t end_of_mapping = 0;
+uint8_t end_of_linear_mapping_run = 0;
 
 // Circular mapping structs
 
@@ -138,21 +138,18 @@ void jump_to_circular_synchro(int32_t last_sector)
 	}
 
 	// preparing the data for synchro
-	synchro_mapping_flag = 1;
-	sync_sector_idx = approx_sync_sector;
-	sync_next_sector_idx = sync_sector_idx;
-
 	// Ticks of the next sector already advanced
 	meas_l_ticks = extra_ticks;
 	meas_r_ticks = extra_ticks;
 	meas_agg_ticks = extra_ticks;
-
-	// The car is going to advance to the next sector (picking preemptively
-	// the first tick of the next sector)
 	meas_total_ticks =
-	    (mapping_circuit.first_tick[sync_sector_idx + 1] + extra_ticks) * 2;
+	    (mapping_circuit.first_tick[approx_sync_sector] + extra_ticks) * 2;
 
+	sync_next_sector_idx = approx_sync_sector;
 	get_next_sector();
+
+	// End record mapping, start run synchro
+	synchro_mapping_flag = 1;
 }
 
 /*
@@ -330,6 +327,14 @@ void load_synchro_sector(uint16_t index)
 	    mapping_circuit.first_tick[index] + sync_sector_length;
 }
 
+bool can_join_two_additional_sectors()
+{
+	return (sync_next_sector_idx + 2 < MAX_MAP_STATES &&
+		mapping_circuit.mapstates[sync_next_sector_idx] == UNKNOWN &&
+		mapping_circuit.mapstates[sync_next_sector_idx + 1] ==
+		    mapping_circuit.mapstates[sync_sector_idx]);
+}
+
 void join_and_load_next_sectors()
 {
 	//  Three sectors can be joined in one if the the sectors in the
@@ -345,37 +350,23 @@ void join_and_load_next_sectors()
 	     mapping_circuit.agg_total_ticks[sync_sector_idx + 2]);
 
 	// Check if there are more sectors that can be joined in one
-	while (1) {
-		if (sync_next_sector_idx + 2 < MAX_MAP_STATES &&
-		    mapping_circuit.mapstates[sync_next_sector_idx] ==
-			UNKNOWN &&
-		    mapping_circuit.mapstates[sync_next_sector_idx + 1] ==
-			mapping_circuit.mapstates[sync_sector_idx]) {
+	while (can_join_two_additional_sectors()) {
+		sync_sector_length +=
+		    (mapping_circuit.agg_total_ticks[sync_next_sector_idx] +
+		     mapping_circuit.agg_total_ticks[sync_next_sector_idx + 1]);
 
-			sync_sector_length +=
-			    (mapping_circuit
-				 .agg_total_ticks[sync_next_sector_idx] +
-			     mapping_circuit
-				 .agg_total_ticks[sync_next_sector_idx + 1]);
+		sync_sector_end =
+		    (mapping_circuit.first_tick[sync_next_sector_idx + 1] +
+		     mapping_circuit.agg_total_ticks[sync_next_sector_idx + 1]);
 
-			sync_sector_end =
-			    (mapping_circuit
-				 .first_tick[sync_next_sector_idx + 1] +
-			     mapping_circuit
-				 .agg_total_ticks[sync_next_sector_idx + 1]);
-
-			sync_next_sector_idx += 2;
-
-		} else {
-			break;
-		}
+		sync_next_sector_idx += 2;
 	}
 }
 
 bool can_join_next_sectors()
 {
-	return (mapping_circuit.mapstates[sync_sector_idx] != UNKNOWN &&
-		sync_sector_idx + 2 < MAX_MAP_STATES &&
+	return (sync_sector_idx + 2 < MAX_MAP_STATES &&
+		mapping_circuit.mapstates[sync_sector_idx] != UNKNOWN &&
 		mapping_circuit.mapstates[sync_sector_idx + 1] == UNKNOWN &&
 		mapping_circuit.mapstates[sync_sector_idx + 2] ==
 		    mapping_circuit.mapstates[sync_sector_idx]);
@@ -387,11 +378,12 @@ bool can_join_next_sectors()
 void get_next_sector()
 {
 
+	sync_sector_idx = sync_next_sector_idx;
+
 	if (DO_CIRCULAR_MAPPING) {
 		// Check if we have finished the lap
 		if (sync_sector_idx >= end_loop_sector) {
 			sync_sector_idx = start_loop_sector;
-			sync_next_sector_idx = sync_sector_idx;
 
 			// updating the total ticks (as it has
 			// overflowed)
@@ -400,12 +392,11 @@ void get_next_sector()
 		}
 	}
 
-	if (sync_sector_idx >= MAX_MAP_STATES) {
-		// Reached maximum number of states (do not adding a new
-		// state)
+	if (sync_sector_idx >= MAX_MAP_STATES - 1) {
+		// Reached maximum number of states
 		sync_next_sector_idx = sync_sector_idx;
 		load_synchro_sector(MAX_MAP_STATES - 1);
-		end_of_mapping = 1;
+		end_of_linear_mapping_run = 1;
 		return;
 	}
 
@@ -413,7 +404,7 @@ void get_next_sector()
 		// Reached the last mapped state
 		sync_next_sector_idx = sync_sector_idx;
 		load_synchro_sector(sync_sector_idx);
-		end_of_mapping = 1;
+		end_of_linear_mapping_run = 1;
 		return;
 	}
 
@@ -439,7 +430,7 @@ void round_synchro()
 
 	if (diff_ticks < SYNCHRO_MAX_DRIFT) {
 		meas_total_ticks = sync_sector_end * 2;
-		sync_change_flag = 1;
+		get_next_sector();
 	} else {
 		diff_ticks = abs(meas_total_ticks / 2 -
 				 mapping_circuit.first_tick[sync_sector_idx]);
@@ -447,25 +438,6 @@ void round_synchro()
 		if (diff_ticks < SYNCHRO_MAX_DRIFT) {
 			meas_total_ticks =
 			    mapping_circuit.first_tick[sync_sector_idx] * 2;
-		}
-	}
-}
-
-void check_sector_synchronization_change()
-{
-}
-
-void sync_sector()
-{
-	if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
-		// Get synchro
-		round_synchro();
-
-		if (sync_change_flag) {
-			sync_sector_idx = sync_next_sector_idx;
-
-			// Get next sector
-			get_next_sector();
 		}
 	}
 }
@@ -492,7 +464,10 @@ void synchro_mapping(void)
 	if ((measured_sector_type != NONE) &&
 	    (measured_sector_type != new_measured_sector_type)) {
 
-		sync_sector();
+		if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
+			// Get synchro
+			round_synchro();
+		}
 
 		meas_l_ticks = 0;
 		meas_r_ticks = 0;
@@ -511,8 +486,6 @@ void synchro_mapping(void)
 		if (meas_total_ticks / 2 > sync_sector_end) {
 			meas_total_ticks = sync_sector_end * 2;
 
-			// Get next state but do not syncronize
-			sync_sector_idx = sync_next_sector_idx;
 			get_next_sector();
 
 			if (measured_sector_type == sync_sector_type) {
@@ -574,9 +547,9 @@ uint8_t is_hyper_turbo_safe(mapstate_e state)
 	return 0;
 }
 
-uint8_t get_end_of_mapping(void)
+uint8_t get_end_of_linear_mapping_run(void)
 {
-	return end_of_mapping;
+	return end_of_linear_mapping_run;
 }
 
 uint16_t get_synchro_sector_idx(void)

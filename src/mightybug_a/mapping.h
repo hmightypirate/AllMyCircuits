@@ -47,7 +47,7 @@ uint16_t get_synchro_sector_idx(void);
 uint16_t get_mapping_pointer_idx(void);
 mapstate_e get_mapping_state(void);
 mapstate_e get_synchro_state(void);
-uint8_t get_end_of_mapping(void);
+uint8_t get_end_of_linear_mapping_run(void);
 void get_next_sector(void);
 int32_t get_largest_rect_size(void);
 int32_t get_start_loop_sector();
