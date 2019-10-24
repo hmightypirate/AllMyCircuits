@@ -3,17 +3,17 @@
 // Mapping circuit vars
 mapping_e mapping_circuit;
 uint16_t curr_mapping_pointer = 0;
-sector_type_e curr_mapstate = NONE;
-uint32_t curr_agg_left_ticks = 0;
-uint32_t curr_agg_right_ticks = 0;
-uint32_t curr_agg_total_ticks = 0;
-uint32_t first_tick_sector = 0;
+sector_type_e current_measured_sector_type = NONE;
+uint32_t current_sector_left_ticks = 0;
+uint32_t current_sector_right_ticks = 0;
+uint32_t current_sector_mean_ticks = 0;
+uint32_t absolute_mean_ticks = 0;
 
 // Synchro mapping vars
 sector_type_e measured_sector_type = NONE;
 uint32_t meas_l_ticks = 0;
 uint32_t meas_r_ticks = 0;
-uint32_t meas_agg_ticks = 0;
+uint32_t meas_mean_ticks = 0;
 int32_t meas_total_ticks = 0;
 sector_type_e sync_sector_type = NONE;
 uint32_t sync_sector_length = -1;
@@ -92,18 +92,18 @@ void add_sector_to_list(sector_type_e new_state)
 	     new_state)) {
 		// New sector
 		set_sector_data(curr_mapping_pointer, new_state,
-				first_tick_sector, curr_agg_left_ticks,
-				curr_agg_right_ticks, curr_agg_total_ticks);
+				absolute_mean_ticks, current_sector_left_ticks,
+				current_sector_right_ticks, current_sector_mean_ticks);
 		curr_mapping_pointer += 1;
 	} else {
 		// Join to previous sector (these might
 		// only happen with UNKNOWN states)
 		increase_sector_data(curr_mapping_pointer - 1,
-				     curr_agg_left_ticks, curr_agg_right_ticks,
-				     curr_agg_total_ticks);
+				     current_sector_left_ticks, current_sector_right_ticks,
+				     current_sector_mean_ticks);
 	}
 
-	first_tick_sector += curr_agg_total_ticks;
+	absolute_mean_ticks += current_sector_mean_ticks;
 }
 
 /*
@@ -141,7 +141,7 @@ void jump_to_circular_synchro(int32_t last_sector)
 	// Ticks of the next sector already advanced
 	meas_l_ticks = extra_ticks;
 	meas_r_ticks = extra_ticks;
-	meas_agg_ticks = extra_ticks;
+	meas_mean_ticks = extra_ticks;
 	meas_total_ticks =
 	    (mapping_circuit.first_tick[approx_sync_sector] + extra_ticks) * 2;
 
@@ -215,16 +215,16 @@ void check_circular_stline(int16_t index)
 
 void add_sector()
 {
-	if (curr_agg_total_ticks < MIN_SECTOR_LENGTH) {
+	if (current_sector_mean_ticks < MIN_SECTOR_LENGTH) {
 		add_sector_to_list(UNKNOWN);
 	} else {
 		// Adding a sector that has the minimum length
-		add_sector_to_list(curr_mapstate);
+		add_sector_to_list(current_measured_sector_type);
 
 		// Search for largst rect
 		if (DO_CIRCULAR_MAPPING) {
 			if ((curr_mapping_pointer > 1) &&
-			    (curr_mapstate != ST_LINE))
+			    (current_measured_sector_type != ST_LINE))
 				check_circular_stline(curr_mapping_pointer - 2);
 		}
 	}
@@ -258,18 +258,18 @@ void record_mapping()
 	sector_type_e new_measured_sector_type =
 	    get_sector_type_from_encoder_ticks();
 
-	if (curr_mapstate != new_measured_sector_type) {
+	if (current_measured_sector_type != new_measured_sector_type) {
 		add_sector();
 
-		curr_agg_total_ticks = 0;
-		curr_agg_left_ticks = 0;
-		curr_agg_right_ticks = 0;
+		current_sector_mean_ticks = 0;
+		current_sector_left_ticks = 0;
+		current_sector_right_ticks = 0;
 	}
 
-	curr_mapstate = new_measured_sector_type;
-	curr_agg_left_ticks += get_last_left_ticks();
-	curr_agg_right_ticks += get_last_right_ticks();
-	curr_agg_total_ticks = (curr_agg_left_ticks + curr_agg_right_ticks) / 2;
+	current_measured_sector_type = new_measured_sector_type;
+	current_sector_left_ticks += get_last_left_ticks();
+	current_sector_right_ticks += get_last_right_ticks();
+	current_sector_mean_ticks = (current_sector_left_ticks + current_sector_right_ticks) / 2;
 }
 
 /*
@@ -278,11 +278,11 @@ void record_mapping()
 void reset_mapping_pointer()
 {
 	curr_mapping_pointer = 0;
-	curr_agg_total_ticks = 0;
-	curr_agg_left_ticks = 0;
-	curr_agg_right_ticks = 0;
-	first_tick_sector = 0;
-	curr_mapstate = NONE;
+	current_sector_mean_ticks = 0;
+	current_sector_left_ticks = 0;
+	current_sector_right_ticks = 0;
+	absolute_mean_ticks = 0;
+	current_measured_sector_type = NONE;
 }
 
 /*
@@ -306,7 +306,7 @@ void reset_circuit_mapping()
  */
 void reset_synchro(void)
 {
-	meas_agg_ticks = 0;
+	meas_mean_ticks = 0;
 	meas_total_ticks = 0;
 	meas_l_ticks = 0;
 	meas_r_ticks = 0;
@@ -464,21 +464,21 @@ void synchro_mapping(void)
 	if ((measured_sector_type != NONE) &&
 	    (measured_sector_type != new_measured_sector_type)) {
 
-		if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
+		if (meas_mean_ticks > MIN_SECTOR_LENGTH) {
 			// Get synchro
 			round_synchro();
 		}
 
 		meas_l_ticks = 0;
 		meas_r_ticks = 0;
-		meas_agg_ticks = 0;
+		meas_mean_ticks = 0;
 	}
 
 	measured_sector_type = new_measured_sector_type;
 
 	meas_l_ticks += last_left_ticks;
 	meas_r_ticks += last_right_ticks;
-	meas_agg_ticks = (meas_l_ticks + meas_r_ticks) / 2;
+	meas_mean_ticks = (meas_l_ticks + meas_r_ticks) / 2;
 	meas_total_ticks += (last_left_ticks + last_right_ticks);
 
 	// if detected sector is not the synchro (mapping)
@@ -489,7 +489,7 @@ void synchro_mapping(void)
 			get_next_sector();
 
 			if (measured_sector_type == sync_sector_type) {
-				meas_total_ticks += 2 * meas_agg_ticks;
+				meas_total_ticks += 2 * meas_mean_ticks;
 			}
 		}
 	}
@@ -564,7 +564,7 @@ uint16_t get_mapping_pointer_idx(void)
 
 sector_type_e get_mapping_state(void)
 {
-	return curr_mapstate;
+	return current_measured_sector_type;
 }
 
 sector_type_e get_synchro_state(void)
