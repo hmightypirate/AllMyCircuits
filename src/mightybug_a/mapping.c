@@ -3,19 +3,19 @@
 // Mapping circuit vars
 mapping_e mapping_circuit;
 uint16_t curr_mapping_pointer = 0;
-mapstate_e curr_mapstate = NONE;
+sector_type_e curr_mapstate = NONE;
 uint32_t curr_agg_left_ticks = 0;
 uint32_t curr_agg_right_ticks = 0;
 uint32_t curr_agg_total_ticks = 0;
 uint32_t first_tick_sector = 0;
 
 // Synchro mapping vars
-mapstate_e measured_sector_type = NONE;
+sector_type_e measured_sector_type = NONE;
 uint32_t meas_l_ticks = 0;
 uint32_t meas_r_ticks = 0;
 uint32_t meas_agg_ticks = 0;
 int32_t meas_total_ticks = 0;
-mapstate_e sync_sector_type = NONE;
+sector_type_e sync_sector_type = NONE;
 uint32_t sync_sector_length = -1;
 uint16_t sync_sector_idx = 0;
 uint16_t sync_sector_end = 0;
@@ -56,7 +56,7 @@ int32_t get_end_loop_sector()
 	return end_loop_sector;
 }
 
-void set_sector_data(uint16_t index, mapstate_e type, int32_t first_tick,
+void set_sector_data(uint16_t index, sector_type_e type, int32_t first_tick,
 		     int32_t left_ticks, int32_t right_ticks,
 		     int32_t total_ticks)
 {
@@ -78,7 +78,7 @@ void increase_sector_data(uint16_t index, int32_t left_ticks,
 /*
  * @brief adding a sector to the current mapping
  */
-void add_sector_to_list(mapstate_e new_state)
+void add_sector_to_list(sector_type_e new_state)
 {
 
 	if (curr_mapping_pointer >= MAX_MAP_STATES) {
@@ -230,7 +230,7 @@ void add_sector()
 	}
 }
 
-mapstate_e get_sector_type_from_encoder_ticks()
+sector_type_e get_sector_type_from_encoder_ticks()
 {
 	// aggregated ticks
 	uint32_t left_ticks = get_left_encoder_ticks();
@@ -255,7 +255,7 @@ mapstate_e get_sector_type_from_encoder_ticks()
  */
 void record_mapping()
 {
-	mapstate_e new_measured_sector_type =
+	sector_type_e new_measured_sector_type =
 	    get_sector_type_from_encoder_ticks();
 
 	if (curr_mapstate != new_measured_sector_type) {
@@ -448,7 +448,7 @@ void round_synchro()
  */
 void synchro_mapping(void)
 {
-	mapstate_e new_measured_sector_type =
+	sector_type_e new_measured_sector_type =
 	    get_sector_type_from_encoder_ticks();
 
 	// last ticks (last ms)
@@ -529,7 +529,7 @@ uint8_t get_synchro_flag(void)
 /*
  * @brief indicate if we can safely increase the velocity
  */
-uint8_t is_hyper_turbo_safe(mapstate_e state)
+uint8_t is_hyper_turbo_safe(sector_type_e state)
 {
 
 	if (synchro_mapping_flag) {
@@ -562,12 +562,12 @@ uint16_t get_mapping_pointer_idx(void)
 	return curr_mapping_pointer;
 }
 
-mapstate_e get_mapping_state(void)
+sector_type_e get_mapping_state(void)
 {
 	return curr_mapstate;
 }
 
-mapstate_e get_synchro_state(void)
+sector_type_e get_synchro_state(void)
 {
 	return sync_sector_type;
 }

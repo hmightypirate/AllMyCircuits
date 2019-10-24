@@ -25,28 +25,28 @@ typedef enum {
 	RIGHT_CORNER,
 	ST_LINE,
 	MAX_MAP_EVENTS
-} mapstate_e;
+} sector_type_e;
 
 typedef struct {
 	int32_t agg_total_ticks[MAX_MAP_STATES];
 	int32_t agg_left_ticks[MAX_MAP_STATES];
 	int32_t agg_right_ticks[MAX_MAP_STATES];
 	int32_t first_tick[MAX_MAP_STATES];
-	mapstate_e mapstates[MAX_MAP_STATES];
+	sector_type_e mapstates[MAX_MAP_STATES];
 } mapping_e;
 
 void reset_circuit_mapping(void);
 void reset_mapping_pointer(void);
 void reset_synchro(void);
 void update_synchro_mapping_flag(void);
-uint8_t is_hyper_turbo_safe(mapstate_e state);
+uint8_t is_hyper_turbo_safe(sector_type_e state);
 mapping_e get_mapping_info(void);
 void update_mapping(void);
 uint8_t get_synchro_flag(void);
 uint16_t get_synchro_sector_idx(void);
 uint16_t get_mapping_pointer_idx(void);
-mapstate_e get_mapping_state(void);
-mapstate_e get_synchro_state(void);
+sector_type_e get_mapping_state(void);
+sector_type_e get_synchro_state(void);
 uint8_t get_end_of_linear_mapping_run(void);
 void get_next_sector(void);
 int32_t get_largest_rect_size(void);
