@@ -133,7 +133,8 @@ void jump_to_circular_synchro(int32_t last_sector)
 	uint16_t approx_sync_sector = start_loop_sector;
 	while (extra_ticks >
 	       mapping_circuit.agg_total_ticks[approx_sync_sector]) {
-		extra_ticks -= mapping_circuit.agg_total_ticks[approx_sync_sector++];
+		extra_ticks -=
+		    mapping_circuit.agg_total_ticks[approx_sync_sector++];
 	}
 
 	// preparing the data for synchro
@@ -450,39 +451,21 @@ void round_synchro()
 	}
 }
 
-void check_sector_synchronization(mapstate_e state)
-{
-	if (measured_sector_type != NONE && measured_sector_type != state) {
-		if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
-			// Get synchro
-			round_synchro();
-
-			if (sync_change_flag) {
-				sync_sector_idx = sync_next_sector_idx;
-
-				// Get next sector
-				get_next_sector();
-			}
-		}
-		meas_l_ticks = 0;
-		meas_r_ticks = 0;
-		meas_agg_ticks = 0;
-	}
-}
-
 void check_sector_synchronization_change()
 {
-	if (meas_total_ticks / 2 > sync_sector_end &&
-	    sync_sector_type != measured_sector_type) {
-		meas_total_ticks = sync_sector_end * 2;
+}
 
-		// Get next state but do not syncronize
-		sync_sector_idx = sync_next_sector_idx;
+void sync_sector()
+{
+	if (meas_agg_ticks > MIN_SECTOR_LENGTH) {
+		// Get synchro
+		round_synchro();
 
-		get_next_sector();
+		if (sync_change_flag) {
+			sync_sector_idx = sync_next_sector_idx;
 
-		if (measured_sector_type == sync_sector_type) {
-			meas_total_ticks += 2 * meas_agg_ticks;
+			// Get next sector
+			get_next_sector();
 		}
 	}
 }
@@ -505,16 +488,38 @@ void synchro_mapping(void)
 		get_next_sector(); // Get next sector
 	}
 
-	check_sector_synchronization(new_measured_sector_type);
+	// if changed measured sector type (line sensors)
+	if ((measured_sector_type != NONE) &&
+	    (measured_sector_type != new_measured_sector_type)) {
+
+		sync_sector();
+
+		meas_l_ticks = 0;
+		meas_r_ticks = 0;
+		meas_agg_ticks = 0;
+	}
+
 	measured_sector_type = new_measured_sector_type;
 
 	meas_l_ticks += last_left_ticks;
 	meas_r_ticks += last_right_ticks;
 	meas_agg_ticks = (meas_l_ticks + meas_r_ticks) / 2;
-	// should divide by 2 but numbers could be very small
 	meas_total_ticks += (last_left_ticks + last_right_ticks);
 
-	check_sector_synchronization_change();
+	// if detected sector is not the synchro (mapping)
+	if (sync_sector_type != measured_sector_type) {
+		if (meas_total_ticks / 2 > sync_sector_end) {
+			meas_total_ticks = sync_sector_end * 2;
+
+			// Get next state but do not syncronize
+			sync_sector_idx = sync_next_sector_idx;
+			get_next_sector();
+
+			if (measured_sector_type == sync_sector_type) {
+				meas_total_ticks += 2 * meas_agg_ticks;
+			}
+		}
+	}
 }
 
 /*
