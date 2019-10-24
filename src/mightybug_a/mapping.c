@@ -311,7 +311,7 @@ void reset_synchro(void)
 	meas_r_ticks = 0;
 	measured_sector_type = NONE;
 	sync_sector_type = NONE;
-	sync_sector_length = -1;
+	sync_sector_length = 0;
 	sync_sector_idx = 0;
 	sync_sector_end = 0;
 	sync_next_sector_idx = 0;
