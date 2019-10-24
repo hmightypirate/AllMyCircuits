@@ -32,7 +32,6 @@ uint8_t end_of_linear_mapping_run = 0;
 // start_loop_sector should point to the id of the next sector after the
 // largest straight line in the first pass
 int32_t start_loop_sector = 0;
-int32_t size_largest_rect = 0;
 int16_t largest_st_line_last_sector = -1;
 int32_t largest_st_line_size = 0;
 
@@ -40,9 +39,9 @@ int32_t largest_st_line_size = 0;
 // the largest straight line in the second pass
 int32_t end_loop_sector = 0;
 
-int32_t get_largest_rect_size()
+int32_t get_largest_st_line_size()
 {
-	return size_largest_rect;
+	return largest_st_line_size;
 }
 
 int32_t get_start_loop_sector()

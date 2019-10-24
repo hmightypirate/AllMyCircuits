@@ -49,7 +49,7 @@ sector_type_e get_mapping_state(void);
 sector_type_e get_synchro_state(void);
 uint8_t get_end_of_linear_mapping_run(void);
 void get_next_sector(void);
-int32_t get_largest_rect_size(void);
+int32_t get_largest_st_line_size(void);
 int32_t get_start_loop_sector();
 int32_t get_end_loop_sector();
 
