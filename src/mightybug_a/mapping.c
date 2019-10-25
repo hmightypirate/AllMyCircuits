@@ -529,15 +529,11 @@ uint8_t get_synchro_flag(void)
 uint8_t is_hyper_turbo_safe(sector_type_e state)
 {
 
-	if (synchro_mapping_flag) {
-		// Check if it is in the required state
-		// if (sync_sector_type == state)
-		if (sync_sector_type == state) {
-			// Check it is safe to update the velocity
-			if (meas_total_ticks / 2 + TURBO_SYNCHRO_TICKS <
-			    sync_sector_end) {
-				return 1;
-			}
+	if (synchro_mapping_flag && (sync_sector_type == state)) {
+		// Check it is safe to update the velocity
+		if (meas_total_ticks / 2 + TURBO_SYNCHRO_TICKS <
+		    sync_sector_end) {
+			return 1;
 		}
 	}
 
