@@ -452,11 +452,6 @@ void synchro_mapping(void)
 	uint32_t last_left_ticks = get_last_left_ticks();
 	uint32_t last_right_ticks = get_last_right_ticks();
 
-	// First sector
-	if (sync_sector_type == NONE) {
-		get_next_sector(); // Get next sector
-	}
-
 	// if changed measured sector type (line sensors)
 	if ((measured_sector_type != NONE) &&
 	    (measured_sector_type != new_measured_sector_type)) {
@@ -500,6 +495,7 @@ void update_synchro_mapping_flag(void)
 {
 	if (curr_mapping_pointer > 0) {
 		synchro_mapping_flag = 1;
+		get_next_sector();
 	}
 }
 
