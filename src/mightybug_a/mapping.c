@@ -10,9 +10,6 @@ uint32_t current_sector_mean_ticks = 0;
 uint32_t absolute_mean_ticks = 0;
 
 // Synchro mapping vars
-uint32_t meas_l_ticks = 0;
-uint32_t meas_r_ticks = 0;
-uint32_t meas_mean_ticks = 0;
 int32_t meas_absolute_sum_ticks = 0;
 sector_type_e sync_sector_type = NONE;
 uint32_t sync_sector_length = -1;
@@ -137,9 +134,9 @@ void jump_to_circular_synchro(int32_t last_sector)
 
 	// preparing the data for synchro
 	// Ticks of the next sector already advanced
-	meas_l_ticks = extra_ticks;
-	meas_r_ticks = extra_ticks;
-	meas_mean_ticks = extra_ticks;
+	current_sector_left_ticks = extra_ticks;
+	current_sector_right_ticks = extra_ticks;
+	current_sector_mean_ticks = extra_ticks;
 	meas_absolute_sum_ticks =
 	    (mapping_circuit.first_tick[approx_sync_sector] + extra_ticks) * 2;
 
@@ -305,10 +302,10 @@ void reset_circuit_mapping()
  */
 void reset_synchro(void)
 {
-	meas_mean_ticks = 0;
+	current_sector_mean_ticks = 0;
 	meas_absolute_sum_ticks = 0;
-	meas_l_ticks = 0;
-	meas_r_ticks = 0;
+	current_sector_left_ticks = 0;
+	current_sector_right_ticks = 0;
 	current_measured_sector_type = NONE;
 	sync_sector_type = NONE;
 	sync_sector_length = 0;
@@ -455,21 +452,21 @@ void synchro_mapping(void)
 	if ((current_measured_sector_type != NONE) &&
 	    (current_measured_sector_type != new_current_measured_sector_type)) {
 
-		if (meas_mean_ticks > MIN_SECTOR_LENGTH) {
+		if (current_sector_mean_ticks > MIN_SECTOR_LENGTH) {
 			// Get synchro
 			round_synchro();
 		}
 
-		meas_l_ticks = 0;
-		meas_r_ticks = 0;
-		meas_mean_ticks = 0;
+		current_sector_left_ticks = 0;
+		current_sector_right_ticks = 0;
+		current_sector_mean_ticks = 0;
 	}
 
 	current_measured_sector_type = new_current_measured_sector_type;
 
-	meas_l_ticks += last_left_ticks;
-	meas_r_ticks += last_right_ticks;
-	meas_mean_ticks = (meas_l_ticks + meas_r_ticks) / 2;
+	current_sector_left_ticks += last_left_ticks;
+	current_sector_right_ticks += last_right_ticks;
+	current_sector_mean_ticks = (current_sector_left_ticks + current_sector_right_ticks) / 2;
 	meas_absolute_sum_ticks += (last_left_ticks + last_right_ticks);
 
 	// if detected sector is not the synchro (mapping)
@@ -480,7 +477,7 @@ void synchro_mapping(void)
 			get_next_sector();
 
 			if (current_measured_sector_type == sync_sector_type) {
-				meas_absolute_sum_ticks += 2 * meas_mean_ticks;
+				meas_absolute_sum_ticks += 2 * current_sector_mean_ticks;
 			}
 		}
 	}
