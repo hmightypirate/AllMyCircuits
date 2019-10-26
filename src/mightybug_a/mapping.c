@@ -10,7 +10,6 @@ uint32_t current_sector_mean_ticks = 0;
 uint32_t absolute_mean_ticks = 0;
 
 // Synchro mapping vars
-sector_type_e measured_sector_type = NONE;
 uint32_t meas_l_ticks = 0;
 uint32_t meas_r_ticks = 0;
 uint32_t meas_mean_ticks = 0;
@@ -254,10 +253,10 @@ sector_type_e get_sector_type_from_encoder_ticks()
  */
 void record_mapping()
 {
-	sector_type_e new_measured_sector_type =
+	sector_type_e new_current_measured_sector_type =
 	    get_sector_type_from_encoder_ticks();
 
-	if (current_measured_sector_type != new_measured_sector_type) {
+	if (current_measured_sector_type != new_current_measured_sector_type) {
 		add_sector();
 
 		current_sector_mean_ticks = 0;
@@ -265,7 +264,7 @@ void record_mapping()
 		current_sector_right_ticks = 0;
 	}
 
-	current_measured_sector_type = new_measured_sector_type;
+	current_measured_sector_type = new_current_measured_sector_type;
 	current_sector_left_ticks += get_last_left_ticks();
 	current_sector_right_ticks += get_last_right_ticks();
 	current_sector_mean_ticks =
@@ -310,7 +309,7 @@ void reset_synchro(void)
 	meas_absolute_sum_ticks = 0;
 	meas_l_ticks = 0;
 	meas_r_ticks = 0;
-	measured_sector_type = NONE;
+	current_measured_sector_type = NONE;
 	sync_sector_type = NONE;
 	sync_sector_length = 0;
 	sync_sector_idx = 0;
@@ -445,7 +444,7 @@ void round_synchro()
  */
 void synchro_mapping(void)
 {
-	sector_type_e new_measured_sector_type =
+	sector_type_e new_current_measured_sector_type =
 	    get_sector_type_from_encoder_ticks();
 
 	// last ticks (last ms)
@@ -453,8 +452,8 @@ void synchro_mapping(void)
 	uint32_t last_right_ticks = get_last_right_ticks();
 
 	// if changed measured sector type (line sensors)
-	if ((measured_sector_type != NONE) &&
-	    (measured_sector_type != new_measured_sector_type)) {
+	if ((current_measured_sector_type != NONE) &&
+	    (current_measured_sector_type != new_current_measured_sector_type)) {
 
 		if (meas_mean_ticks > MIN_SECTOR_LENGTH) {
 			// Get synchro
@@ -466,7 +465,7 @@ void synchro_mapping(void)
 		meas_mean_ticks = 0;
 	}
 
-	measured_sector_type = new_measured_sector_type;
+	current_measured_sector_type = new_current_measured_sector_type;
 
 	meas_l_ticks += last_left_ticks;
 	meas_r_ticks += last_right_ticks;
@@ -474,13 +473,13 @@ void synchro_mapping(void)
 	meas_absolute_sum_ticks += (last_left_ticks + last_right_ticks);
 
 	// if detected sector is not the synchro (mapping)
-	if (sync_sector_type != measured_sector_type) {
+	if (sync_sector_type != current_measured_sector_type) {
 		if (meas_absolute_sum_ticks / 2 > sync_sector_end) {
 			meas_absolute_sum_ticks = sync_sector_end * 2;
 
 			get_next_sector();
 
-			if (measured_sector_type == sync_sector_type) {
+			if (current_measured_sector_type == sync_sector_type) {
 				meas_absolute_sum_ticks += 2 * meas_mean_ticks;
 			}
 		}
