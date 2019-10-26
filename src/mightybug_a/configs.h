@@ -17,6 +17,7 @@ extern int16_t vel_nool_maps[NUMBER_OF_MAPPINGS];
 extern int16_t pid_turbo_maps[NUMBER_OF_MAPPINGS * 3];
 extern int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS];
 extern int16_t vel_hyper_turbo_maps[NUMBER_OF_MAPPINGS];
+extern int16_t vel_hyper_turbo_corner_maps[NUMBER_OF_MAPPINGS];
  
 extern int16_t vel_brake_maps[NUMBER_OF_MAPPINGS];
 

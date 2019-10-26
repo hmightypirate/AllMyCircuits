@@ -7,6 +7,7 @@ uint32_t current_loop_millisecs = 0;
 uint32_t pidvel_map_ms = 0;
 
 uint32_t last_ms_inline = 0;
+uint32_t last_ms_outline = 0;
 uint32_t running_loop_millisecs = 0;
 
 int32_t line_error = 0;
@@ -22,6 +23,7 @@ void go_to_normal(void)
 	reset_sequential_readings();
 	update_running_state(SET_NORMAL_MODE_STATE);
 }
+
 /*
  * @brief get next sub-state (running)
  *
@@ -100,6 +102,17 @@ void keypad_events(void)
 void hyper_turbo_running_state()
 {
   set_target_as_hyper_turbo();
+
+  
+  jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+}
+
+
+void hyper_turbo_running_corner_state()
+{
+  set_target_as_hyper_turbo_corner();
+
+  
   jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 }
 
@@ -116,6 +129,11 @@ void turbo_running_state()
 	      {
 		hyper_turbo_running_state();
 	      }
+
+	    if (get_end_of_mapping()) {
+	      jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
+	    }
+
 	  }
 
 	
@@ -151,14 +169,6 @@ void normal_running_state()
 {
 	set_target_as_normal();
 
-	if (FLAG_CIRCUIT_MAPPING)
-	  {
-	    if (is_increase_vel_enable(ST_LINE))
-	      {
-		hyper_turbo_running_state();
-	      }
-	  }
-	
 	if (ENABLE_INCDEC_NORMAL_FLAG) {
 		if (USE_ENCODERS_FOR_INCDEC) {
 			update_target_normal_with_encoders();
@@ -168,9 +178,23 @@ void normal_running_state()
 			}
 		}
 	}
+
+	if (FLAG_CIRCUIT_MAPPING && ALLOW_MAPPING_IN_CORNERS)
+	  {
+	    if (is_increase_vel_enable(ST_LINE))
+	      {
+		hyper_turbo_running_corner_state();
+	      }
+
+	    if (get_end_of_mapping()) {
+	      jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
+	    }
+	  }
+       		
 	reset_pids_normal();
 
-	jukebox_setcurrent_song(NO_SONG);
+	if (!FLAG_CIRCUIT_MAPPING)
+	  jukebox_setcurrent_song(NO_SONG);
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(TENOR_BEAT_ORDER);
 
@@ -213,8 +237,8 @@ void recovery_running_state()
 
 	// set_target_as_normal();
 	// reset_pids_normal();
-  if (USE_RECOVERY_VELOCITY)
-    set_target_as_recovery();
+        if (USE_RECOVERY_VELOCITY)
+           set_target_as_recovery();
 
 	set_led_mode(LED_1, BLINK);
 	set_led_mode(LED_2, BLINK);
@@ -467,7 +491,9 @@ void just_run_state()
 
 	// Set the current ms (inline)
 	if (!is_out_of_line()) {
-		last_ms_inline = current_loop_millisecs;
+		if (current_loop_millisecs - last_ms_outline > MIN_TIME_TO_SUCCESS_LINE_RECOVER) {
+			last_ms_inline = current_loop_millisecs;
+		}
 		if (get_running_state() == RUNNING_RECOVERY) {
 			if (last_rn_state == RUNNING_NORMAL)
 				update_running_state(SET_NORMAL_MODE_STATE);
@@ -485,6 +511,7 @@ void just_run_state()
 			if (get_running_state()!=RUNNING_RECOVERY) {
 				last_rn_state = get_running_state();
 			}
+			last_ms_outline = current_loop_millisecs;
 			update_running_state(LOST_LINE_EVENT);
 		}
 	}

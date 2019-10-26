@@ -215,12 +215,16 @@ static void cli_map_all() {
     idx_map = 0;
   //for (int i = 0; i < MAX_MAP_STATES; i++)
   //  {
-      printf("%i State: %d, Ticks left: %zu, Ticks right: %zu Total: %zu\n",
+      printf("%i State: %d, Ticks left: %u, Ticks right: %u Total: %u Lrgst: %li Endsec %li Finish %li Current %li\n",
 	     idx_map,
 	     last_map.mapstates[idx_map],
 	     (unsigned int) last_map.agg_left_ticks[idx_map],
 	     (unsigned int) last_map.agg_right_ticks[idx_map],
-	     (unsigned int) last_map.agg_total_ticks[idx_map]);
+	     (unsigned int) last_map.agg_total_ticks[idx_map],
+	     get_largest_rect(),
+	     get_end_sector_largest_rect(),
+	     get_finish_mapping_largest_rect(),
+	     get_current_synchro_sector());
 
       
 
