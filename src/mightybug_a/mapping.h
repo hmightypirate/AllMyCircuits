@@ -3,6 +3,7 @@
 
 #include "encoder.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 /* Mapping variables */
 #define FLAG_CIRCUIT_MAPPING 1
