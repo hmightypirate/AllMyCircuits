@@ -2,6 +2,7 @@
 #define __FSM_H
 
 #include "libjukebox.h"
+#include "mapping.h"
 #include <stdint.h>
 
 typedef enum {
@@ -17,6 +18,8 @@ typedef enum {
 	INFO_MAP_STATE,
 	INERTIA_STATE,
 	DELAYED_START_INERTIA_STATE,
+	INFO_MAPMODE_STATE,
+	CHANGE_MAPMODE_STATE,
 	MAX_STATES
 } state_e;
 
@@ -39,6 +42,8 @@ typedef enum {
 	CHANGED_MAP_EVENT,
 	CHANGE_MAP_TIMEOUT_EVENT,
 	INERTIA_TIMEOUT_EVENT,
+	CHANGE_MAPMODE_TIMEOUT_EVENT,
+	CHANGED_MAPMODE_EVENT,
 	MAX_EVENTS
 } event_e;
 

@@ -401,12 +401,56 @@ void info_map_state(void)
 	}
 }
 
+
+void info_mapmode_state(void)
+{
+	if (pidvel_map_ms == 0) {
+		pidvel_map_ms = current_loop_millisecs;
+		push_enable_jukebox();
+		enable_jukebox();
+	}
+
+	/* stop motors */
+	stop_motors();
+
+	set_led_mode(LED_1, ON);
+
+	uint8_t mapmode = get_mapmode();
+
+	if (mapmode == 0) {
+		set_led_mode(LED_2, BLINK);
+	} else if (mapmode == 1) {
+		set_led_mode(LED_2, DOUBLE_BLINK);
+	} else if (mapmode == 2) {
+		set_led_mode(LED_2, TRIPLE_BLINK);
+	}
+
+	jukebox_setcurrent_song(get_map_song(mapmode));
+
+	if (current_loop_millisecs - pidvel_map_ms >
+	    AVAILABLE_MAP_CHANGE_TIME) {
+		disable_jukebox();
+		pull_enable_jukebox();
+		pidvel_map_ms = 0;
+		update_state(CHANGE_MAPMODE_TIMEOUT_EVENT); 
+	}
+}
+
 void change_map_state(void)
 {
 	select_next_pidvel_map();
 	pidvel_map_ms = current_loop_millisecs;
 	update_state(CHANGED_MAP_EVENT);
 }
+
+
+void change_mapmode_state(void)
+{
+	next_mapmode();
+	pidvel_map_ms = current_loop_millisecs;
+	update_state(CHANGED_MAPMODE_EVENT);
+}
+
 
 void select_running_state(void)
 {
@@ -638,6 +682,12 @@ void execute_state(state_e state)
 		break;
 	case INERTIA_STATE:
 		inertia_run_state();
+		break;
+	case INFO_MAPMODE_STATE:
+		info_mapmode_state();
+		break;
+	case CHANGE_MAPMODE_STATE:
+		change_mapmode_state();
 		break;
 	default:
 		running_state();

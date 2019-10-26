@@ -62,6 +62,11 @@ void update_state(event_e event)
 		} else if (current_state == IDLE_STATE) {
 			if (DEBUG_INERTIA_TEST)
 				current_state = DELAYED_START_INERTIA_STATE;
+			else {
+				current_state = INFO_MAPMODE_STATE;
+			}
+		} else if (current_state == INFO_MAPMODE_STATE) {
+			current_state = CHANGE_MAPMODE_STATE;
 		}
 		break;
 	case BUTTON2_RELEASED_EVENT:
@@ -85,6 +90,12 @@ void update_state(event_e event)
 		break;
 	case INERTIA_TIMEOUT_EVENT:
 		current_state = IDLE_STATE;
+		break;
+	case CHANGE_MAPMODE_TIMEOUT_EVENT:
+		current_state = IDLE_STATE;
+		break;
+	case CHANGED_MAPMODE_EVENT:
+		current_state = INFO_MAPMODE_STATE;
 		break;
 	default:
 		current_state = IDLE_STATE;
