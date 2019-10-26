@@ -194,11 +194,12 @@ void check_circular_stline(int16_t index)
 	if (largest_st_line_last_sector == -1) {
 		// first st_line detected
 		largest_st_line_size = new_st_line_size;
+		largest_st_line_last_sector = new_st_line_last_sector;
 		return;
 	}
 
 	if (abs(new_st_line_size - largest_st_line_size) <
-	    CIRCULAR_TICKS_MINSTLINE) {
+	    CIRCULAR_TICKS_STLINE_DIFF) {
 		// Probably it is repeating the same st_line
 		jump_to_circular_synchro(new_st_line_last_sector);
 	} else if (new_st_line_size > largest_st_line_size) {
