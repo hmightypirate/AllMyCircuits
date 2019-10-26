@@ -450,8 +450,7 @@ void synchro_mapping(void)
 	uint32_t last_right_ticks = get_last_right_ticks();
 
 	// if changed measured sector type (line sensors)
-	if ((current_measured_sector_type != NONE) &&
-	    (current_measured_sector_type != new_current_measured_sector_type)) {
+	if (current_measured_sector_type != new_current_measured_sector_type) {
 
 		if (current_sector_mean_ticks > MIN_SECTOR_LENGTH) {
 			// Get synchro
