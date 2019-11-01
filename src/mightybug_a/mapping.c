@@ -39,6 +39,8 @@ int32_t last_circular_synchro = 0;
 // finish_mapping_largest_rect should point to the id of the next sector after the largest straight line in the second pass
 int32_t finish_mapping_largest_rect = 0;
 
+uint8_t mapmode = 0;
+
 int32_t get_largest_rect()
 {
   return size_largest_rect;
@@ -258,7 +260,7 @@ void do_circuit_mapping() {
 	adding_map_to_list(curr_mapstate);
 
 	// Search for largst rect
-	if (DO_CIRCULAR_MAPPING) {
+	if (mapmode == CIRCULAR_MAPMODE) {
 	  if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE))
 	    check_circular_stline(curr_mapping_pointer - 2);
 	}
@@ -282,7 +284,7 @@ void do_circuit_mapping() {
 	adding_map_to_list(curr_mapstate);
 
 	// Search for largst rect
-	if (DO_CIRCULAR_MAPPING) {
+	if (mapmode == CIRCULAR_MAPMODE) {
 	  if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE))
 	      check_circular_stline(curr_mapping_pointer - 2);
 	}
@@ -303,7 +305,7 @@ void do_circuit_mapping() {
 	adding_map_to_list(curr_mapstate);
 	
 	// Search for largest rect
-	if (DO_CIRCULAR_MAPPING) {		    
+	if (mapmode == CIRCULAR_MAPMODE) {		    
 	  if (curr_mapping_pointer > 1)
 	    if ((curr_mapping_pointer > 1) && (curr_mapstate != ST_LINE))
 	      check_circular_stline(curr_mapping_pointer - 2);
@@ -378,7 +380,7 @@ void get_next_sector() {
 
   last_circular_synchro = sync_sector_idx;
   
-  if (DO_CIRCULAR_MAPPING) {
+  if (mapmode == CIRCULAR_MAPMODE) {
     // Check if we have finished the lap
     if (sync_sector_idx >= finish_mapping_largest_rect) {
       sync_sector_idx = end_sector_largest_rect;
@@ -679,4 +681,14 @@ mapstate_e get_mapping_state(void) {
 
 mapstate_e get_synchro_state(void) {
   return sync_sector_type;
+}
+
+void next_mapmode()
+{
+	mapmode = (mapmode + 1) % 3;
+}
+
+uint8_t get_mapmode()
+{
+	return mapmode;
 }
