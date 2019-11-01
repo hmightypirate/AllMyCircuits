@@ -166,7 +166,7 @@ void jump_to_circular_synchro(int32_t last_sector) {
   meas_agg_ticks = extra_ticks;
 
   // The car is going to advance to the next sector (picking preemptively the first tick of the next sector)
-  meas_total_ticks = (mapping_circuit.first_tick[sync_sector_idx + 1] + extra_ticks) * 2;
+  meas_total_ticks = (mapping_circuit.first_tick[sync_sector_idx] + extra_ticks) * 2;
 
   get_next_sector();
 }
