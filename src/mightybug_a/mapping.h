@@ -10,7 +10,7 @@
 #define OUT_MAPSTLINE_STATE 6 // diff in abs encoder ticks
 #define MIN_SECTOR_LENGTH 180 // minimum length of sector
 #define SYNCHRO_MAX_DRIFT 200
-#define TURBO_SYNCHRO_TICKS 400 // remaining ticks
+#define TURBO_SYNCHRO_TICKS 500 // 400 remaining ticks
 
 #define ALLOW_MAPPING_IN_CORNERS 1
 #define CIRCULAR_TICKS_STLINE_DIFF 150  // 150 ticks of difference of the largest rect
