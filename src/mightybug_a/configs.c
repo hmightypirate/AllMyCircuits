@@ -15,7 +15,8 @@ int16_t vel_maps[NUMBER_OF_MAPPINGS] = {
     //500, 600, 700 
   //300, 400, 425
   //300, 400, 450 // Record circuito (aguanta pero le cuesta)
-  300, 400, 425 
+  //300, 400, 425
+  400, 400, 425 
 };
 
 int16_t vel_recovery_maps[NUMBER_OF_MAPPINGS] = {
@@ -45,18 +46,21 @@ int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
     // 675, 725, 775 // testing turbo
     //800, 900, 950
     //300, 375, 400
-  300, 400, 425
+  //300, 400, 425
   //300, 375, 450 // Record circuito (aguanta pero le cuesta)
+  325, 400, 425
 };
 
 int16_t vel_hyper_turbo_maps[NUMBER_OF_MAPPINGS] = {
   //650, 650, 650
-  550, 675, 700
+  //550, 675, 700
+  425, 600, 700
 };
 
 int16_t vel_hyper_turbo_corner_maps[NUMBER_OF_MAPPINGS] = {
   //650, 650, 650
-  400, 525, 550
+  //400, 525, 550
+  500, 525, 550
 };
 
 
