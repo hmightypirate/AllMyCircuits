@@ -159,7 +159,7 @@ static uint32_t encoder_measurement(uint32_t value)
 		value = UINT16_MAX + 1 - value;
 	}
 
-	return value;
+	return value/THOR_NUMBER;
 }
 
 void reset_encoder_ticks(void)

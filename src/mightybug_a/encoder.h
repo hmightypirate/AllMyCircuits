@@ -27,6 +27,8 @@
 /* Weird encoder measures */
 #define WEIRD_ENCODER_MEAS UINT16_MAX / 2
 
+#define THOR_NUMBER 128
+
 void update_encoder_ticks(void);
 void update_velocities_encoders(void);
 
