@@ -3,8 +3,8 @@
 
 /* pid maps: k_p, k_i, k_d */
 int16_t pid_maps[NUMBER_OF_MAPPINGS * 3] = {
-    250, 0, 300, // 400, 0, 500
-    250, 0, 300, 250, 0, 300};
+    300, 0, 500, // 400, 0, 500
+    350, 0, 600, 375, 0, 600};
 
 int16_t vel_maps[NUMBER_OF_MAPPINGS] = {
     // 650, 675, 725
@@ -16,11 +16,11 @@ int16_t vel_maps[NUMBER_OF_MAPPINGS] = {
   //300, 400, 425
   //300, 400, 450 // Record circuito (aguanta pero le cuesta)
   //300, 400, 425
-  600, 700, 825 
+  500, 550, 575 
 };
 
 int16_t vel_recovery_maps[NUMBER_OF_MAPPINGS] = {
-  800, 800, 800
+  250, 250, 250
 };
   
 
@@ -35,8 +35,8 @@ int16_t vel_nool_maps[NUMBER_OF_MAPPINGS] = {
 };
 
 int16_t pid_turbo_maps[NUMBER_OF_MAPPINGS * 3] = {
-    200, 0, 300, // 350, 0, 600
-    200, 0, 300, 200, 0, 300};
+    200, 0, 600, // 350, 0, 600
+    200, 0, 600, 250, 0, 650};
 
 int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
     // 515, 515, 515
@@ -48,19 +48,19 @@ int16_t vel_turbo_maps[NUMBER_OF_MAPPINGS] = {
     //300, 375, 400
   //300, 400, 425
   //300, 375, 450 // Record circuito (aguanta pero le cuesta)
-  525, 600, 625
+  600, 650, 675
 };
 
 int16_t vel_hyper_turbo_maps[NUMBER_OF_MAPPINGS] = {
   //650, 650, 650
   //550, 675, 700
-  625, 700, 800
+  700, 750, 775
 };
 
 int16_t vel_hyper_turbo_corner_maps[NUMBER_OF_MAPPINGS] = {
   //650, 650, 650
   //400, 525, 550
-  600, 625, 650
+  500, 550, 575
 };
 
 
