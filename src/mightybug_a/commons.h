@@ -37,7 +37,7 @@
 
 /* Wait time in out of line */
 
-#define MAX_RUNNING_RECOVERY_TIME 25 // ms
+#define MAX_RUNNING_RECOVERY_TIME 300 // ms
 #define MIN_TIME_TO_SUCCESS_LINE_RECOVER 100 // ms
 
 /* Hysteresis values for changing state whilst running  */
