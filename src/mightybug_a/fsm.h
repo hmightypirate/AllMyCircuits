@@ -2,7 +2,7 @@
 #define __FSM_H
 
 #include "libjukebox.h"
-#include "fsm.h"
+#include "mapping.h"
 #include <stdint.h>
 
 typedef enum {

@@ -99,46 +99,24 @@ void keypad_events(void)
 	}
 }
 
-void hyper_turbo_running_state()
-{
-  set_target_as_hyper_turbo();
-
-  
-  jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
-}
-
-
-void hyper_turbo_running_corner_state()
-{
-  set_target_as_hyper_turbo_corner();
-
-  
-  jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
-}
-
-
-
 void turbo_running_state()
 {
 	set_target_as_turbo();
 
-	jukebox_setcurrent_song(NO_SONG);   
-	if (FLAG_CIRCUIT_MAPPING)
-	  {
-	    if (is_increase_vel_enable(ST_LINE))
-	      {
-		hyper_turbo_running_state();
-	      }
+	jukebox_setcurrent_song(NO_SONG);
+	if (FLAG_CIRCUIT_MAPPING) {
+		if (is_hyper_turbo_safe(ST_LINE)) {
+			set_target_as_hyper_turbo();
+			jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+		}
 
-	    if (get_end_of_mapping()) {
-	      jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
-	    }
+		if (get_end_of_linear_mapping_run()) {
+			jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
+		}
+	}
 
-	  }
-
-	
 	reset_pids_turbo();
-	
+
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
 
@@ -147,8 +125,6 @@ void turbo_running_state()
 
 	just_run_state();
 }
-
-
 
 void brake_running_state()
 {
@@ -179,22 +155,21 @@ void normal_running_state()
 		}
 	}
 
-	if (FLAG_CIRCUIT_MAPPING && ALLOW_MAPPING_IN_CORNERS)
-	  {
-	    if (is_increase_vel_enable(ST_LINE))
-	      {
-		hyper_turbo_running_corner_state();
-	      }
+	if (FLAG_CIRCUIT_MAPPING && ALLOW_MAPPING_IN_CORNERS) {
+		if (is_hyper_turbo_safe(ST_LINE)) {
+			set_target_as_hyper_turbo_corner();
+			jukebox_setcurrent_song(SOPRANO_BEAT_ORDER);
+		}
 
-	    if (get_end_of_mapping()) {
-	      jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
-	    }
-	  }
-       		
+		if (get_end_of_linear_mapping_run()) {
+			jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
+		}
+	}
+
 	reset_pids_normal();
 
 	if (!FLAG_CIRCUIT_MAPPING)
-	  jukebox_setcurrent_song(NO_SONG);
+		jukebox_setcurrent_song(NO_SONG);
 	if (RUNNING_STATE_PITCH)
 		jukebox_setcurrent_song(TENOR_BEAT_ORDER);
 
@@ -237,8 +212,8 @@ void recovery_running_state()
 
 	// set_target_as_normal();
 	// reset_pids_normal();
-        if (USE_RECOVERY_VELOCITY)
-           set_target_as_recovery();
+	if (USE_RECOVERY_VELOCITY)
+		set_target_as_recovery();
 
 	set_led_mode(LED_1, BLINK);
 	set_led_mode(LED_2, BLINK);
@@ -257,17 +232,9 @@ void check_rn_state(void)
 
 	switch (running_state) {
 	case RUNNING_TURBO:
-	        // FIXME
-	        // Adding mapping velocity
-	        // checking velocity
-	  
-		turbo_running_state();		
+		turbo_running_state();
 		break;
 	case RUNNING_NORMAL:
-	        // FIXME
-	        // Adding mapping velocity
-	        // checking velocity
-	  
 		normal_running_state();
 		break;
 	case RUNNING_NOOL:
@@ -307,12 +274,18 @@ void calibration_state(void)
 
 void idle_state(void)
 {
-        /* reset synchro state */
-        reset_synchro();	
+	/* reset synchro state */
+	reset_synchro();
 	/* reset out of line measurements, resets calibration */
 	reset_all_inline();
 	reset_calibration_values();
 	stop_motors();
+
+	// Check if the mapping was already done and we must go to the
+	// synchro phase
+	if (FLAG_CIRCUIT_MAPPING) {
+		update_synchro_mapping_flag();
+	}
 
 	delayed_start_time = 0;
 	running_loop_millisecs = 0;
@@ -532,7 +505,8 @@ void just_run_state()
 
 	// Set the current ms (inline)
 	if (!is_out_of_line()) {
-		if (current_loop_millisecs - last_ms_outline > MIN_TIME_TO_SUCCESS_LINE_RECOVER) {
+		if (current_loop_millisecs - last_ms_outline >
+		    MIN_TIME_TO_SUCCESS_LINE_RECOVER) {
 			last_ms_inline = current_loop_millisecs;
 		}
 		if (get_running_state() == RUNNING_RECOVERY) {
@@ -549,7 +523,7 @@ void just_run_state()
 		if (get_all_inline()) {
 			update_state(ALL_SENSORS_IN_LINE_EVENT);
 		} else {
-			if (get_running_state()!=RUNNING_RECOVERY) {
+			if (get_running_state() != RUNNING_RECOVERY) {
 				last_rn_state = get_running_state();
 			}
 			last_ms_outline = current_loop_millisecs;
@@ -601,11 +575,10 @@ void running_state(void)
 		print_telemetry(current_loop_millisecs);
 	}
 
-	if (FLAG_CIRCUIT_MAPPING)
-	  {
-	    // Add circuit mapping
-	    update_mapping_function();
-	  }	
+	if (FLAG_CIRCUIT_MAPPING) {
+		// Add circuit mapping
+		update_mapping();
+	}
 }
 
 void setup_keypad(void)
@@ -688,23 +661,12 @@ void execute_state(state_e state)
 		break;
 	case IDLE_STATE:
 		idle_state();
-
-		// Check if the mapping was already done and we must go to the synchro phase
-		if (FLAG_CIRCUIT_MAPPING)
-		  {
-		    check_synchro_start();
-		  }
 		break;
 	case OUT_OF_BATTERY_STATE:
 		out_of_battery_state();
 		break;
 	case DELAYED_START_STATE:
 		delayed_start_state();
-
-		//// Reset pointer (starting from the beginning)
-		//if (FLAG_CIRCUIT_MAPPING)
-		//  reset_mapping_pointer();
-		
 		break;
 	case CHANGE_MAP_STATE:
 		change_map_state();
