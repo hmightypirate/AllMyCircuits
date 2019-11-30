@@ -97,6 +97,43 @@ void update_state(event_e event)
 	case CHANGED_MAPMODE_EVENT:
 		current_state = INFO_MAPMODE_STATE;
 		break;
+	case STREAM_BAT_EVENT:
+		if (current_state == STREAM_BAT_STATE) {
+			current_state = IDLE_STATE;
+		} else {
+			current_state = STREAM_BAT_STATE;
+		}
+		break;
+	case STREAM_BUZ_EVENT:
+		if (current_state == STREAM_BUZ_STATE) {
+			current_state = STREAM_BUZ_END_STATE;
+		} else if (current_state == STREAM_BUZ_END_STATE) {
+			current_state = IDLE_STATE;
+		} else {
+			current_state = STREAM_BUZ_STATE;
+		}
+		break;
+	case STREAM_LED_EVENT:
+		if (current_state == STREAM_LED_STATE) {
+			current_state = IDLE_STATE;
+		} else {
+			current_state = STREAM_LED_STATE;
+		}
+		break;
+	case STREAM_LINE_EVENT:
+		if (current_state == STREAM_LINE_STATE) {
+			current_state = IDLE_STATE;
+		} else {
+			current_state = STREAM_LINE_STATE;
+		}
+		break;
+	case STREAM_MOTORS_EVENT:
+		if (current_state == STREAM_MOTORS_STATE) {
+			current_state = IDLE_STATE;
+		} else {
+			current_state = STREAM_MOTORS_STATE;
+		}
+		break;
 	default:
 		current_state = IDLE_STATE;
 	}
