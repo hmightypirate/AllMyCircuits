@@ -151,6 +151,31 @@ static void cli_bat() {
 	printf("%u mV\n", read_vbatt());
 }
 
+char str_STREAM_BAT[] = "STREAM_BAT";
+static void cli_sbat() {
+	update_state(STREAM_BAT_EVENT);
+}
+
+char str_STREAM_BUZ[] = "STREAM_BUZ";
+static void cli_sbuz() {
+	update_state(STREAM_BUZ_EVENT);
+}
+
+char str_STREAM_LED[] = "STREAM_LED";
+static void cli_sled() {
+	update_state(STREAM_LED_EVENT);
+}
+
+char str_STREAM_LINE[] = "STREAM_LINE";
+static void cli_sline() {
+	update_state(STREAM_LINE_EVENT);
+}
+
+char str_STREAM_MOTORS[] = "STREAM_MOTORS";
+static void cli_smotors() {
+	update_state(STREAM_MOTORS_EVENT);
+}
+
 char str_CLK_GET[] = "CLK";
 static void cli_clk_get() {
 	printf("%lu\n", get_millisecs_since_start());
@@ -235,7 +260,7 @@ static void cli_map_all() {
 }
 
 // This is all the available commands data as an array of command structures
-#define CLI_COMMANDS_LIST_SIZE 10
+#define CLI_COMMANDS_LIST_SIZE 15
 struct command_struct commands_list[] = {
 	{.text = str_BAT, .functionPtr = cli_bat, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_CLK_GET, .functionPtr = cli_clk_get, .is_a_candidate = 'y', .syntax_hint = NULL},
@@ -246,6 +271,11 @@ struct command_struct commands_list[] = {
 	{.text = str_GET, .functionPtr = cli_get, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_SET, .functionPtr = cli_set, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_VER, .functionPtr = cli_ver, .is_a_candidate = 'y', .syntax_hint = NULL},
+	{.text = str_STREAM_BAT, .functionPtr = cli_sbat, .is_a_candidate = 'y', .syntax_hint = NULL},
+	{.text = str_STREAM_BUZ, .functionPtr = cli_sbuz, .is_a_candidate = 'y', .syntax_hint = NULL},
+	{.text = str_STREAM_LED, .functionPtr = cli_sled, .is_a_candidate = 'y', .syntax_hint = NULL},	
+	{.text = str_STREAM_LINE, .functionPtr = cli_sline, .is_a_candidate = 'y', .syntax_hint = NULL},
+	{.text = str_STREAM_MOTORS, .functionPtr = cli_smotors, .is_a_candidate = 'y', .syntax_hint = NULL},
 	{.text = str_MAP_ALL, .functionPtr = cli_map_all, .is_a_candidate = 'y', .syntax_hint = NULL}
 };
 

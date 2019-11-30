@@ -677,6 +677,59 @@ void setup_modules()
 	setup_keypad();
 }
 
+void stream_bat()
+{
+	printf("%u\n", read_vbatt());
+}
+
+void stream_buz()
+{
+	if (pidvel_map_ms == 0) {
+		pidvel_map_ms = current_loop_millisecs;
+		push_enable_jukebox();
+		enable_jukebox();
+	}
+	jukebox_setcurrent_song(SONG_SUPERMAN_ORDER);
+}
+
+void stream_buz_end()
+{
+	disable_jukebox();
+	pull_enable_jukebox();
+	pidvel_map_ms = 0;
+	update_state(STREAM_BUZ_END_EVENT);
+}
+
+void stream_led()
+{
+	if (current_loop_millisecs % 500 == 0) {
+		printf(".");
+		set_led_mode(LED_1, BLINK_ALT);
+		set_led_mode(LED_2, BLINK);
+	}
+}
+
+void stream_line()
+{
+	if (current_loop_millisecs % 500 == 0) {
+		read_line_sensors(line_sensor_value);
+		for (int i = 0; i < NUM_SENSORS; i++) {
+			printf("%i ", line_sensor_value[i]);
+		}
+		printf("\n");
+	}
+}
+
+void stream_motors()
+{
+	if (current_loop_millisecs % 500 == 0) {
+		set_target_velocity(400);
+		motor_control(0);
+		update_velocities_encoders();
+		printf("%u, %u\n", (unsigned int)get_left_encoder_ticks(), (unsigned int)get_right_encoder_ticks());
+	}
+}
+
 void execute_state(state_e state)
 {
 	switch (state) {
@@ -723,6 +776,24 @@ void execute_state(state_e state)
 		break;
 	case CHANGE_MAPMODE_STATE:
 		change_mapmode_state();
+		break;
+	case STREAM_BAT_STATE:
+		stream_bat();
+		break;
+	case STREAM_BUZ_STATE:
+		stream_buz();
+		break;
+	case STREAM_BUZ_END_STATE:
+		stream_buz_end();
+		break;
+	case STREAM_LED_STATE:
+		stream_led();
+		break;
+	case STREAM_LINE_STATE:
+		stream_line();
+		break;
+	case STREAM_MOTORS_STATE:
+		stream_motors();
 		break;
 	default:
 		running_state();
