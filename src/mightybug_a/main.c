@@ -667,9 +667,6 @@ void setup_modules()
 	set_led_blink_period(LED_1, LED_BLINK_PERIOD_DEFAULT);
 	set_led_blink_period(LED_2, LED_BLINK_PERIOD_DEFAULT);
 
-	/* enable sensors */
-	enable_line_sensors();
-
 	/* setup jukebox */
 	jukebox_setup();
 
