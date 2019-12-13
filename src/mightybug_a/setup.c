@@ -45,6 +45,9 @@ void clock_setup(void)
 	if (USE_ALTERNATE_FUNCTIONS) {
 		rcc_periph_clock_enable(RCC_AFIO);
 	}
+
+	// Enable counter at 72MHz
+	dwt_enable_cycle_counter();
 }
 
 /*
