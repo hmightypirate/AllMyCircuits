@@ -146,7 +146,7 @@ void encoder_setup_edge_interruptions(void)
 	/* Enable EXTI7 interrupt. */
 	// Shared with EXTI6
 	// nvic_set_priority(NVIC_EXTI5_9_IRQ, 12);
-	// nvic_enable_irq(NVIC_EXTI5_9_IRQ);	
+	// nvic_enable_irq(NVIC_EXTI5_9_IRQ);
 
 	/* Set GPIO7 (in GPIO port B) to 'input open-drain'. */
 	gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO7);
@@ -156,7 +156,6 @@ void encoder_setup_edge_interruptions(void)
 	exti_set_trigger(EXTI7, EXTI_TRIGGER_BOTH);
 	exti_enable_request(EXTI7);
 }
-
 
 /*
  * @brief pwm engine setup
@@ -322,6 +321,8 @@ void sensor_setup(void)
 void gpio_setup(void)
 {
 	/* Sensors */
+	gpio_set_mode(SENSOR_ON_PORT, GPIO_MODE_OUTPUT_2_MHZ,
+		      GPIO_CNF_OUTPUT_PUSHPULL, SENSOR_ON_PIN);
 	gpio_set_mode(SENSOR_0_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG,
 		      SENSOR_0_PIN);
 	gpio_set_mode(SENSOR_1_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG,
@@ -431,12 +432,14 @@ void setup_microcontroller(void)
 		/* left encoder */
 		encoder_setup(LEFT_ENCODER_TIMER, LEFT_ENCODER_AFIO,
 			      LEFT_ENCODER_CHANNEL1, LEFT_ENCODER_CHANNEL2,
-		    	  LEFT_ENCODER_CHANNEL1_TI, LEFT_ENCODER_CHANNEL2_TI);
+			      LEFT_ENCODER_CHANNEL1_TI,
+			      LEFT_ENCODER_CHANNEL2_TI);
 
 		/* Right encoder */
 		encoder_setup(RIGHT_ENCODER_TIMER, RIGHT_ENCODER_AFIO,
 			      RIGHT_ENCODER_CHANNEL1, RIGHT_ENCODER_CHANNEL2,
-			      RIGHT_ENCODER_CHANNEL1_TI, RIGHT_ENCODER_CHANNEL2_TI);
+			      RIGHT_ENCODER_CHANNEL1_TI,
+			      RIGHT_ENCODER_CHANNEL2_TI);
 	} else {
 		encoder_setup_edge_interruptions();
 	}

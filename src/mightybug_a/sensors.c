@@ -145,7 +145,7 @@ void read_line_sensors(uint16_t *sensor_value)
 {
 
 	enable_line_sensors();
-	delay_microseconds(100);
+	delay_microseconds(500);
 
 	for (int i = 0; i < NUM_SENSORS; i++) {
 		sensor_value[i] = read_adc_naiive(i);

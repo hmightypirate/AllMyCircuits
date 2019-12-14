@@ -322,6 +322,8 @@ void idle_state(void)
 	/* Clear led during idle state */
 	set_led_mode(LED_1, ON);
 	set_led_mode(LED_2, OFF);
+
+	disable_line_sensors();
 }
 
 void out_of_battery_state(void)
@@ -672,6 +674,8 @@ void setup_modules()
 
 	/* Setup keypad */
 	setup_keypad();
+
+	disable_line_sensors();
 }
 
 void stream_bat()
