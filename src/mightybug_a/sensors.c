@@ -143,9 +143,15 @@ uint16_t *interpolate_wrong_values(uint16_t *value)
  */
 void read_line_sensors(uint16_t *sensor_value)
 {
+
+	enable_line_sensors();
+	delay_microseconds(500);
+
 	for (int i = 0; i < NUM_SENSORS; i++) {
 		sensor_value[i] = read_adc_naiive(i);
 	}
+
+	disable_line_sensors();
 
 	if (INTERPOLATE_BAD_MEASURES)
 	  sensor_value = interpolate_wrong_values(sensor_value);

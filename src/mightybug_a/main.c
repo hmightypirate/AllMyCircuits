@@ -295,6 +295,8 @@ void idle_state(void)
 	/* Clear led during idle state */
 	set_led_mode(LED_1, ON);
 	set_led_mode(LED_2, OFF);
+
+	disable_line_sensors();
 }
 
 void out_of_battery_state(void)
@@ -640,14 +642,13 @@ void setup_modules()
 	set_led_blink_period(LED_1, LED_BLINK_PERIOD_DEFAULT);
 	set_led_blink_period(LED_2, LED_BLINK_PERIOD_DEFAULT);
 
-	/* enable sensors */
-	enable_line_sensors();
-
 	/* setup jukebox */
 	jukebox_setup();
 
 	/* Setup keypad */
 	setup_keypad();
+
+	disable_line_sensors();
 }
 
 void stream_bat()

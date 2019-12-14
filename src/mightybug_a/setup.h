@@ -12,6 +12,7 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/exti.h>
+#include <libopencm3/cm3/dwt.h>
 
 #define USE_ENCODER_TIMER 1
 #define MILLISEC_SLICES 72000

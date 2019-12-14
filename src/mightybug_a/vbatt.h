@@ -5,7 +5,7 @@
 
 /* Battery limit in millivolts (2 cells) */
 #define BATTERY_LIMIT_MV 6400
-#define RESISTOR_DIVISOR 37
+#define RESISTOR_DIVISOR 43 // 37 Drakkar
 
 /* Time between battery readings: 1000 ms => 1s */
 #define VBATT_TIME_BETWEEN_READS 5000
