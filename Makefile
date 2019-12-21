@@ -27,6 +27,29 @@ console: build_image
 		--device=$(PORT) \
 		$(DOCKER_IMAGE_NAME)
 
+build_quemu_for_stm32_image:
+	sudo docker build ./tests/quemu_stm32/ -t qemu_stm32
+
+unit_tests_build: build_image ## Build unit tests at tests/unit/mightybug_a
+	sudo docker run -v $(shell pwd):/home/src/ \
+		-ti \
+		--rm \
+		$(DOCKER_IMAGE_NAME) \
+		make -C tests/mightybug_a/ clean all
+
+unit_tests_run: unit_tests_build build_quemu_for_stm32_image ## Run unit tests at tests/unit/mightybug_a/bin on 
+	sudo docker run --net=host \
+		-v $(shell pwd)/tests/mightybug_a/TestDumbExample.bin:/bins/kernel.bin \
+		--rm -ti qemu_stm32 /usr/local/bin/qemu-system-arm -M stm32-f103c8 \
+		-kernel /bins/kernel.bin -serial tcp::5900,server
+
+unit_tests_clean: ## Clean the test binaries
+	sudo docker run -v $(shell pwd):/home/src/ \
+		-ti \
+		--rm \
+		$(DOCKER_IMAGE_NAME) \
+		make -C tests/mightybug_a/ clean
+
 buga_fw: build_image ## Build line follower firmware at src/mightybug_a
 	sudo docker run -v $(shell pwd):/home/src/ \
 		-ti \
