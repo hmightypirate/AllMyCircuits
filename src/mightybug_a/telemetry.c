@@ -36,7 +36,7 @@ void print_telemetry(int millis)
 	if (SHOW_SENSOR_INLINE)
 	  printf("%u,", (unsigned int)get_inline_change());
 	if (SHOW_SYNCHRO_FLAG)
-	  printf("%u,", (unsigned int)get_mapping_function());
+	  printf("%u,", (unsigned int)get_synchro_flag());
 	if (SHOW_SYNCHRO_POINTER)
 	  printf("%u,",(unsigned int)get_synchro_sector_idx());
 	if (SHOW_MAPPING_POINTER)
