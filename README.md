@@ -1,3 +1,9 @@
+# Brief info
+Line follower code for Mighty Bug-A boards
+
+Current version: Electronic Experience (v1.4.0)
+
+
 # All My Circuits
 
 [![Build Status](https://travis-ci.org/hmightypirate/AllMyCircuits.svg?branch=develop)](https://travis-ci.org/hmightypirate/AllMyCircuits)

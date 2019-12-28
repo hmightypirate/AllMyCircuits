@@ -207,8 +207,8 @@ static void cli_lin_blacks() {
 
 char str_VER[] = "VER";
 static void cli_ver() {
-	printf("Disable Drive CLI by Mighty Escuderida\n");
-	printf("Version v1.3.0\n");
+	printf("Electronic Experience CLI by Mighty Escuderida\n");
+	printf("Version v1.4.0\n");
 }
 
 
