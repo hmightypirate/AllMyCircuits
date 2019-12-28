@@ -1,3 +1,9 @@
+# Brief info
+Line follower code for Mighty Bug-A boards
+
+Current version: Electronic Experience (v1.4.0)
+
+
 # All My Circuits
 
 [![Build Status](https://travis-ci.org/hmightypirate/AllMyCircuits.svg?branch=develop)](https://travis-ci.org/hmightypirate/AllMyCircuits)
@@ -57,6 +63,10 @@ Finally you can flash the new firmware with the command shown below. Remember to
 python stm32loader.py -p SERIAL_PORT -e -w -V -g 0x08000000 -v bluepill_test.bin
 ```
 
+# Alternative building using Docker
+
+It is possible to build and flash the firmware and the tests as well. Use "make help" to read the propper make targets.
+
 ## Blackpill
 
 The Makefiles are ready for using with the black pill (the newest blue pill version). Use the following commands to compile for the black pill:
@@ -69,6 +79,7 @@ or define PILL=BLACK as an environment variable
 
 # Related Projects
 
+* for our line follower, we are using the chassis from https://gitlab.com/punkto/line_follower_3d_designs
 * stm32loader.py: https://github.com/jsnyder/stm32loader
 * libopencm3: https://github.com/libopencm3/libopencm3
 * pill_blink: https://github.com/satoshinm/pill_blink

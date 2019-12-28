@@ -1,15 +1,16 @@
 #ifndef __LIBMUSIC_H
 #define __LIBMUSIC_H
 
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 
+#include "setup.h"
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
-#include <libopencm3/stm32/gpio.h>
-#include "setup.h"
+
+#include "printf.h"
 
 #define LIBMUSIC_TICKS_PER_SECOND 1000
 
@@ -126,11 +127,8 @@
 #define MAX_DUTY_BUZZER 65503
 
 int play_note(int note_number);
-void play_music(int song_id,
-                int beats_per_minute,
-                uint16_t notes_number,
-                uint8_t * notes_pitch,
-                uint8_t * notes_duration);
+void play_music(int song_id, int beats_per_minute, uint16_t notes_number,
+		uint8_t *notes_pitch, uint8_t *notes_duration);
 void play_music_loop(void);
 uint8_t is_music_playing(void);
 void stop_music_play(void);

@@ -1,59 +1,95 @@
 #ifndef __FSM_H
 #define __FSM_H
 
-#include <inttypes.h>
-#include "sensors.h"
-#include "pid.h"
-#include "motors.h"
 #include "libjukebox.h"
-
-/* delay before the car starts running in DELAYED_START_STATE */
-#define DELAYED_START_MS  5000
-
-/* delays applied when trying to change a pid/vel mapping */
-#define DELAYED_PIDVEL_CHANGE_MS 5000
-
-/* Number of mappings for pid and vel */
-#define MAX_MAPPINGS 3
-#define NUMBER_PIDVEL_MAPPINGS 3
-#define INITIAL_PIDVEL_MAPPING 0
-
+#include "mapping.h"
+#include <stdint.h>
 
 typedef enum {
-  IDLE_STATE,
-  CALLIBRATION_STATE,
-  RUNNING_STATE,
-  NO_BATTERY_STATE,
-  STOP_STATE,
-  DELAYED_START_STATE,
-  PIDANDVEL_CHANGE_STATE,
-  PIDANDVEL_MAPPING_STATE,
-  MAX_STATES
+	IDLE_STATE,
+	CALIBRATION_STATE,
+	RUNNING_STATE,
+	OUT_OF_BATTERY_STATE,
+	STOP_STATE,
+	DELAYED_START_STATE,
+	PIDANDVEL_CHANGE_STATE,
+	PIDANDVEL_MAPPING_STATE,
+	CHANGE_MAP_STATE,
+	INFO_MAP_STATE,
+	INERTIA_STATE,
+	DELAYED_START_INERTIA_STATE,
+	INFO_MAPMODE_STATE,
+	CHANGE_MAPMODE_STATE,
+	STREAM_BAT_STATE,
+	STREAM_BUZ_STATE,
+	STREAM_BUZ_END_STATE,
+	STREAM_LED_STATE,
+	STREAM_LINE_STATE,
+	STREAM_MOTORS_STATE,
+	MAX_STATES
 } state_e;
 
 typedef enum {
-  NO_EVENT,
-  FORCE_CALLIBRATION_EVENT,
-  FORCE_IDLE_EVENT,
-  GO_TO_DELAYED_START_EVENT,
-  GO_TO_RUN_EVENT,
-  OUT_OF_BATTERY_EVENT,
-  NEXT_PIDANDVELMAP_EVENT,
-  FORCE_PIDANDVELMAP_EVENT,
-  NEXT_BUZZER_EVENT,
-  MAX_EVENTS
+	NO_EVENT,
+	FORCE_CALIBRATION_EVENT,
+	ALL_SENSORS_IN_LINE_EVENT,
+	GO_TO_DELAYED_START_EVENT,
+	GO_TO_RUN_EVENT,
+	OUT_OF_BATTERY_EVENT,
+	NEXT_PIDANDVELMAP_EVENT,
+	FORCE_PIDANDVELMAP_EVENT,
+	BUTTON1_PRESSED_EVENT,
+	BUTTON2_PRESSED_EVENT,
+	BUTTON3_PRESSED_EVENT,
+	BUTTON1_RELEASED_EVENT,
+	BUTTON2_RELEASED_EVENT,
+	BUTTON3_RELEASED_EVENT,
+	DELAYED_START_TIMEOUT_EVENT,
+	CHANGED_MAP_EVENT,
+	CHANGE_MAP_TIMEOUT_EVENT,
+	INERTIA_TIMEOUT_EVENT,
+	CHANGE_MAPMODE_TIMEOUT_EVENT,
+	CHANGED_MAPMODE_EVENT,
+	STREAM_BAT_EVENT,
+	STREAM_BUZ_EVENT,
+	STREAM_BUZ_END_EVENT,
+	STREAM_LED_EVENT,
+	STREAM_LINE_EVENT,
+	STREAM_MOTORS_EVENT,
+	MAX_EVENTS
 } event_e;
 
+/* Sub-states in the RUNNING State
+   NORMAL: normal operation of the car
+   TURBO: in straight lines
+   NOOL (nearly out of line): harsh correction
+
+*/
+typedef enum {
+	RUNNING_NORMAL,
+	RUNNING_TURBO,
+	RUNNING_NOOL,
+	RUNNING_RECOVERY,
+	RUNNING_STOP,
+	RUNNING_BRAKE,
+	MAX_RUNNING_STATES
+} rnstate_e;
+
+typedef enum {
+	SET_TURBO_MODE_STATE,
+	SET_NORMAL_MODE_STATE,
+	SET_NOOL_MODE_STATE,
+	STOP_RUNNING_EVENT,
+	NEAR_CORNER_EVENT,
+	LOST_LINE_EVENT
+} rnevent_e;
 
 state_e get_state(void);
+void set_state(state_e state);
 void update_state(event_e new_event);
-void set_delay_start_time(uint32_t delay);
-uint32_t get_delay_start_time();
-void set_pidvel_map_time(uint32_t current_time);
-uint32_t get_pidvel_map_time(void);
-void select_next_pidvel_map(void);
-uint8_t get_current_pidvel_map(void);
-uint8_t get_map_song(uint8_t id_map);
-void reset_mappings(void);
+
+rnstate_e get_running_state();
+void set_running_state(rnstate_e state);
+void update_running_state(rnevent_e rnevent);
 
 #endif /* __FSM_H */
