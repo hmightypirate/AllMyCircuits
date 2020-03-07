@@ -65,29 +65,6 @@ buga_fw_flash: build_image ## Flash firmware to the board at PORT (default: /dev
 		$(DOCKER_IMAGE_NAME) \
 		stm32loader -p $(PORT) -e -w -V -g 0x08000000 -v src/mightybug_a/bin/electronic_experience.bin
 
-EXAMPLES := $(sort $(wildcard examples/*))
-FLASH := $(addsuffix _flash, $(EXAMPLES))
-
-$(EXAMPLES): BINARY = $(subst examples/,,$@)
-$(EXAMPLES): build_image
-	sudo docker run -v $(shell pwd):/home/src/ \
-		-ti \
-		--rm \
-		$(DOCKER_IMAGE_NAME) \
-		make -C $@ clean all BIN=$(BINARY)
-
-$(FLASH): FOLDER = $(subst _flash,,$@)
-$(FLASH): BINARY = $(subst examples/,,$(FOLDER))
-$(FLASH): build_image
-	sudo docker run -v $(shell pwd):/home/src/ \
-		-ti \
-		--rm \
-		--device=$(PORT) \
-		$(DOCKER_IMAGE_NAME) \
-		stm32loader -p $(PORT) -e -w -V -g 0x08000000 -v $(FOLDER)/$(BINARY).bin
-
-.PHONY: $(EXAMPLES) $(FLASH)
-
 help:
 	@printf '\033[33mBase targets:\033[0m\n'
 	@printf '\033[36m    %-25s\033[0m %s\n' 'build_image' 'Generate Docker development image. Includes ARM GCC toolchain and stm32loader.'
@@ -96,9 +73,5 @@ help:
 	@printf '\033[36m    %-25s\033[0m %s\n' 'buga_fw' 'Build line follower firwmare at src/mightybug_a.'
 	@printf '\033[36m    %-25s\033[0m %s\n' 'buga_fw_flash' 'Load firmware to the board connected to PORT (default: /dev/ttyUSB0). Example: make buga_fw_flash PORT=/dev/ttyUSB3'
 	@printf '\n'
-	@printf '\033[33m%-29s\033[0m Targets to build each example. Add \033[36m"_flash"\033[0m suffix to load the corresponding example to the board\n' 'Examples:'
-	@for v in $(EXAMPLES) ; do \
-		printf '\033[36m    %s\033[0m\n' $$v; \
-    done
 
 .DEFAULT_GOAL := help
